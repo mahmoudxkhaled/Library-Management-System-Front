@@ -3,8 +3,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { MenuService } from './app.menu.service';
 import { LayoutService } from './service/app.layout.service';
+import { MenuService } from './service/app.menu.service';
 
 @Component({
     // eslint-disable-next-line @angular-eslint/component-selector
@@ -74,8 +74,7 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
         public layoutService: LayoutService,
         private cd: ChangeDetectorRef,
         public router: Router,
-        private menuService: MenuService)
-    {
+        private menuService: MenuService) {
         // 當 menuSource$ 發出新的值時，觀察者的回呼函式會從 menuSource$ 接收到value值
         this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
             // 異步操作

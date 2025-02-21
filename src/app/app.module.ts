@@ -12,6 +12,8 @@ import { IconService } from './demo/service/icon.service';
 import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
 import { NgModule } from '@angular/core';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { authInterceptor } from './core/Interceptors/auth.interceptor';
 
 @NgModule({
     declarations: [AppComponent, NotfoundComponent],
@@ -19,7 +21,14 @@ import { NgModule } from '@angular/core';
     providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         CountryService, CustomerService, EventService, IconService, NodeService,
-        PhotoService, ProductService
+        PhotoService, ProductService,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: authInterceptor,
+            multi: true,
+        },
+
+
     ],
     bootstrap: [AppComponent],
 })

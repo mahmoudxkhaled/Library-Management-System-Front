@@ -14,7 +14,13 @@ import { AppLayoutComponent } from "./layout/app.layout.component";
                     { path: 'utilities', loadChildren: () => import('./demo/components/utilities/utilities.module').then(m => m.UtilitiesModule) },
                     { path: 'documentation', loadChildren: () => import('./demo/components/documentation/documentation.module').then(m => m.DocumentationModule) },
                     { path: 'blocks', loadChildren: () => import('./demo/components/primeblocks/primeblocks.module').then(m => m.PrimeBlocksModule) },
-                    { path: 'pages', loadChildren: () => import('./demo/components/pages/pages.module').then(m => m.PagesModule) }
+                    { path: 'pages', loadChildren: () => import('./demo/components/pages/pages.module').then(m => m.PagesModule) },
+                    { path: 'books', loadChildren: () => import('./modules/books/books.module').then(m => m.BooksModule) },
+                    { path: 'categories', loadChildren: () => import('./modules/categories/categories.module').then(m => m.CategoriesModule) },
+                    { path: 'feedbacks', loadChildren: () => import('./modules/feedbacks/feedbacks.module').then(m => m.FeedbacksModule) },
+                    { path: 'transactions', loadChildren: () => import('./modules/transactions/transactions.module').then(m => m.TransactionsModule) },
+                    { path: 'trending-books', loadChildren: () => import('./modules/trending-books/trending-books.module').then(m => m.TrendingBooksModule) }
+
                 ]
             },
             { path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },

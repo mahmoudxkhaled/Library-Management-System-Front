@@ -1,6 +1,6 @@
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
-import { LayoutService } from './service/app.layout.service';
+import { LayoutService } from '../service/app.layout.service';
 
 @Component({
     selector: 'app-menu',
@@ -15,6 +15,19 @@ export class AppMenuComponent implements OnInit {
     ngOnInit() {
         // 側邊導覽列item
         this.model = [
+            {
+                label: 'LMS MAIN MENU',
+                items: [
+                    { label: 'Books', icon: 'pi pi-fw pi-home', routerLink: ['/books'] },
+                    { label: 'Categories', icon: 'pi pi-fw pi-home', routerLink: ['/categories'] },
+                    { label: 'Feedbacks', icon: 'pi pi-fw pi-home', routerLink: ['/feedbacks'] },
+                    { label: 'Transactions', icon: 'pi pi-fw pi-home', routerLink: ['/transactions'] },
+                    { label: 'Trending Books', icon: 'pi pi-fw pi-home', routerLink: ['/trending-books'] },
+
+
+
+                ]
+            },
             {
                 label: 'Home',
                 items: [

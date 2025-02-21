@@ -1,0 +1,1 @@
+Shared Components: Reusable components (e.g., buttons, modal dialogs) are moved to a global shared/components folder.

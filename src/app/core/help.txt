@@ -1,0 +1,1 @@
+Core Folder: Centralized services, guards, and interceptors are housed in the core folder, as they are application-wide.
