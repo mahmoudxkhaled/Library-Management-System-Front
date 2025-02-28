@@ -14,6 +14,7 @@ import { PhotoService } from './demo/service/photo.service';
 import { NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { authInterceptor } from './core/Interceptors/auth.interceptor';
+import { BaseUrlInterceptor } from './core/Interceptors/base-url.service';
 
 @NgModule({
     declarations: [AppComponent, NotfoundComponent],
@@ -27,8 +28,11 @@ import { authInterceptor } from './core/Interceptors/auth.interceptor';
             useClass: authInterceptor,
             multi: true,
         },
-
-
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: BaseUrlInterceptor,
+            multi: true
+        }
     ],
     bootstrap: [AppComponent],
 })

@@ -1,1 +1,172 @@
-<p>transaction-list works!</p>
+<div class="card">
+    <p-toast></p-toast>
+    <h5>Transaction List</h5>
+    <p-dataView #dv [value]="transactions" [paginator]="true" [rows]="10" layout="grid">
+        <ng-template pTemplate="header">
+            <div class="flex flex-column md:flex-row md:justify-content-between gap-2">
+                <button pButton pRipple label="Add New Transaction" icon="pi pi-plus" class="p-button mr-2"
+                    (click)="addTransaction()"></button>
+            </div>
+        </ng-template>
+        <ng-template let-transactions pTemplate="gridItem">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <div class="grid grid-nogutter">
+                    <div class="col-12 md:col-4" *ngFor="let transaction of transactions">
+                        <div class="p-3">
+                            <div
+                                class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
+                                <!-- Three Dots Button -->
+                                <button pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                                    class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
+                                    (click)="iAwareMenu.toggle($event); assignCurrentSelect(transaction)">
+                                </button>
+
+                                <!-- Menus -->
+                                <p-menu #iAwareMenu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
+
+                                <!-- Transaction Details -->
+                                <div class="text-center mt-3">
+                                    <h4 class="font-semibold text-xl">Status: {{ transaction.status }}</h4>
+                                </div>
+
+                                <div class="text-center mt-2 mb-3">
+                                    <p class="text-md text-gray-700">
+                                        <span style="font-weight: bold;">Book ID:</span> {{ transaction.bookId }}
+                                    </p>
+                                    <p class="text-md text-gray-700">
+                                        <span style="font-weight: bold;">Issue Date:</span> {{ transaction.issueDate |
+                                        date:'mediumDate' }}
+                                    </p>
+                                    <p class="text-md text-gray-700">
+                                        <span style="font-weight: bold;">Due Date:</span> {{ transaction.dueDate |
+                                        date:'mediumDate' }}
+                                    </p>
+                                    <p class="text-md text-gray-700">
+                                        <span style="font-weight: bold;">Return Date:</span> {{ transaction.returnDate ?
+                                        (transaction.returnDate | date:'mediumDate') : 'Not Returned' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-dataView>
+</div>
+
+<!-- Add Transaction Dialog -->
+<p-dialog [(visible)]="addTransactionDialog" [style]="{ width: '100%', height: '100%' }" header="Add New Transaction"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="addTransactionForm" (ngSubmit)="saveAddTransaction()">
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+                    <div class="md:col-6">
+                        <div class="field col-12 md:col-12">
+                            <label for="userId" class="font-medium text-900">User ID</label>
+                            <input type="text" pInputText id="userId" formControlName="userId" placeholder="User ID"
+                                required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !addTransactionForm.controls['userId'].valid}" />
+                            <small *ngIf="submitted && !addTransactionForm.controls['userId'].valid"
+                                class="ng-dirty ng-invalid text-red-500">User ID is required</small>
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="bookId" class="font-medium text-900">Book ID</label>
+                            <input type="text" pInputText id="bookId" formControlName="bookId" placeholder="Book ID"
+                                required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !addTransactionForm.controls['bookId'].valid}" />
+                            <small *ngIf="submitted && !addTransactionForm.controls['bookId'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Book ID is required</small>
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="issueDate" class="font-medium text-900">Issue Date</label>
+                            <input type="date" pInputText id="issueDate" formControlName="issueDate"
+                                placeholder="Issue Date" required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !addTransactionForm.controls['issueDate'].valid}" />
+                            <small *ngIf="submitted && !addTransactionForm.controls['issueDate'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Issue Date is required</small>
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="dueDate" class="font-medium text-900">Due Date</label>
+                            <input type="date" pInputText id="dueDate" formControlName="dueDate" placeholder="Due Date"
+                                required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !addTransactionForm.controls['dueDate'].valid}" />
+                            <small *ngIf="submitted && !addTransactionForm.controls['dueDate'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Due Date is required</small>
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="status" class="font-medium text-900">Status</label>
+                            <p-dropdown [options]="['Issued', 'Returned', 'Overdue']" formControlName="status"
+                                placeholder="Select Status"></p-dropdown>
+                            <small *ngIf="submitted && !addTransactionForm.controls['status'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Status is required</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineAddTransactionDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="saveAddTransaction()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- Deletion Dialog -->
+<p-dialog [(visible)]="deletionTransactionDialog" header="Delete Transaction" [modal]="true"
+    [style]="{ width: 'auto', maxWidth: '90%' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="selectedTransaction">Are you sure you want to delete transaction for <b>{{
+                selectedTransaction.bookId }}</b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineDeletion()"></button>
+        <button pButton pRipple label="Delete" icon="pi pi-check" class="p-button-text"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<!-- Update Transaction Dialog -->
+<p-dialog [(visible)]="updateTransactionDialog" [style]="{ width: '100%', height: '100%' }" header="Update Transaction"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="updateTransactionForm" (ngSubmit)="saveUpdateTransaction()">
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+                    <div class="md:col-6">
+                        <div class="field col-12 md:col-12">
+                            <label for="returnDate" class="font-medium text-900">Return Date</label>
+                            <input type="date" pInputText id="returnDate" formControlName="returnDate"
+                                placeholder="Return Date" />
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="status" class="font-medium text-900">Status</label>
+                            <p-dropdown [options]="['Issued', 'Returned', 'Overdue']" formControlName="status"
+                                placeholder="Select Status"></p-dropdown>
+                            <small *ngIf="submitted && !updateTransactionForm.controls['status'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Status is required</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineUpdateTransactionDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="saveUpdateTransaction()"></button>
+    </ng-template>
+</p-dialog>

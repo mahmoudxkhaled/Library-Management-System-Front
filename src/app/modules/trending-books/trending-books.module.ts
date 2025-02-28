@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 
 import { TrendingBooksRoutingModule } from './trending-books-routing.module';
 import { TrendingBookListComponent } from './components/trending-book-list/trending-book-list.component';
-import { SharedModule } from 'primeng/api';
+import { LMSSharedModule } from 'src/app/shared/lms-shared.module';
 
 
 @NgModule({
   declarations: [TrendingBookListComponent],
   imports: [
-    SharedModule,
+    LMSSharedModule,
     TrendingBooksRoutingModule
   ]
 })

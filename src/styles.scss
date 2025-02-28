@@ -12,3 +12,11 @@ $gutter: 1rem; //for primeflex grid system
 @import "assets/demo/styles/flags/flags.css";
 @import "assets/demo/styles/badges.scss";
 @import "assets/demo/styles/code.scss";
+
+
+
+.iAware-loading-table-container {
+    position: relative;
+    min-height: 300px;
+    // background-color: rgba(0, 0, 0, 0.05) ;
+}

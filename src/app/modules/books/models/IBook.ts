@@ -5,6 +5,7 @@ import { ITransaction } from "../../transactions/models/ITransaction";
 export interface IBook {
   id: string;
   title: string;
+  description: string;
   author: string;
   imageUrl?: string;
   publicationYear: number;
