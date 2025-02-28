@@ -14,22 +14,20 @@ import { TableLoadingService } from 'src/app/core/Services/table-loading.service
   styleUrls: ['./category-list.component.scss']
 })
 export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestroy {
-
   tableLoadingSpinner: boolean = true;
   subs: Subscription = new Subscription();
 
-  editCategoryDialog: boolean = false;
-  addCategoryDialog: boolean = false;
+  categoryDialog: boolean = false;
   deletionCategoryDialog: boolean = false;
   switchActivationCategoryDialog: boolean = false;
 
   submitted: boolean = false;
+  isEditing: boolean = false;
 
   categories: ICategory[] = [];
-  selectedCategory: ICategory | null = null;
+  category: ICategory;
 
-  addCategoryForm: FormGroup;
-  editCategoryForm: FormGroup;
+  categoryForm: FormGroup;
 
   selectedCategoryImage: File | null = null;
   imageUrl: string = '../../../../../assets/media/upload-photo.jpg';
@@ -40,8 +38,6 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
     private categoryServ: CategoryService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
     private ref: ChangeDetectorRef,
     private tableLoadingService: TableLoadingService,
   ) {
@@ -59,24 +55,15 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
       this.tableLoadingSpinner = isLoading;
     });
 
-    const editBtn = {
-      label: 'Edit',
-      icon: 'pi pi-fw pi-pencil',
-      command: () => this.editCategory(this.selectedCategory!),
-    };
-    const deleteBtn = {
-      label: 'Delete',
-      icon: 'pi pi-fw pi-trash',
-      command: () => this.deleteCategory(this.selectedCategory!),
-    };
 
-    this.menuItems = [];
-    this.menuItems.push(deleteBtn);
-    this.menuItems.push(editBtn);
+    this.menuItems = [
+      { label: 'Edit', icon: 'pi pi-pencil', command: () => this.editCategory(this.category) },
+      { label: 'Delete', icon: 'pi pi-trash', command: () => this.deleteCategory(this.category) }
+    ];
   }
 
   assignCurrentSelect(category: ICategory) {
-    this.selectedCategory = category;
+    this.category = category;
   }
 
   loadCategories() {
@@ -90,47 +77,83 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
     );
   }
 
-  //#region Add Category
+  //#region Add/Edit Category
   addCategory() {
+    this.isEditing = false;
     this.initCategoryModelAndForm();
     this.imageUrl = '../../../../../assets/media/upload-photo.jpg';
     this.selectedCategoryImage = null;
-    this.addCategoryDialog = true;
+    this.categoryDialog = true;
   }
+
+  editCategory(category: ICategory) {
+    this.isEditing = true;
+    this.category = { ...category };
+    this.imageUrl = category.imageUrl ? category.imageUrl : '../../../../../assets/media/upload-photo.jpg';
+
+    this.categoryForm.patchValue({
+      id: category.id,
+      name: category.name,
+      description: category.description,
+      imageUrl: category.imageUrl,
+      isActive: category.isActive,
+    });
+
+    this.categoryDialog = true;
+  }
+
 
   saveAddCategory() {
     this.submitted = true;
 
-    if (this.addCategoryForm.valid) {
+    if (this.categoryForm.valid) {
       const formData = new FormData();
-      formData.append('Name', this.addCategoryForm.value.name);
+      formData.append('Name', this.categoryForm.value.name);
+      formData.append('Description', this.categoryForm.value.description);
+      if (this.isEditing) {
+        formData.append('Id', this.category.id);
+      }
 
       const categoryImageFile = this.selectedCategoryImage;
       if (categoryImageFile) {
         formData.append('ImageUrl', categoryImageFile, categoryImageFile.name);
       }
 
+      const serviceCall = this.isEditing
+        ? this.categoryServ.updateCategory(formData)
+        : this.categoryServ.addCategory(formData);
+
       this.subs.add(
-        this.categoryServ.addCategory(formData).subscribe({
+        serviceCall.subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
               summary: 'Successful',
-              detail: 'Category Added',
+              detail: this.isEditing ? 'Category Updated' : 'Category Added',
               life: 3000,
             });
             this.loadCategories();
             this.ref.detectChanges();
             this.initCategoryModelAndForm();
-            this.addCategoryDialog = false;
+            this.categoryDialog = false;
+            this.submitted = false;
+            this.isEditing = false;
           },
+          error: (err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'An error occurred while saving the category',
+              life: 3000,
+            });
+          }
         })
       );
     } else {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Fill all fields please',
+        detail: 'Please fill all required fields',
         life: 3000,
       });
     }
@@ -139,39 +162,27 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
   declineAddCategoryDialog() {
     this.submitted = false;
     this.initCategoryModelAndForm();
-    this.addCategoryDialog = false;
-  }
-  //#endregion
-
-  //#region Edit Category
-  editCategory(category: ICategory) {
-    this.selectedCategory = category;
-    this.editCategoryDialog = true;
-  }
-
-  declineEditCategory() {
-    this.submitted = false;
-    this.initCategoryModelAndForm();
-    this.editCategoryDialog = false;
+    this.categoryDialog = false;
+    this.isEditing = false;
   }
   //#endregion
 
   //#region Deletion
   deleteCategory(category: ICategory) {
     this.deletionCategoryDialog = true;
-    this.selectedCategory = { ...category };
+    this.category = { ...category };
   }
 
   confirmDeletion() {
     this.deletionCategoryDialog = false;
     this.subs.add(
-      this.categoryServ.deleteCategory(this.selectedCategory!.id).subscribe({
+      this.categoryServ.deleteCategory(this.category!.id).subscribe({
         next: (response: ApiResult) => {
           if (response.code !== 406) {
             this.messageService.add({
               severity: 'success',
               summary: 'Successfully',
-              detail: response.message,
+              detail: 'Category Deleted Successfully',
               life: 3000,
             });
             this.loadCategories();
@@ -199,19 +210,13 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
   }
   //#endregion
 
-
   initCategoryModelAndForm() {
-    this.selectedCategory = {
-      id: '',
-      name: '',
-      description: '',
-      imageUrl: '',
-      books: [],
-      isActive: false,
-    };
 
-    this.addCategoryForm = this.formBuilder.group({
+
+    this.categoryForm = this.formBuilder.group({
+      id: [''],
       name: ['', Validators.required],
+      description: ['', Validators.required],
       imageUrl: [''],
       isActive: [true],
     });

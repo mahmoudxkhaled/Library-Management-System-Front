@@ -1,14 +1,13 @@
 import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
-import { IBook } from '../../models/IBook';
-import { BookService } from '../../services/book.service';
-import { ICategory } from 'src/app/modules/categories/models/ICategory';
-import { CategoryService } from 'src/app/modules/categories/services/category.service';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { TableLoadingService } from 'src/app/core/Services/table-loading.service';
+import { ICategory } from 'src/app/modules/categories/models/ICategory';
+import { CategoryService } from 'src/app/modules/categories/services/category.service';
+import { IBook } from '../../models/IBook';
+import { BookService } from '../../services/book.service';
 
 @Component({
   selector: 'app-book-list',
@@ -40,9 +39,8 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   selectedCategoryId: string = '';
 
   book: IBook;
-  selectedBook: IBook | null = null;
 
-  addBookForm: FormGroup;
+  bookForm: FormGroup;
   editBookForm: FormGroup;
 
   selectedBookImage: File | null = null;
@@ -116,16 +114,16 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
   saveBook() {
     this.submitted = true;
-    if (this.addBookForm.valid) {
+    if (this.bookForm.valid) {
       const formData = new FormData();
-      formData.append('Title', this.addBookForm.value.title);
-      formData.append('Description', this.addBookForm.value.description);
-      formData.append('Author', this.addBookForm.value.author);
-      formData.append('PublicationYear', this.addBookForm.value.publicationYear);
-      formData.append('AvailableCopies', this.addBookForm.value.availableCopies);
-      formData.append('TotalCopies', this.addBookForm.value.totalCopies);
-      formData.append('CategoryId', this.addBookForm.value.categoryId);
-      formData.append('isActive', this.addBookForm.value.isActive);
+      formData.append('Title', this.bookForm.value.title);
+      formData.append('Description', this.bookForm.value.description);
+      formData.append('Author', this.bookForm.value.author);
+      formData.append('PublicationYear', this.bookForm.value.publicationYear);
+      formData.append('AvailableCopies', this.bookForm.value.availableCopies);
+      formData.append('TotalCopies', this.bookForm.value.totalCopies);
+      formData.append('CategoryId', this.bookForm.value.categoryId);
+      formData.append('isActive', this.bookForm.value.isActive);
 
       const bookImageFile = this.selectedBookImage;
       if (bookImageFile) {
@@ -200,7 +198,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.book = { ...book };
     this.imageUrl = book.imageUrl ? book.imageUrl : '../../../../../assets/media/upload-photo.jpg';
 
-    this.addBookForm.patchValue({
+    this.bookForm.patchValue({
       id: book.id,
       title: book.title,
       description: book.description,
@@ -280,7 +278,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
       isActive: false,
     };
 
-    this.addBookForm = this.formBuilder.group({
+    this.bookForm = this.formBuilder.group({
       title: ['', Validators.required],
       description: ['', Validators.required],
       author: ['', Validators.required],

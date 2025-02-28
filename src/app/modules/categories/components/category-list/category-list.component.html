@@ -16,31 +16,30 @@
                         <div class="p-3">
                             <div
                                 class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
-                                <!-- Container for Image and Menu -->
                                 <div style="cursor: pointer;">
                                     <img (click)="editCategory(category)"
-                                        [src]="category.imageUrl ?? 'assets/images/default-category.png'"
+                                        [src]="category.imageUrl ?? 'assets/media/dummy-photo-list.jpg'"
                                         [alt]="category.name" class="square-image" />
                                 </div>
-                                <!-- Three Dots Button -->
                                 <button pButton pRipple type="button" icon="pi pi-ellipsis-v"
                                     class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
                                     (click)="iAwareMenu.toggle($event); assignCurrentSelect(category)">
                                 </button>
 
-                                <!-- Menus -->
                                 <p-menu #iAwareMenu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
 
-                                <!-- Category Name -->
                                 <div class="text-center mt-3">
                                     <h4 class="font-semibold text-xl">{{ category.name }}</h4>
                                 </div>
+                                <div class="text-center mt-3">
+                                    <h4 class="font-semibold text-xl">{{ category.description }}</h4>
+                                </div>
 
-                                <!-- Category Details -->
                                 <div class="text-center mt-2 mb-3">
                                     <p class="text-md text-gray-700">
-                                        <span style="font-weight: bold;">Books:</span> {{ category.books.length }}
+                                        <span style="font-weight: bold;">Books:</span> {{ category.booksCount }}
                                     </p>
+
                                 </div>
                             </div>
                         </div>
@@ -51,38 +50,47 @@
     </p-dataView>
 </div>
 
-<!-- Add Category Dialog -->
-<p-dialog [(visible)]="addCategoryDialog" [style]="{ width: '100%', height: '100%' }" header="Add New Category"
-    [modal]="true" class="p-fluid">
+
+<!-- Add/Edit Category Dialog -->
+<p-dialog [(visible)]="categoryDialog" [style]="{ width: '50%', maxHeight: '90vh' }"
+    [header]="isEditing ? 'Edit Category' : 'Add New Category'" [modal]="true" class="p-fluid">
     <ng-template pTemplate="content">
-        <form [formGroup]="addCategoryForm" (ngSubmit)="saveAddCategory()">
-            <div class="col-12">
-                <div class="grid formgrid p-fluid">
-                    <div class="md:col-6">
-                        <div class="field col-12 md:col-12">
-                            <label for="name" class="font-medium text-900">Name</label>
-                            <input type="text" pInputText id="name" formControlName="name" placeholder="Name" required
-                                [ngClass]="{'ng-invalid ng-dirty': submitted && !addCategoryForm.controls['name'].valid}" />
-                            <small *ngIf="submitted && !addCategoryForm.controls['name'].valid"
-                                class="ng-dirty ng-invalid text-red-500">Name is required</small>
-                        </div>
+        <form [formGroup]="categoryForm" (ngSubmit)="saveAddCategory()">
+            <div class="p-grid p-fluid">
+                <div class="p-col-12 p-md-6">
+                    <div class="field p-col-12">
+                        <label for="name" class="font-medium text-900">Name</label>
+                        <input type="text" pInputText id="name" formControlName="name" placeholder="Name" required
+                            [ngClass]="{'ng-invalid ng-dirty': submitted && !categoryForm.controls['name'].valid}" />
+                        <small *ngIf="submitted && !categoryForm.controls['name'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Name is required</small>
                     </div>
 
-                    <div class="col-12 md:col-6 mt-2">
-                        <p-panel header="Category Image" class="mb-3">
-                            <div class="flex flex-column align-items-center justify-content-center">
-                                <div class="image-upload-container" (click)="triggerImageUpload()">
-                                    <img [src]="imageUrl" alt="Category Image" class="avatar"
-                                        style="width: 300px; height: 225px; max-width: 300px; border-radius: 8px; object-fit: fill; border: 1px solid #ccc; cursor: pointer;" />
-                                    <div class="upload-hover-text">Upload Image</div>
-                                </div>
-                                <small class="text-center block m-2">Recommended Dimensions: <strong>800px x
-                                        500px</strong></small>
-                            </div>
-                            <input type="file" id="myCategoryImage" style="display: none"
-                                (change)="handleImageSelection($event)" />
-                        </p-panel>
+                    <div class="field p-col-12">
+                        <label for="description" class="font-medium text-900">Description</label>
+                        <textarea pInputTextarea id="description" formControlName="description"
+                            placeholder="Write Description for category" required rows="5" [ngClass]="{
+                                'ng-invalid ng-dirty': submitted && !categoryForm.controls['description'].valid
+                            }"></textarea>
+                        <small *ngIf="submitted && !categoryForm.controls['description'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Description is required</small>
                     </div>
+                </div>
+
+                <div class="p-col-12 p-md-6 p-mt-2">
+                    <p-panel header="Category Image" class="mb-3">
+                        <div class="flex flex-column align-items-center justify-content-center">
+                            <div class="image-upload-container" (click)="triggerImageUpload()">
+                                <img [src]="imageUrl" alt="Category Image" class="avatar"
+                                    style="width: 300px; height: 225px; max-width: 300px; border-radius: 8px; object-fit: fill; border: 1px solid #ccc; cursor: pointer;" />
+                                <div class="upload-hover-text">Upload Image</div>
+                            </div>
+                            <small class="text-center block m-2">Recommended Dimensions: <strong>800px x
+                                    500px</strong></small>
+                        </div>
+                        <input type="file" id="myCategoryImage" style="display: none"
+                            (change)="handleImageSelection($event)" />
+                    </p-panel>
                 </div>
             </div>
         </form>
@@ -90,23 +98,18 @@
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
             (click)="declineAddCategoryDialog()"></button>
-        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+        <button pButton pRipple [label]="isEditing ? 'Update' : 'Save'" icon="pi pi-check" class="p-button-text"
             (click)="saveAddCategory()"></button>
     </ng-template>
 </p-dialog>
 
-<!-- Edit Category Dialog -->
-<p-dialog [(visible)]="editCategoryDialog" *ngIf="selectedCategory" [header]="selectedCategory.name" [modal]="true"
-    [style]="{ width: '98%', height: '100vh' }">
-    <app-category-edit [category]="selectedCategory"></app-category-edit>
-</p-dialog>
 
 <!-- Deletion Dialog -->
 <p-dialog [(visible)]="deletionCategoryDialog" header="Delete Category" [modal]="true"
     [style]="{ width: 'auto', maxWidth: '90%' }">
     <div class="flex align-items-center justify-content-center">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-        <span *ngIf="selectedCategory">Are you sure you want to delete <b>{{ selectedCategory.name }}</b>?</span>
+        <span *ngIf="category">Are you sure you want to delete <b>{{ category.name }}</b>?</span>
     </div>
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"

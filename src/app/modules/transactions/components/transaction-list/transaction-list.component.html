@@ -16,16 +16,13 @@
                         <div class="p-3">
                             <div
                                 class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
-                                <!-- Three Dots Button -->
                                 <button pButton pRipple type="button" icon="pi pi-ellipsis-v"
                                     class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
                                     (click)="iAwareMenu.toggle($event); assignCurrentSelect(transaction)">
                                 </button>
 
-                                <!-- Menus -->
                                 <p-menu #iAwareMenu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
 
-                                <!-- Transaction Details -->
                                 <div class="text-center mt-3">
                                     <h4 class="font-semibold text-xl">Status: {{ transaction.status }}</h4>
                                 </div>

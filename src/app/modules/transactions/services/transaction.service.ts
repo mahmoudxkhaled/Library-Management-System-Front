@@ -23,10 +23,10 @@ export class TransactionService {
   }
 
   updateTransaction(request: FormData): Observable<ApiResult> {
-    return this.apiService.postRequest<ApiResult>('/Transaction/UpdateTransaction', request);
+    return this.apiService.putRequest<ApiResult>('/Transaction/UpdateTransaction', request);
   }
 
   deleteTransaction(id: string): Observable<ApiResult> {
-    return this.apiService.postRequest<ApiResult>(`/Transaction/DeleteTransaction/${id}`, null);
+    return this.apiService.deleteRequest<ApiResult>(`/Transaction/DeleteTransaction`, id);
   }
 }

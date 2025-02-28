@@ -23,10 +23,10 @@ export class CategoryService {
   }
 
   updateCategory(request: FormData): Observable<ApiResult> {
-    return this.apiService.postRequest<ApiResult>('/Category/UpdateCategory', request);
+    return this.apiService.putRequest<ApiResult>('/Category/UpdateCategory', request);
   }
 
   deleteCategory(id: string): Observable<ApiResult> {
-    return this.apiService.postRequest<ApiResult>(`/Category/DeleteCategory/${id}`, null);
+    return this.apiService.deleteRequest<ApiResult>(`/Category/DeleteCategory`, id);
   }
 }

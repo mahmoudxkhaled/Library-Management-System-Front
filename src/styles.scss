@@ -20,3 +20,45 @@ $gutter: 1rem; //for primeflex grid system
     min-height: 300px;
     // background-color: rgba(0, 0, 0, 0.05) ;
 }
+
+.square-image {
+    width: 100%;  
+    height: 250px;  
+    object-fit: fill;  
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  
+
+
+   
+  .image-upload-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .upload-hover-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);  
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    opacity: 0;  
+    transition: opacity 0.3s ease-in-out;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .image-upload-container:hover .upload-hover-text {
+    opacity: 1;  
+  }
+  
+ 
+ 

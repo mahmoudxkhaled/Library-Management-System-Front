@@ -1,12 +1,11 @@
 import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
+import { TableLoadingService } from 'src/app/core/Services/table-loading.service';
 import { ITransaction } from '../../models/ITransaction';
 import { TransactionService } from '../../services/transaction.service';
-import { TableLoadingService } from 'src/app/core/Services/table-loading.service';
 
 
 export interface UpdateTransactionDto {
@@ -25,7 +24,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   subs: Subscription = new Subscription();
 
   addTransactionDialog: boolean = false;
-  updateTransactionDialog: boolean = false; // New dialog for updating
+  updateTransactionDialog: boolean = false;
   deletionTransactionDialog: boolean = false;
   switchActivationTransactionDialog: boolean = false;
 
@@ -35,7 +34,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   selectedTransaction: ITransaction | null = null;
 
   addTransactionForm: FormGroup;
-  updateTransactionForm: FormGroup; // New form for updating
+  updateTransactionForm: FormGroup;
 
   menuItems: MenuItem[] = [];
 
@@ -43,8 +42,6 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
     private transactionServ: TransactionService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
     private ref: ChangeDetectorRef,
     private tableLoadingService: TableLoadingService,
   ) {
@@ -244,8 +241,8 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
     this.addTransactionForm = this.formBuilder.group({
       userId: ['', Validators.required],
       bookId: ['', Validators.required],
-      issueDate: [new Date().toISOString().split('T')[0]], // Default to today's date
-      dueDate: [new Date().toISOString().split('T')[0]], // Default to today's date
+      issueDate: [new Date().toISOString().split('T')[0]],
+      dueDate: [new Date().toISOString().split('T')[0]],
       returnDate: [null],
       status: ['Issued', Validators.required],
       isActive: [true],
