@@ -2,6 +2,7 @@ import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { NotfoundComponent } from './demo/components/notfound/notfound.component';
 import { AppLayoutComponent } from "./layout/app.layout.component";
+import { AuthGuard } from './core/guards/auth.guard.service';
 
 @NgModule({
     imports: [
@@ -19,11 +20,12 @@ import { AppLayoutComponent } from "./layout/app.layout.component";
                     { path: 'categories', loadChildren: () => import('./modules/categories/categories.module').then(m => m.CategoriesModule) },
                     { path: 'feedbacks', loadChildren: () => import('./modules/feedbacks/feedbacks.module').then(m => m.FeedbacksModule) },
                     { path: 'transactions', loadChildren: () => import('./modules/transactions/transactions.module').then(m => m.TransactionsModule) },
-                    { path: 'trending-books', loadChildren: () => import('./modules/trending-books/trending-books.module').then(m => m.TrendingBooksModule) }
-
-                ]
+                    { path: 'trending-books', loadChildren: () => import('./modules/trending-books/trending-books.module').then(m => m.TrendingBooksModule) },
+                    { path: 'users', loadChildren: () => import('./modules/users/users.module').then(m => m.UsersModule) }
+                ],
+                canActivate: [AuthGuard],
             },
-            { path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },
+            { path: 'auth', loadChildren: () => import('./modules/auth/auth.module').then(m => m.AuthModule) },
             { path: 'landing', loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule) },
             { path: 'notfound', component: NotfoundComponent },
             { path: '**', redirectTo: '/notfound' },
