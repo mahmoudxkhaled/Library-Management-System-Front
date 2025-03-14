@@ -3,12 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
-import { TableLoadingService } from 'src/app/core/Services/table-loading.service';
-import { ICategory } from 'src/app/modules/categories/models/ICategory';
-import { CategoryService } from 'src/app/modules/categories/services/category.service';
 import { UserService } from '../../services/user.service';
 import { IUser } from '../../models/IUser';
 import { IRole } from '../../models/IRole';
+import { CategoryService } from '../../../categories/services/category.service';
+import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 
 @Component({
   selector: 'app-user-list',

@@ -1,6 +1,7 @@
-import { ICategory } from "../../categories/models/ICategory";
-import { IFeedback } from "../../feedbacks/models/IFeedback";
-import { ITransaction } from "../../transactions/models/ITransaction";
+import { ICategory } from "../components/categories/models/ICategory";
+import { IFeedback } from "../components/feedbacks/models/IFeedback";
+import { ITransaction } from "../components/transactions/models/ITransaction";
+
 
 export interface IBook {
   id: string;

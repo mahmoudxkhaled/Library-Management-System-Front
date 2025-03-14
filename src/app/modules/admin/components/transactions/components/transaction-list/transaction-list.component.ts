@@ -3,9 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
-import { TableLoadingService } from 'src/app/core/Services/table-loading.service';
 import { ITransaction } from '../../models/ITransaction';
 import { TransactionService } from '../../services/transaction.service';
+import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 
 
 export interface UpdateTransactionDto {

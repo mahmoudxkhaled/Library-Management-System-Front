@@ -15,10 +15,11 @@ import { NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { authInterceptor } from './core/Interceptors/auth.interceptor';
 import { BaseUrlInterceptor } from './core/Interceptors/base-url.service';
+import { AdminModule } from './modules/admin/admin.module';
 
 @NgModule({
     declarations: [AppComponent, NotfoundComponent],
-    imports: [AppRoutingModule, AppLayoutModule],
+    imports: [AppRoutingModule, AppLayoutModule,AdminModule],
     providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         CountryService, CustomerService, EventService, IconService, NodeService,

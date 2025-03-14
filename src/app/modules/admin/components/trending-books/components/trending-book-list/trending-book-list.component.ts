@@ -1,9 +1,9 @@
 import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
-import { TableLoadingService } from 'src/app/core/Services/table-loading.service';
 import { TrendingBooksService } from '../../services/trending-books.service';
 import { TrendingBook } from '../../models/ITrendingBook';
+import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 
 @Component({
   selector: 'app-trending-book-list',

@@ -1,4 +1,4 @@
-import { IBook } from "../../books/models/IBook";
+import { IBook } from "../../../models/IBook";
 
 export interface ITransaction {
     id: string;

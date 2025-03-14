@@ -3,11 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
-import { TableLoadingService } from 'src/app/core/Services/table-loading.service';
-import { ICategory } from 'src/app/modules/categories/models/ICategory';
-import { CategoryService } from 'src/app/modules/categories/services/category.service';
 import { IBook } from '../../models/IBook';
 import { BookService } from '../../services/book.service';
+import { ICategory } from '../categories/models/ICategory';
+import { CategoryService } from '../categories/services/category.service';
+import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 
 @Component({
   selector: 'app-book-list',

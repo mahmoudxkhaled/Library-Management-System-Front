@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService } from '../../users/services/user.service';
 import { Router } from '@angular/router';
+import { UserService } from '../../admin/components/users/services/user.service';
 
 @Component({
     selector: 'app-login',

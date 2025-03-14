@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { ICategory } from '../../models/ICategory';
 import { CategoryService } from '../../services/category.service';
 import { ApiResult } from 'src/app/core/models/ApiResult';
-import { TableLoadingService } from 'src/app/core/Services/table-loading.service';
+import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 
 @Component({
   selector: 'app-category-list',
