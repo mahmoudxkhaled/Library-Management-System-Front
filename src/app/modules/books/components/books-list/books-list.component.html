@@ -1,0 +1,11 @@
+   <div class="row">
+      <span *ngFor="let book of booksResult.data.result" class="col-2 p-1 book m-3" [routerLink]="'book.id'">
+         <div class="text-center">
+            <img style="width: 180px;height:230px;"    [src]="book.imageUrl ?? 'assets/images/default-book.png'"  alt="notfound">
+            <span class="mt-2">
+               <h5>{{book.title}}</h5>
+            </span>
+         </div>
+      </span>
+      <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" [rowsPerPageOptions]="[10, 20, 30]" />
+   </div>
