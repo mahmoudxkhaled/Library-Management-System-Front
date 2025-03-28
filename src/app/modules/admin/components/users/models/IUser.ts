@@ -4,6 +4,7 @@ export interface IUser {
     lastName: string;
     email:string;
     profileImageUrl?: string;
+    phoneNumber: string;
     role: string; // "Admin", "Librarian", "Member"
     isActive: boolean;
 }

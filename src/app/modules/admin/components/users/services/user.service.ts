@@ -18,7 +18,7 @@ export class UserService {
   }
 
   addUser(request: FormData): Observable<ApiResult> {
-    return this.apiService.postRequest<ApiResult>('/User/AddUser', request);
+    return this.apiService.postRequest<ApiResult>('/User/AddUserWithDefaultPassword', request);
   }
 
   updateUser(request: FormData): Observable<ApiResult> {

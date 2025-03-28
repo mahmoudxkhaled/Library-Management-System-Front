@@ -11,7 +11,7 @@
                         (click)="addUser()"></button>
                     <span class="p-input-icon-left">
                         <i class="pi pi-search"></i>
-                        <input type="search" pInputText placeholder="Search by Name" (input)="onFilter(dv, $event)">
+                        <input type="search" pInputText placeholder="Search by Name" (input)="onFilter($event)">
                     </span>
                 </div>
                 <!-- <p-dataViewLayoutOptions [(layout)]="layout"></p-dataViewLayoutOptions> -->
@@ -22,9 +22,9 @@
         <ng-template let-users pTemplate="listItem">
             <div class="iAware-loading-table-container" style="position: relative">
                 <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
-                <div class="p-col-12" *ngFor="let user of users">
+                <div class="p-col-12" *ngFor="let user of filteredUsers">
                     <div class="flex flex-column md:flex-row align-items-center p-3 w-full">
-                        <img (click)="editUser(user)" style="width: 200px; height: 100px;cursor: pointer;"
+                        <img  style="width: 200px; height: 100px;cursor: pointer;"
                             [src]="user.profileImageUrl ?? 'assets/media/dummy-photo-list.jpg'" [alt]="user.firstName"
                             class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5" />
                         <div class="flex-1 flex flex-column align-items-start text-center md:text-left">
@@ -52,7 +52,7 @@
             <div class="col-12">
                 <div class="align-items-center grid formgrid p-fluid">
                     <div class="md:col-6">
-
+                        
                         <div class="field col-12 md:col-12">
                             <label for="role" class="font-medium text-900">Role</label>
                             <p-dropdown [options]="roles" formControlName="role" optionLabel="name"
@@ -60,8 +60,6 @@
                             <small *ngIf="submitted && !userForm.controls['role'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Role is required</small>
                         </div>
-
-
                         <div class="field col-12 md:col-12">
                             <label for="firstName" class="font-medium text-900">Firt Name</label>
                             <input type="text" pInputText id="firstName" formControlName="firstName" placeholder="firstName"
@@ -70,7 +68,6 @@
                             <small *ngIf="submitted && !userForm.controls['firstName'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Firt Name is required</small>
                         </div>
-
                         <div class="field col-12 md:col-12">
                             <label for="lastName" class="font-medium text-900">Last Name</label>
                             <input type="text" pInputText id="lastName" formControlName="lastName" placeholder="lastName"
@@ -79,7 +76,17 @@
                             <small *ngIf="submitted && !userForm.controls['lastName'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Last Name is required</small>
                         </div>
-
+                        
+                    </div>
+                    <div class="md:col-6">
+                        <div class="field col-12 md:col-12">
+                            <label for="phoneNumber" class="font-medium text-900">Phone Number</label>
+                            <input type="text" pInputText id="phoneNumber" formControlName="phoneNumber" placeholder="Phone Number"
+                                required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !userForm.controls['phoneNumber'].valid}" />
+                            <small *ngIf="submitted && !userForm.controls['phoneNumber'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Phone Number is required</small>
+                        </div>
                         <div class="field col-12 md:col-12">
                             <label for="email" class="font-medium text-900">Email Address</label>
                             <input type="text" pInputText id="email" formControlName="email" placeholder="email"
@@ -88,23 +95,7 @@
                             <small *ngIf="submitted && !userForm.controls['email'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Email Address is required</small>
                         </div>
-                    </div>
-
-                    <div class="col-12 md:col-6 mt-2">
-                        <p-panel header="User Image" class="mb-3">
-                            <div class="flex flex-column align-items-center justify-content-center">
-                                <div class="image-upload-container" (click)="triggerImageUpload()">
-                                    <img [src]="profileImageUrl" alt="User Image" class="avatar"
-                                        style="width: 300px; height: 225px; max-width: 300px; border-radius: 8px; object-fit: fill; border: 1px solid #ccc; cursor: pointer;" />
-                                    <div class="text-center upload-hover-text">Upload Image</div>
-                                </div>
-                                <small class="text-center block m-2">Recommended Dimensions:
-                                    <strong>800px X 500px</strong></small>
-                            </div>
-                            <input type="file" id="myUserImage" style="display: none"
-                                (change)="handleImageSelection($event)" />
-                        </p-panel>
-
+                        
                     </div>
                 </div>
             </div>
