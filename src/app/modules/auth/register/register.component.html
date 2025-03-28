@@ -1,0 +1,80 @@
+<p-toast key="tst"></p-toast>
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
+    <div class="flex flex-column align-items-center justify-content-center">
+        <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
+            alt="LMS logo" class="mb-5 w-6rem flex-shrink-0">
+        <div
+            style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+            <div class="w-full md:w-30rem surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+                <div class="text-center">
+                    <div class="text-900 text-3xl font-medium">Create new Account</div>
+                    <span class="text-red-500 font-medium text-danger">{{message}}</span>
+                </div>
+
+                <div>
+                    <form [formGroup]="registerForm" (ngSubmit)="register()">
+                            <div class="col-12 md:col-12">
+                                <label for="firstName" class="block text-900 text-xl font-medium mb-2">Firt Name</label>
+                                <input pInputText class="w-full" type="text" pInputText id="firstName" formControlName="firstName" placeholder="firstName"
+                                    required
+                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['firstName'].valid}" />
+                                <small *ngIf="submitted && !registerForm.controls['firstName'].valid"
+                                    class="ng-dirty ng-invalid text-red-500">Firt Name is required</small>
+                            </div>
+                            <div class="col-12 md:col-12">
+                                <label for="lastName" class="block text-900 text-xl font-medium mb-2">Last Name</label>
+                                <input pInputText class="w-full" type="text" pInputText id="lastName" formControlName="lastName" placeholder="lastName"
+                                    required
+                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['lastName'].valid}" />
+                                <small *ngIf="submitted && !registerForm.controls['lastName'].valid"
+                                    class="ng-dirty ng-invalid text-red-500">Last Name is required</small>
+                            </div>
+                            <div class="col-12 md:col-12">
+                                <label for="phoneNumber" class="block text-900 text-xl font-medium mb-2">Phone Number</label>
+                                <input pInputText class="w-full" type="text" pInputText id="phoneNumber" formControlName="phoneNumber" placeholder="Phone Number"
+                                    required
+                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['phoneNumber'].valid}" />
+                                <small *ngIf="submitted && !registerForm.controls['phoneNumber'].valid"
+                                    class="ng-dirty ng-invalid text-red-500">Phone Number is required</small>
+                            </div>
+                            <div class="col-12 md:col-12">
+                                <label for="email" class="block text-900 text-xl font-medium mb-2">Email Address</label>
+                                <input pInputText class="w-full" type="text" pInputText id="email" formControlName="email" placeholder="email"
+                                    required
+                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['email'].valid}" />
+                                <small *ngIf="submitted && !registerForm.controls['email'].valid && registerForm.controls['email'].errors?.['required']"
+                                    class="ng-dirty ng-invalid text-red-500">Email Address is required</small>
+                                    <small *ngIf="submitted && !registerForm.controls['confirmPassword'].valid && registerForm.controls['email'].errors?.['email']"
+                                    class="ng-dirty ng-invalid text-red-500">Invalid email format</small>
+                            </div>
+                            <div class="col-12 md:col-12">
+                                <label for="password" class="block text-900 text-xl font-medium mb-2">Password</label>
+                                <input pInputText class="w-full" type="password" pInputText id="password" formControlName="password" placeholder="password"
+                                    required
+                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['password'].valid}" />
+                                <small *ngIf="submitted && !registerForm.controls['password'].valid"
+                                    class="ng-dirty ng-invalid text-red-500">Password is required</small>
+                            </div>
+                            <div class="col-12 md:col-12">
+                                <label for="confirmPassword" class="block text-900 text-xl font-medium mb-2">Confirm Password</label>
+                                <input pInputText class="w-full" type="password" pInputText id="confirmPassword" formControlName="confirmPassword" placeholder="Confirm Password"
+                                    required
+                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['confirmPassword'].valid}" />
+                                    <small *ngIf="submitted && registerForm.errors?.['mismatch']"
+                                    class="ng-dirty ng-invalid text-red-500">Passwords do not match</small>
+                            </div>
+                            <div class="flex align-items-center justify-content-between mb-5 gap-5">
+                                <!-- <div class="flex align-items-center">
+                                    <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox>
+                                    <label for="rememberme1">Remember me</label>
+                                </div> -->
+                                <a routerLink="/auth/login" class="font-medium no-underline ml-2 text-right cursor-pointer"
+                                    style="color: var(--primary-color)">back to login</a>
+                            </div>
+                            <button type="submit" pButton pRipple label="Register" class="w-full p-3 text-xl"></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

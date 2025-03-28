@@ -36,4 +36,7 @@ export class UserService {
   login(request: any): Observable<ApiResult> {
     return this.apiService.postRequest<ApiResult>('/User/login', request);
   }
+  register(request: any): Observable<ApiResult> {
+    return this.apiService.postRequest<ApiResult>('/User/register', request);
+  }
 }
