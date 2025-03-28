@@ -1,0 +1,152 @@
+<div class="card p-4">
+    <p-toast></p-toast>
+    <h5>Users List</h5>
+    <p-dataView #dv [value]="users" [paginator]="true" [rows]="10" filterBy="firstName" [layout]="layout">
+
+        <ng-template pTemplate="header">
+
+            <div class="flex flex-column md:flex-row md:justify-content-between gap-3 mb-3">
+                <div class="flex flex-column md:flex-row gap-2">
+                    <button pButton pRipple label="Add New User" icon="pi pi-plus" class="p-button"
+                        (click)="addUser()"></button>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input type="search" pInputText placeholder="Search by Name" (input)="onFilter(dv, $event)">
+                    </span>
+                </div>
+                <!-- <p-dataViewLayoutOptions [(layout)]="layout"></p-dataViewLayoutOptions> -->
+            </div>
+        </ng-template>
+
+        <!-- List View -->
+        <ng-template let-users pTemplate="listItem">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <div class="p-col-12" *ngFor="let user of users">
+                    <div class="flex flex-column md:flex-row align-items-center p-3 w-full">
+                        <img (click)="editUser(user)" style="width: 200px; height: 100px;cursor: pointer;"
+                            [src]="user.profileImageUrl ?? 'assets/media/dummy-photo-list.jpg'" [alt]="user.firstName"
+                            class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5" />
+                        <div class="flex-1 flex flex-column align-items-start text-center md:text-left">
+                            <div class="font-bold text-2xl">{{ user.firstName }} {{ user.lastName }}</div>
+                            <div class="mb-2">
+                                <span class="font-semibold">Email:</span> {{ user.email }}
+                            </div>
+                            <div class="mb-2">
+                                <span class="font-semibold">Role:</span> {{ user.role }}
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </ng-template>
+
+    </p-dataView>
+</div>
+<!-- Add User Dialog -->
+<p-dialog [(visible)]="userDialog" header="Add New User" [modal]="true"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="userForm" (ngSubmit)="saveUser()">
+            <div class="col-12">
+                <div class="align-items-center grid formgrid p-fluid">
+                    <div class="md:col-6">
+
+                        <div class="field col-12 md:col-12">
+                            <label for="role" class="font-medium text-900">Role</label>
+                            <p-dropdown [options]="roles" formControlName="role" optionLabel="name"
+                                optionValue="id" placeholder="Select Role"></p-dropdown>
+                            <small *ngIf="submitted && !userForm.controls['role'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Role is required</small>
+                        </div>
+
+
+                        <div class="field col-12 md:col-12">
+                            <label for="firstName" class="font-medium text-900">Firt Name</label>
+                            <input type="text" pInputText id="firstName" formControlName="firstName" placeholder="firstName"
+                                required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !userForm.controls['firstName'].valid}" />
+                            <small *ngIf="submitted && !userForm.controls['firstName'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Firt Name is required</small>
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="lastName" class="font-medium text-900">Last Name</label>
+                            <input type="text" pInputText id="lastName" formControlName="lastName" placeholder="lastName"
+                                required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !userForm.controls['lastName'].valid}" />
+                            <small *ngIf="submitted && !userForm.controls['lastName'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Last Name is required</small>
+                        </div>
+
+                        <div class="field col-12 md:col-12">
+                            <label for="email" class="font-medium text-900">Email Address</label>
+                            <input type="text" pInputText id="email" formControlName="email" placeholder="email"
+                                required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !userForm.controls['email'].valid}" />
+                            <small *ngIf="submitted && !userForm.controls['email'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Email Address is required</small>
+                        </div>
+                    </div>
+
+                    <div class="col-12 md:col-6 mt-2">
+                        <p-panel header="User Image" class="mb-3">
+                            <div class="flex flex-column align-items-center justify-content-center">
+                                <div class="image-upload-container" (click)="triggerImageUpload()">
+                                    <img [src]="profileImageUrl" alt="User Image" class="avatar"
+                                        style="width: 300px; height: 225px; max-width: 300px; border-radius: 8px; object-fit: fill; border: 1px solid #ccc; cursor: pointer;" />
+                                    <div class="text-center upload-hover-text">Upload Image</div>
+                                </div>
+                                <small class="text-center block m-2">Recommended Dimensions:
+                                    <strong>800px X 500px</strong></small>
+                            </div>
+                            <input type="file" id="myUserImage" style="display: none"
+                                (change)="handleImageSelection($event)" />
+                        </p-panel>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineAddUserDialog()"></button>
+        <button pButton pRipple [label]="isEditing ? 'Update' : 'Save'" icon="pi pi-check" class="p-button-text"
+            (click)="saveUser()">
+        </button>
+    </ng-template>
+</p-dialog>
+
+
+
+<!-- Deletion Dialog -->
+<p-dialog [(visible)]="deletionUserDialog" header="Delete User" [modal]="true"
+    [style]="{ width: 'auto', maxWidth: '90%' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="user">Are you sure you want to delete <b>{{ user.firstName }} {{ user.lastName }}</b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineDeletion()"></button>
+        <button pButton pRipple label="Delete" icon="pi pi-check" class="p-button-text"
+            (click)="confirmDeletion()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- Activation Dialog -->
+<p-dialog [(visible)]="switchActivationUserDialog" header="Activation Status" [modal]="true"
+    [style]="{ width: '500px' }">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="user">Are you sure you want to {{ user.isActive ? 'deactivate' : 'activate' }} <b>{{ user.firstName}} {{ user.lastName}}</b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="declineActivation()"></button>
+        <button pButton pRipple label="Confirm" icon="pi pi-check" class="p-button-text"
+            (click)="confirmActivation()"></button>
+    </ng-template>
+</p-dialog>

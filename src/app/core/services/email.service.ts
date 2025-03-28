@@ -24,7 +24,7 @@ export class EmailService {
   sendForm(emailRequest: ISendEmailRequest): Observable<ApiResult> {
     this.isLoadingSubject.next(true);
     const httpHeaders = new HttpHeaders({
-      tenant: environment.defaultTenantId,
+      // tenant: environment.defaultTenantId,
     });
     return this.httpClient.post<ApiResult>(`${API_USERS_URL}/AppUser/SendEmail`, emailRequest, { headers: httpHeaders, });
   }

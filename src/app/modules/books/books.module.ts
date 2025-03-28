@@ -1,15 +1,26 @@
 import { NgModule } from '@angular/core';
-import { SharedModule } from 'primeng/api';
+import { CommonModule, NgFor } from '@angular/common';
+import { PaginatorModule } from 'primeng/paginator';
 import { BooksRoutingModule } from './books-routing.module';
-import { BookListComponent } from './components/book-list/book-list.component';
-import { LMSSharedModule } from 'src/app/shared/lms-shared.module';
+import { BooksListComponent } from 'src/app/modules/books/components/books-list/books-list.component';
+import { BookDetailsComponent } from './components/book-details/book-details.component';
+import { FormsModule } from '@angular/forms';
+import { TooltipModule } from 'primeng/tooltip';
+import { RouterLink } from '@angular/router';
 
 
 @NgModule({
-  declarations: [BookListComponent],
+  declarations: [
+    BooksListComponent,
+    BookDetailsComponent
+  ],
   imports: [
-    LMSSharedModule,
-    BooksRoutingModule
+    CommonModule,
+    FormsModule,
+    BooksRoutingModule,
+    PaginatorModule,
+    TooltipModule,
+    RouterLink
   ]
 })
 export class BooksModule { }

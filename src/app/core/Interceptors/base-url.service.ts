@@ -16,7 +16,6 @@ export class BaseUrlInterceptor implements HttpInterceptor {
       })
     );
   }
-
   private attachDomainToUploads(event: HttpEvent<any>): HttpEvent<any> {
     const baseUrl = environment.apiUrlWithoutAPI;
     if (typeof event['body'] === 'object') {
