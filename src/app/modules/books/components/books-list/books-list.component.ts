@@ -77,6 +77,7 @@ onFilter(event:any)
   const inputValue = (event.target as HTMLInputElement).value;
   this.search=inputValue;
   this.reloadPage.first=0;
+  this.bookParams.Search=this.search;
   this.getBooksPaged();
 }
 getBooksPaged()
