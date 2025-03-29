@@ -1,11 +1,25 @@
    <div class="row">
-      <span *ngFor="let book of booksResult.data.result" class="col-2 p-1 book m-3" [routerLink]="'book.id'">
+      <div class="row">
+         <span class="p-input-icon-left col-4">
+            <i class="pi pi-search ml-3"></i>
+            <input type="search" pInputText placeholder="Search by Title" (input)="onFilter($event)">
+        </span>
+        <div class="col-2">
+         <p-dropdown   (onClear)="onAuthorClear()"(onChange)="onAuthorChange($event)" [options]="authors"ormControlName="authorId"optionLabel="fullName"[filter]="true"filterBy="fullName" [showClear]="true" optionValue="id" placeholder="search by author"></p-dropdown>
+        </div>
+        <div class="col-2">
+         <p-dropdown (onClear)="onCategoryClear()"(onChange)="onCategoryChange($event)" [options]="categories"ormControlName="categoryId"optionLabel="name"[filter]="true"filterBy="name" [showClear]="true" optionValue="id" placeholder="search by Category"></p-dropdown>
+        </div>
+          </div>
+     <div class="row">
+      <span *ngFor="let book of booksResult.data.result" class="col-2 p-1 book m-3" [routerLink]="['/Books', book.id]">
          <div class="text-center">
-            <img style="width: 180px;height:230px;"    [src]="book.imageUrl ?? 'assets/images/default-book.png'"  alt="notfound">
-            <span class="mt-2">
+            <img style="width: 180px;height:230px;"    [src]="book.imageUrl ?? 'assets/media/dummy-photo-list.jpg'"  alt="notfound">
+            <span class="mt-2" class="btn-primary">
                <h5>{{book.title}}</h5>
             </span>
          </div>
       </span>
-      <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="120" [rowsPerPageOptions]="[10, 20, 30]" />
-   </div>
+      <p-paginator (onPageChange)="onPageChange($event)" [first]="reloadPage.first" [rows]="reloadPage.rows" [totalRecords]="booksResult.data.totalCount" [rowsPerPageOptions]="[10, 20, 30]" />
+     </div>
+      </div>
