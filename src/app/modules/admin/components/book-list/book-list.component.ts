@@ -8,6 +8,10 @@ import { BookService } from '../../services/book.service';
 import { ICategory } from '../categories/models/ICategory';
 import { CategoryService } from '../categories/services/category.service';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
+import { AuthorService } from '../../services/author.service';
+import { Author } from '../../models/Author';
+import { BooksService } from 'src/app/modules/books/services/books.service';
+import { BookParams } from 'src/app/modules/books/models/BookParams';
 
 @Component({
   selector: 'app-book-list',
@@ -18,43 +22,42 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   layout: string = 'list';
   sortField: string = 'publicationYear';
-  sortOrder: number = 1;
   sortOptions: any[] = [
     { label: 'Publication Year: Newest First', value: '!publicationYear' },
     { label: 'Publication Year: Oldest First', value: 'publicationYear' }
   ];
-
   tableLoadingSpinner: boolean = true;
   subs: Subscription = new Subscription();
-
   editBookDialog: boolean = false;
   bookDialog: boolean = false;
   deletionBookDialog: boolean = false;
   switchActivationBookDialog: boolean = false;
-
   submitted: boolean = false;
-
   books: IBook[] = [];
+  search:string='';
   categories: ICategory[] = [];
   selectedCategoryId: string = '';
-
   book: IBook;
-
   bookForm: FormGroup;
   editBookForm: FormGroup;
-
   selectedBookImage: File | null = null;
   imageUrl: string = '../../../../../assets/media/upload-photo.jpg';
-
   menuItems: MenuItem[] = [];
-
+  authors:Author[];
+  totalRecords:number;
+  categoryId:number;
+  authorId:number;
+  reloadPage={first:0,rows:10,sortField:null,sortOrder:1}
+  sortOrder:number=-1
+    bookParams:BookParams;
   constructor(
-    private bookServ: BookService,
+    private bookServ: BookService,private bookService:BooksService,
     private categoryServ: CategoryService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
     private ref: ChangeDetectorRef,
     private tableLoadingService: TableLoadingService,
+    private authorService:AuthorService
   ) {
     this.initBookModelAndForm();
   }
@@ -64,9 +67,9 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadBooks();
     this.loadCategories();
-
+    this.loadAuthors();
+    this.bookParams={sortField:null,sortOrder:1,authorId:0,categoryId:0,Search:''}
     this.tableLoadingService.loading$.subscribe((isLoading) => {
       this.tableLoadingSpinner = isLoading;
     });
@@ -82,18 +85,28 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   assignCurrentSelect(book: IBook) {
     this.book = book;
   }
-
-  loadBooks() {
+  loadBooks(event:any)
+  {
+    this.reloadPage.first=event.first;
+    this.reloadPage.rows=event.rows;
+    this.bookParams.sortOrder=this.reloadPage.sortOrder;
+    this.bookParams.Search=this.search;
+    this.bookParams.authorId=this.authorId;
+    this.bookParams.categoryId=this.categoryId;
     this.tableLoadingService.show();
+    console.log("this.bookParams :",this.bookParams);
     this.subs.add(
-      this.bookServ.getAllBooks().subscribe((data) => {
-        this.books = data.data;
+      this.bookService.getBooksPaged(event.first,event.rows,this.bookParams).subscribe((res) => {
+        this.books = res.data.result;
+        this.totalRecords=res.data.totalCount
         console.log(this.books)
         this.ref.detectChanges();
         this.tableLoadingService.hide();
       })
     );
+
   }
+
 
   loadCategories() {
     this.subs.add(
@@ -104,7 +117,14 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
       })
     );
   }
+  loadAuthors()
+  {
+    this.authorService.getAllAuthors().subscribe(res=>{
+    this.authors=res.data;
+    },err=>{
 
+    })
+  }
   //#region Add Book
   addBook() {
     this.initBookModelAndForm();
@@ -115,16 +135,16 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   saveBook() {
     this.submitted = true;
     if (this.bookForm.valid) {
+      console.log("value :",this.bookForm.value)
       const formData = new FormData();
       formData.append('Title', this.bookForm.value.title);
       formData.append('Description', this.bookForm.value.description);
-      formData.append('Author', this.bookForm.value.author);
+      formData.append('AuthorId', this.bookForm.value.authorId);
       formData.append('PublicationYear', this.bookForm.value.publicationYear);
       formData.append('AvailableCopies', this.bookForm.value.availableCopies);
       formData.append('TotalCopies', this.bookForm.value.totalCopies);
       formData.append('CategoryId', this.bookForm.value.categoryId);
       formData.append('isActive', this.bookForm.value.isActive);
-
       const bookImageFile = this.selectedBookImage;
       if (bookImageFile) {
         formData.append('ImageUrl', bookImageFile, bookImageFile.name);
@@ -142,7 +162,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
                 detail: 'Book Updated',
                 life: 3000,
               });
-              this.loadBooks();
+              this.loadBooks(this.reloadPage);
               this.ref.detectChanges();
               this.initBookModelAndForm();
               this.bookDialog = false;
@@ -161,7 +181,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
                 detail: 'Book Added',
                 life: 3000,
               });
-              this.loadBooks();
+              this.loadBooks(this.reloadPage);
               this.ref.detectChanges();
               this.initBookModelAndForm();
               this.bookDialog = false;
@@ -197,12 +217,11 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.isEditing = true;
     this.book = { ...book };
     this.imageUrl = book.imageUrl ? book.imageUrl : '../../../../../assets/media/upload-photo.jpg';
-
     this.bookForm.patchValue({
       id: book.id,
       title: book.title,
       description: book.description,
-      author: book.author,
+      authorId: book.authorId,
       publicationYear: book.publicationYear,
       availableCopies: book.availableCopies,
       totalCopies: book.totalCopies,
@@ -235,7 +254,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
               detail: 'Book Deleted Successfully ',
               life: 3000,
             });
-            this.loadBooks();
+            this.loadBooks(this.reloadPage);
             this.ref.detectChanges();
           } else {
             this.messageService.add({
@@ -244,7 +263,6 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
               detail: 'Cannot delete because there are transactions associated with this book',
               life: 5000,
             });
-            this.loadBooks();
             this.ref.detectChanges();
           }
         },
@@ -260,13 +278,14 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
   //#endregion
 
-
+ 
   initBookModelAndForm() {
     this.book = {
       id: '',
       title: '',
       description: '',
-      author: '',
+      authorId: null,
+      authorName:'',
       imageUrl: '',
       publicationYear: 0,
       availableCopies: 0,
@@ -281,7 +300,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.bookForm = this.formBuilder.group({
       title: ['', Validators.required],
       description: ['', Validators.required],
-      author: ['', Validators.required],
+      authorId: [null, Validators.required],
       publicationYear: [0, Validators.required],
       availableCopies: [0, Validators.required],
       totalCopies: [0, Validators.required],
@@ -326,6 +345,8 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   filterValue: string = '';
   onFilter(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value;
-    this.filterValue = inputValue;
+    this.search=inputValue;
+    this.reloadPage.first=0;
+    this.loadBooks(this.reloadPage);
   }
 }

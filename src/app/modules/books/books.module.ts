@@ -7,6 +7,7 @@ import { BookDetailsComponent } from './components/book-details/book-details.com
 import { FormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
 import { RouterLink } from '@angular/router';
+import { LMSSharedModule } from 'src/app/shared/lms-shared.module';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { RouterLink } from '@angular/router';
     BooksRoutingModule,
     PaginatorModule,
     TooltipModule,
-    RouterLink
+    RouterLink,
+    LMSSharedModule
   ]
 })
 export class BooksModule { }
