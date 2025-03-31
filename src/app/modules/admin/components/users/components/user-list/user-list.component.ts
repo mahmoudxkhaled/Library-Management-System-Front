@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
@@ -9,6 +9,7 @@ import { IRole } from '../../models/IRole';
 import { CategoryService } from '../../../categories/services/category.service';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 import { el } from '@fullcalendar/core/internal-common';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-user-list',
@@ -16,8 +17,14 @@ import { el } from '@fullcalendar/core/internal-common';
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
+  @ViewChild('dt') dt: Table;
 
-  layout: string = 'list';
+  layout: string = 'dataview';
+  loading: boolean = true;
+  layoutOptions = [
+    { label: 'Grid View', value: 'dataview', icon: 'pi pi-th-large' },
+    { label: 'Table View', value: 'table', icon: 'pi pi-list' }
+  ];
 
   tableLoadingSpinner: boolean = true;
   subs: Subscription = new Subscription();
@@ -30,11 +37,12 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   submitted: boolean = false;
 
   users: IUser[] = [];
-  filteredUsers: IUser[] = [];
+  librarians: IUser[] = [];
+  members: IUser[] = [];
   roles: IRole[] = [
-    { id: "Admin",name:"Admin"},
-    { id: "Librarian",name:"Librarian"},
-    { id: "Member",name:"Member"}
+    { id: "Admin", name: "Admin" },
+    { id: "Librarian", name: "Librarian" },
+    { id: "Member", name: "Member" }
   ];
   selectedCategoryId: string = '';
 
@@ -70,8 +78,6 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.tableLoadingSpinner = isLoading;
     });
 
-
-
     this.menuItems = [
       { label: 'Edit', icon: 'pi pi-pencil', command: () => this.editUser(this.user) },
       { label: 'Delete', icon: 'pi pi-trash', command: () => this.deleteUser(this.user) }
@@ -83,18 +89,65 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   loadUsers() {
+    this.loading = true;
     this.tableLoadingService.show();
     this.subs.add(
-      this.userServ.getAllUsers().subscribe((data) => {
-        this.users = data.data;
-        this.filteredUsers = this.users;
-        console.log(this.users)
-        this.ref.detectChanges();
-        this.tableLoadingService.hide();
+      this.userServ.getAllUsers().subscribe({
+        next: (response) => {
+          if (response.isSuccess) {
+            this.users = response.data;
+            // Separate users by role
+            this.librarians = this.users.filter(user => user.role === 'Librarian');
+            this.members = this.users.filter(user => user.role === 'Member');
+            console.log('Users loaded:', this.users);
+            this.ref.detectChanges();
+            this.tableLoadingService.hide();
+            this.loading = false;
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: response.message || 'Failed to load users'
+            });
+            this.loading = false;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading users:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load users'
+          });
+          this.loading = false;
+          this.tableLoadingService.hide();
+        }
       })
     );
   }
 
+  applyFilterGlobal(event: any, stringVal: string) {
+    const searchValue = (event.target as HTMLInputElement).value;
+    if (this.dt) {
+      this.dt.filterGlobal(searchValue, stringVal);
+    } else {
+      this.filterValue = searchValue;
+      if (this.filterValue) {
+        this.librarians = this.users.filter(a =>
+          a.role === 'Librarian' &&
+          (a.firstName + " " + a.lastName).toLowerCase().includes(this.filterValue.toLowerCase())
+        );
+        this.members = this.users.filter(a =>
+          a.role === 'Member' &&
+          (a.firstName + " " + a.lastName).toLowerCase().includes(this.filterValue.toLowerCase())
+        );
+      } else {
+        this.librarians = this.users.filter(user => user.role === 'Librarian');
+        this.members = this.users.filter(user => user.role === 'Member');
+      }
+      this.ref.detectChanges();
+    }
+  }
 
   //#region Add User
   addUser() {
@@ -237,17 +290,17 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
       id: '',
       firstName: '',
       lastName: '',
-      email:'',
-      role : '',
-      phoneNumber:'',
-      profileImageUrl:'',
+      email: '',
+      role: '',
+      phoneNumber: '',
+      profileImageUrl: '',
       isActive: false,
     };
 
     this.userForm = this.formBuilder.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: ['', [Validators.required,Validators.email]],
+      email: ['', [Validators.required, Validators.email]],
       role: ['', Validators.required],
       phoneNumber: ['', Validators.required],
       isActive: [true],
@@ -277,12 +330,23 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   filterValue: string = '';
+
   onFilter(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value;
     this.filterValue = inputValue;
-    if(this.filterValue)
-      this.filteredUsers = this.users.filter(a=> (a.firstName +" "+ a.lastName).toLowerCase().includes(this.filterValue.toLowerCase()));
-    else
-      this.filteredUsers = this.users;
+    if (this.filterValue) {
+      this.librarians = this.users.filter(a =>
+        a.role === 'Librarian' &&
+        (a.firstName + " " + a.lastName).toLowerCase().includes(this.filterValue.toLowerCase())
+      );
+      this.members = this.users.filter(a =>
+        a.role === 'Member' &&
+        (a.firstName + " " + a.lastName).toLowerCase().includes(this.filterValue.toLowerCase())
+      );
+    } else {
+      this.librarians = this.users.filter(user => user.role === 'Librarian');
+      this.members = this.users.filter(user => user.role === 'Member');
+    }
+    this.ref.detectChanges();
   }
 }

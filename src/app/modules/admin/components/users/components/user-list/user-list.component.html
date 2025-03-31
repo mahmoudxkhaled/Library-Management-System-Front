@@ -1,88 +1,173 @@
 <div class="card p-4">
     <p-toast></p-toast>
-    <h5>Users List</h5>
-    <p-dataView #dv [value]="users" [paginator]="true" [rows]="10" filterBy="firstName" [layout]="layout">
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h5>Users List</h5>
+        <button pButton pRipple label="Add New User" icon="pi pi-plus" class="p-button" (click)="addUser()"></button>
+    </div>
 
-        <ng-template pTemplate="header">
+    <!-- Loading State -->
+    <app-loading-state *ngIf="loading" message="Loading users..."></app-loading-state>
 
-            <div class="flex flex-column md:flex-row md:justify-content-between gap-3 mb-3">
-                <div class="flex flex-column md:flex-row gap-2">
-                    <button pButton pRipple label="Add New User" icon="pi pi-plus" class="p-button"
-                        (click)="addUser()"></button>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-search"></i>
-                        <input type="search" pInputText placeholder="Search by Name" (input)="onFilter($event)">
-                    </span>
-                </div>
-                <!-- <p-dataViewLayoutOptions [(layout)]="layout"></p-dataViewLayoutOptions> -->
-            </div>
-        </ng-template>
+    <!-- Users Tabs -->
+    <p-tabView *ngIf="!loading">
+        <!-- Librarians Tab -->
+        <p-tabPanel header="Librarians">
+            <p-table #dt [value]="librarians" [rows]="10" [paginator]="true"
+                [globalFilterFields]="['firstName', 'lastName', 'email', 'phoneNumber']"
+                [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
+                [rowsPerPageOptions]="[5, 10, 25]" [(selection)]="selectedUsers" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [filterDelay]="0"
+                [scrollable]="true" scrollHeight="400px">
 
-        <!-- List View -->
-        <ng-template let-users pTemplate="listItem">
-            <div class="iAware-loading-table-container" style="position: relative">
-                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
-                <div class="p-col-12" *ngFor="let user of filteredUsers">
-                    <div class="flex flex-column md:flex-row align-items-center p-3 w-full">
-                        <img  style="width: 200px; height: 100px;cursor: pointer;"
-                            [src]="user.profileImageUrl ?? 'assets/media/dummy-photo-list.jpg'" [alt]="user.firstName"
-                            class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5" />
-                        <div class="flex-1 flex flex-column align-items-start text-center md:text-left">
-                            <div class="font-bold text-2xl">{{ user.firstName }} {{ user.lastName }}</div>
-                            <div class="mb-2">
-                                <span class="font-semibold">Email:</span> {{ user.email }}
-                            </div>
-                            <div class="mb-2">
-                                <span class="font-semibold">Role:</span> {{ user.role }}
-                            </div>
-                        </div>
+                <ng-template pTemplate="caption">
+                    <div class="flex align-items-center justify-content-between">
+                        <h5 class="m-0">Manage Librarians</h5>
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')"
+                                placeholder="Search..." />
+                        </span>
                     </div>
-                    <hr>
-                </div>
-            </div>
-        </ng-template>
+                </ng-template>
 
-    </p-dataView>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 4rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th pSortableColumn="firstName">First Name <p-sortIcon field="firstName"></p-sortIcon></th>
+                        <th pSortableColumn="lastName">Last Name <p-sortIcon field="lastName"></p-sortIcon></th>
+                        <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+                        <th pSortableColumn="isActive">Status <p-sortIcon field="isActive"></p-sortIcon></th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-user>
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="user"></p-tableCheckbox>
+                        </td>
+                        <td>{{user.firstName}}</td>
+                        <td>{{user.lastName}}</td>
+                        <td>{{user.email}}</td>
+                        <td>
+                            <p-tag [value]="user.isActive ? 'Active' : 'Inactive'"
+                                [severity]="user.isActive ? 'success' : 'danger'">
+                            </p-tag>
+                        </td>
+                        <td>
+                            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                                (click)="editUser(user)">
+                            </button>
+                            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                (click)="deleteUser(user)">
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-tabPanel>
+
+        <!-- Members Tab -->
+        <p-tabPanel header="Members">
+            <p-table #dt [value]="members" [rows]="10" [paginator]="true"
+                [globalFilterFields]="['firstName', 'lastName', 'email', 'phoneNumber']"
+                [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
+                [rowsPerPageOptions]="[5, 10, 25]" [(selection)]="selectedUsers" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [filterDelay]="0"
+                [scrollable]="true" scrollHeight="400px">
+
+                <ng-template pTemplate="caption">
+                    <div class="flex align-items-center justify-content-between">
+                        <h5 class="m-0">Manage Members</h5>
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')"
+                                placeholder="Search..." />
+                        </span>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 4rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th pSortableColumn="firstName">First Name <p-sortIcon field="firstName"></p-sortIcon></th>
+                        <th pSortableColumn="lastName">Last Name <p-sortIcon field="lastName"></p-sortIcon></th>
+                        <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+                        <th pSortableColumn="isActive">Status <p-sortIcon field="isActive"></p-sortIcon></th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-user>
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="user"></p-tableCheckbox>
+                        </td>
+                        <td>{{user.firstName}}</td>
+                        <td>{{user.lastName}}</td>
+                        <td>{{user.email}}</td>
+                        <td>
+                            <p-tag [value]="user.isActive ? 'Active' : 'Inactive'"
+                                [severity]="user.isActive ? 'success' : 'danger'">
+                            </p-tag>
+                        </td>
+                        <td>
+                            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                                (click)="editUser(user)">
+                            </button>
+                            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                (click)="deleteUser(user)">
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-tabPanel>
+    </p-tabView>
 </div>
+
 <!-- Add User Dialog -->
-<p-dialog [(visible)]="userDialog" header="Add New User" [modal]="true"
-    class="p-fluid">
+<p-dialog [(visible)]="userDialog" header="Add New User" [modal]="true" class="p-fluid">
     <ng-template pTemplate="content">
         <form [formGroup]="userForm" (ngSubmit)="saveUser()">
             <div class="col-12">
                 <div class="align-items-center grid formgrid p-fluid">
                     <div class="md:col-6">
-                        
+
                         <div class="field col-12 md:col-12">
                             <label for="role" class="font-medium text-900">Role</label>
-                            <p-dropdown [options]="roles" formControlName="role" optionLabel="name"
-                                optionValue="id" placeholder="Select Role"></p-dropdown>
+                            <p-dropdown [options]="roles" formControlName="role" optionLabel="name" optionValue="id"
+                                placeholder="Select Role"></p-dropdown>
                             <small *ngIf="submitted && !userForm.controls['role'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Role is required</small>
                         </div>
                         <div class="field col-12 md:col-12">
                             <label for="firstName" class="font-medium text-900">Firt Name</label>
-                            <input type="text" pInputText id="firstName" formControlName="firstName" placeholder="firstName"
-                                required
+                            <input type="text" pInputText id="firstName" formControlName="firstName"
+                                placeholder="firstName" required
                                 [ngClass]="{'ng-invalid ng-dirty': submitted && !userForm.controls['firstName'].valid}" />
                             <small *ngIf="submitted && !userForm.controls['firstName'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Firt Name is required</small>
                         </div>
                         <div class="field col-12 md:col-12">
                             <label for="lastName" class="font-medium text-900">Last Name</label>
-                            <input type="text" pInputText id="lastName" formControlName="lastName" placeholder="lastName"
-                                required
+                            <input type="text" pInputText id="lastName" formControlName="lastName"
+                                placeholder="lastName" required
                                 [ngClass]="{'ng-invalid ng-dirty': submitted && !userForm.controls['lastName'].valid}" />
                             <small *ngIf="submitted && !userForm.controls['lastName'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Last Name is required</small>
                         </div>
-                        
+
                     </div>
                     <div class="md:col-6">
                         <div class="field col-12 md:col-12">
                             <label for="phoneNumber" class="font-medium text-900">Phone Number</label>
-                            <input type="text" pInputText id="phoneNumber" formControlName="phoneNumber" placeholder="Phone Number"
-                                required
+                            <input type="text" pInputText id="phoneNumber" formControlName="phoneNumber"
+                                placeholder="Phone Number" required
                                 [ngClass]="{'ng-invalid ng-dirty': submitted && !userForm.controls['phoneNumber'].valid}" />
                             <small *ngIf="submitted && !userForm.controls['phoneNumber'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Phone Number is required</small>
@@ -95,7 +180,7 @@
                             <small *ngIf="submitted && !userForm.controls['email'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Email Address is required</small>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -132,7 +217,8 @@
     [style]="{ width: '500px' }">
     <div class="flex align-items-center justify-content-center">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-        <span *ngIf="user">Are you sure you want to {{ user.isActive ? 'deactivate' : 'activate' }} <b>{{ user.firstName}} {{ user.lastName}}</b>?</span>
+        <span *ngIf="user">Are you sure you want to {{ user.isActive ? 'deactivate' : 'activate' }} <b>{{
+                user.firstName}} {{ user.lastName}}</b>?</span>
     </div>
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"

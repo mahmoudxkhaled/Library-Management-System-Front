@@ -63,11 +63,12 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { TableLoadingSpinnerComponent } from './components/table-loading-spinner/table-loading-spinner.component';
+import { LoadingStateComponent } from './components/loading-state/loading-state.component';
 
 
 const components = [
   TableLoadingSpinnerComponent,
-
+  LoadingStateComponent
 ];
 
 const imports = [
