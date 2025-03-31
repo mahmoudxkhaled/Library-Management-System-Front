@@ -5,6 +5,6 @@ export interface ApiResult {
     isSuccess: boolean;
     data: any | null;
     code: number;
-    totalRecords: number;
+    totalCount: number;
     errorList: ApiError[] | null;
 }

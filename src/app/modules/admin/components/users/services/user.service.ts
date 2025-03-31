@@ -18,7 +18,7 @@ export class UserService {
   }
 
   addUser(request: FormData): Observable<ApiResult> {
-    return this.apiService.postRequest<ApiResult>('/User/AddUser', request);
+    return this.apiService.postRequest<ApiResult>('/User/AddUserWithDefaultPassword', request);
   }
 
   updateUser(request: FormData): Observable<ApiResult> {
@@ -35,5 +35,8 @@ export class UserService {
 
   login(request: any): Observable<ApiResult> {
     return this.apiService.postRequest<ApiResult>('/User/login', request);
+  }
+  register(request: any): Observable<ApiResult> {
+    return this.apiService.postRequest<ApiResult>('/User/register', request);
   }
 }

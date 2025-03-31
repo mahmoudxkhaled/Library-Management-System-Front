@@ -1,1 +1,34 @@
-<p>book-details works!</p>
+<div class="row">
+    <div class="card">
+        <h4>Book Details</h4>
+        <h5 class="mt-1">{{bookDetails.title}}</h5>
+    <div class="col-6">
+        <p>{{bookDetails.description}}</p>
+    </div>
+    <div class="col-6">
+        <img style="width: 180px;height:230px;"    [src]="bookDetails.imageUrl ?? 'assets/media/dummy-photo-list.jpg'"  alt="notfound">
+    </div>
+    <div>publicationYear {{bookDetails.publicationYear}}</div>
+    <div>availableCopies : {{bookDetails.availableCopies}}</div>
+    <div>totalCopies : {{bookDetails.totalCopies}}</div>
+</div>
+</div>
+<div class="row mt-3">
+    <div class="card">
+        <h4>Author Details</h4>
+        <div>{{bookDetails.authorFullName}}</div>
+        <div>{{bookDetails.authorDescription}}</div>
+        <div>        <img style="width: 180px;height:230px;"    [src]="bookDetails.authorImageUrl ?? 'assets/media/dummy-photo-list.jpg'"  alt="notfound">
+        </div>
+        <div>authorDateOfBirth {{bookDetails.authorDateOfBirth}}</div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="card">
+        <h4>Category Details</h4>
+        <div>{{bookDetails.categoryName}}</div>
+        <div>{{bookDetails.categoryDescription}}</div>
+        <div>        <img style="width: 180px;height:230px;"    [src]="bookDetails.categoryImageUrl ?? 'assets/media/dummy-photo-list.jpg'"  alt="notfound">
+        </div>
+    </div>
+</div>

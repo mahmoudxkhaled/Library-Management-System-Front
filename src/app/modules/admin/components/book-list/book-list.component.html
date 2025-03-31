@@ -1,8 +1,9 @@
 <div class="card p-4">
     <p-toast></p-toast>
     <h5>Book List</h5>
-    <p-dataView #dv [value]="books" [paginator]="true" [rows]="10" filterBy="title" [sortField]="sortField"
-        [sortOrder]="sortOrder" [layout]="layout">
+    <p-dataView #dv [value]="books" [paginator]="true" [totalRecords]="totalRecords" [rows]="10" filterBy="title"
+        [sortField]="sortField" [layout]="layout" [lazy]="true" [sortOrder]="sortOrder"
+        (onLazyLoad)="loadBooks($event)">
 
         <ng-template pTemplate="header">
 
@@ -14,7 +15,7 @@
                         (onChange)="onSortChange($event)"></p-dropdown>
                     <span class="p-input-icon-left">
                         <i class="pi pi-search"></i>
-                        <input type="search" pInputText placeholder="Search by Title" (input)="onFilter(dv, $event)">
+                        <input type="search" pInputText placeholder="Search by Title" (input)="onFilter($event)">
                     </span>
                 </div>
                 <!-- <p-dataViewLayoutOptions [(layout)]="layout"></p-dataViewLayoutOptions> -->
@@ -33,7 +34,7 @@
                         <div class="flex-1 flex flex-column align-items-start text-center md:text-left">
                             <div class="font-bold text-2xl">{{ book.title }}</div>
                             <div class="mb-2">
-                                <span class="font-semibold">Author:</span> {{ book.author }}
+                                <span class="font-semibold">Author:</span> {{ book.authorFullName }}
                             </div>
                             <div class="mb-2">
                                 <span class="font-semibold">Description:</span> {{ book.description }}
@@ -127,7 +128,17 @@
                             <small *ngIf="submitted && !bookForm.controls['categoryId'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Category is required</small>
                         </div>
-
+                        <div class="field col-12 md:col-12">
+                            <label for="author" class="font-medium text-900">Author</label>
+                            <!-- <input type="text" pInputText id="author" formControlName="author" placeholder="Author"
+                                required
+                                [ngClass]="{'ng-invalid ng-dirty': submitted && !bookForm.controls['author'].valid}" /> -->
+                            <p-dropdown [options]="authors" ormControlName="authorId" optionLabel="fullName"
+                                [filter]="true" filterBy="fullName" [showClear]="true" optionValue="id"
+                                placeholder="Select an author"></p-dropdown>
+                            <small *ngIf="submitted && !bookForm.controls['authorId'].valid"
+                                class="ng-dirty ng-invalid text-red-500">Author is required</small>
+                        </div>
 
                         <div class="field col-12 md:col-12">
                             <label for="title" class="font-medium text-900">Title</label>
@@ -149,14 +160,7 @@
                         </div>
 
 
-                        <div class="field col-12 md:col-12">
-                            <label for="author" class="font-medium text-900">Author</label>
-                            <input type="text" pInputText id="author" formControlName="author" placeholder="Author"
-                                required
-                                [ngClass]="{'ng-invalid ng-dirty': submitted && !bookForm.controls['author'].valid}" />
-                            <small *ngIf="submitted && !bookForm.controls['author'].valid"
-                                class="ng-dirty ng-invalid text-red-500">Author is required</small>
-                        </div>
+
 
                         <div class="field col-12 md:col-12">
                             <label for="publicationYear" class="font-medium text-900">Publication Year</label>

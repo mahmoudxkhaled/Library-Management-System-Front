@@ -8,6 +8,7 @@ import { IUser } from '../../models/IUser';
 import { IRole } from '../../models/IRole';
 import { CategoryService } from '../../../categories/services/category.service';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
+import { el } from '@fullcalendar/core/internal-common';
 
 @Component({
   selector: 'app-user-list',
@@ -29,6 +30,7 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   submitted: boolean = false;
 
   users: IUser[] = [];
+  filteredUsers: IUser[] = [];
   roles: IRole[] = [
     { id: "Admin",name:"Admin"},
     { id: "Librarian",name:"Librarian"},
@@ -85,6 +87,7 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.subs.add(
       this.userServ.getAllUsers().subscribe((data) => {
         this.users = data.data;
+        this.filteredUsers = this.users;
         console.log(this.users)
         this.ref.detectChanges();
         this.tableLoadingService.hide();
@@ -103,42 +106,29 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   saveUser() {
     this.submitted = true;
     if (this.userForm.valid) {
-      const formData = new FormData();
-      formData.append('FirstName', this.userForm.value.firstName);
-      formData.append('LastName', this.userForm.value.lastName);
-      formData.append('email', this.userForm.value.email);
-      formData.append('Role', this.userForm.value.role);
-      formData.append('isActive', this.userForm.value.isActive);
-
-      const userImageFile = this.selectedUserImage;
-      if (userImageFile) {
-        formData.append('profileImageUrl', userImageFile, userImageFile.name);
-      }
-
       if (this.isEditing) {
         // If editing, update user
-        formData.append('Id', this.user.id);
-        this.subs.add(
-          this.userServ.updateUser(formData).subscribe({
-            next: () => {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'User Updated',
-                life: 3000,
-              });
-              this.loadUsers();
-              this.ref.detectChanges();
-              this.initUserModelAndForm();
-              this.userDialog = false;
-              this.isEditing = false;
-            },
-          })
-        );
+        // this.subs.add(
+        //   this.userServ.updateUser(formData).subscribe({
+        //     next: () => {
+        //       this.messageService.add({
+        //         severity: 'success',
+        //         summary: 'Successful',
+        //         detail: 'User Updated',
+        //         life: 3000,
+        //       });
+        //       this.loadUsers();
+        //       this.ref.detectChanges();
+        //       this.initUserModelAndForm();
+        //       this.userDialog = false;
+        //       this.isEditing = false;
+        //     },
+        //   })
+        // );
       } else {
         // If adding new user
         this.subs.add(
-          this.userServ.addUser(formData).subscribe({
+          this.userServ.addUser(this.userForm.value).subscribe({
             next: () => {
               this.messageService.add({
                 severity: 'success',
@@ -249,16 +239,17 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
       lastName: '',
       email:'',
       role : '',
-      profileImageUrl: '',
+      phoneNumber:'',
+      profileImageUrl:'',
       isActive: false,
     };
 
     this.userForm = this.formBuilder.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: ['', Validators.required],
+      email: ['', [Validators.required,Validators.email]],
       role: ['', Validators.required],
-      profileImageUrl: [''],
+      phoneNumber: ['', Validators.required],
       isActive: [true],
     });
   }
@@ -289,5 +280,9 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   onFilter(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value;
     this.filterValue = inputValue;
+    if(this.filterValue)
+      this.filteredUsers = this.users.filter(a=> (a.firstName +" "+ a.lastName).toLowerCase().includes(this.filterValue.toLowerCase()));
+    else
+      this.filteredUsers = this.users;
   }
 }
