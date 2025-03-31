@@ -1,38 +1,52 @@
-<!-- Loading State -->
-<app-loading-state [show]="loading" message="Loading books..."></app-loading-state>
-
-<!-- Books Grid -->
-<div class="books-container" *ngIf="!loading">
-   <div class="row">
-      <div class="row">
-         <span class="p-input-icon-left col-4">
-            <i class="pi pi-search ml-3"></i>
-            <input type="search" pInputText placeholder="Search by Title" (input)="onFilter($event)">
+<div class="books-container">
+   <!-- Header Section -->
+   <div class="header-section">
+      <h1>Our Library Collection</h1>
+      <div class="search-bar">
+         <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" (input)="onSearch($event)" placeholder="Search books..." />
          </span>
-         <div class="col-2">
-            <p-dropdown (onClear)="onAuthorClear()" (onChange)="onAuthorChange($event)" [options]="authors"
-               ormControlName="authorId" optionLabel="fullName" [filter]="true" filterBy="fullName" [showClear]="true"
-               optionValue="id" placeholder="search by author"></p-dropdown>
-         </div>
-         <div class="col-2">
-            <p-dropdown (onClear)="onCategoryClear()" (onChange)="onCategoryChange($event)" [options]="categories"
-               ormControlName="categoryId" optionLabel="name" [filter]="true" filterBy="name" [showClear]="true"
-               optionValue="id" placeholder="search by Category"></p-dropdown>
-         </div>
-      </div>
-      <div class="row">
-         <span *ngFor="let book of booksResult.data.result" class="col-2 p-1 book m-3"
-            [routerLink]="['/Books', book.id]">
-            <div class="text-center">
-               <img style="width: 180px;height:230px;" [src]="book.imageUrl ?? 'assets/media/dummy-photo-list.jpg'"
-                  alt="notfound">
-               <span class="mt-2" class="btn-primary">
-                  <h5>{{book.title}}</h5>
-               </span>
-            </div>
-         </span>
-         <p-paginator (onPageChange)="onPageChange($event)" [first]="reloadPage.first" [rows]="reloadPage.rows"
-            [totalRecords]="booksResult.data.totalCount" [rowsPerPageOptions]="[10, 20, 30]" />
       </div>
    </div>
+
+   <!-- Loading State -->
+   <app-loading-state *ngIf="loading" message="Loading books..."></app-loading-state>
+
+   <!-- Books Grid -->
+   <div class="books-grid" *ngIf="!loading">
+      <a [routerLink]="['/Books', book.id]" class="book-card" *ngFor="let book of books">
+         <div class="book-cover">
+            <img [src]="book.coverImageUrl || 'assets/media/default-book-cover.jpg'" [alt]="book.title">
+            <div class="book-status"
+               [ngClass]="{'available': book.availableCopies > 0, 'unavailable': book.availableCopies === 0}">
+               {{ book.availableCopies > 0 ? 'Available' : 'Borrowed' }}
+            </div>
+         </div>
+         <div class="book-info">
+            <h3 class="book-title">{{ book.title }}</h3>
+            <p class="book-author">by {{ book.authorFullName }}</p>
+            <div class="book-meta">
+               <span class="book-category">
+                  <i class="pi pi-tag"></i> {{ book.categoryName }}
+               </span>
+               <span class="book-copies">
+                  <i class="pi pi-book"></i> {{ book.availableCopies }}/{{ book.totalCopies }}
+               </span>
+            </div>
+         </div>
+      </a>
+   </div>
+
+   <!-- No Books Message -->
+   <div class="no-books" *ngIf="!loading && books.length === 0">
+      <i class="pi pi-book"></i>
+      <h2>No Books Found</h2>
+      <p>Try adjusting your search or check back later</p>
+   </div>
+
+   <!-- Pagination -->
+   <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="currentPage"
+      (onPageChange)="onPageChange($event)" [rowsPerPageOptions]="[12, 24, 36]" class="pagination">
+   </p-paginator>
 </div>

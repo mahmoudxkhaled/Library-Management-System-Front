@@ -51,6 +51,30 @@ export class BookDetailsComponent implements OnInit {
   // Reviews list
   reviews: GetFeedbackDto[] = [];
 
+  // Carousel responsive options
+  responsiveOptions = [
+    {
+      breakpoint: '1400px',
+      numVisible: 4,
+      numScroll: 1
+    },
+    {
+      breakpoint: '1200px',
+      numVisible: 3,
+      numScroll: 1
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+      numScroll: 1
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -101,12 +125,14 @@ export class BookDetailsComponent implements OnInit {
             this.similarBooks = res.data.map(book => ({
               id: book.id,
               title: book.title,
-              authorFullName: book.authorFullName,
+              authorName: book.authorName,
+              categoryName: book.categoryName,
               imageUrl: book.imageUrl,
               availableCopies: book.availableCopies,
               totalCopies: book.totalCopies
             }));
           }
+          console.log(this.similarBooks)
         },
         error: (error) => {
           console.error('Error loading similar books:', error);
@@ -114,10 +140,6 @@ export class BookDetailsComponent implements OnInit {
         }
       });
     }
-  }
-
-  viewBookDetails(bookId: number) {
-    this.router.navigate(['/books', bookId]);
   }
 
   loadReviews() {

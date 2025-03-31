@@ -103,25 +103,36 @@
     <!-- Similar Books Section -->
     <div class="similar-books-section">
         <h2>Similar Books in {{bookDetails?.categoryName}}</h2>
-        <div class="similar-books-grid">
-            <div class="book-card" *ngFor="let book of similarBooks">
-                <div class="book-thumbnail">
-                    <img [src]="book.imageUrl || 'assets/media/dummy-photo-list.jpg'" [alt]="book.title">
-                </div>
-                <div class="book-info">
-                    <h3>{{book.title}}</h3>
-                    <p class="author">by {{book.authorFullName}}</p>
-                    <div class="book-meta">
-                        <span class="availability">{{book.availableCopies}}/{{book.totalCopies}} available</span>
+        <p-carousel [value]="similarBooks" [numVisible]="4" [numScroll]="1" [circular]="true"
+            [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+            <ng-template let-book pTemplate="item">
+                <div class="book-card">
+                    <div class="book-thumbnail">
+                        <img [src]="book.imageUrl || 'assets/media/dummy-photo-list.jpg'" [alt]="book.title">
+                        <div class="book-status"
+                            [ngClass]="{'available': book.availableCopies > 0, 'unavailable': book.availableCopies === 0}">
+                            {{ book.availableCopies > 0 ? 'Available' : 'Borrowed' }}
+                        </div>
                     </div>
-                    <button pButton type="button" label="View Details" (click)="viewBookDetails(book.id)"
-                        class="p-button-outlined"></button>
+                    <div class="book-info">
+                        <h3 class="book-title">{{book.title}}</h3>
+                        <p class="book-author">by {{book.authorName}}</p>
+                        <div class="book-meta">
+                            <span class="book-category">
+                                <i class="pi pi-tag"></i> {{book.categoryName}}
+                            </span>
+                            <span class="book-copies">
+                                <i class="pi pi-book"></i> {{book.availableCopies}}/{{book.totalCopies}}
+                            </span>
+                        </div>
+                        <a [routerLink]="['/books', book.id]" pButton class="p-button-outlined">View Details</a>
+                    </div>
                 </div>
-            </div>
+            </ng-template>
+        </p-carousel>
 
-            <div class="no-similar-books" *ngIf="!similarBooks?.length">
-                <p>No similar books found in this category.</p>
-            </div>
+        <div class="no-similar-books" *ngIf="!similarBooks?.length">
+            <p>No similar books found in this category.</p>
         </div>
     </div>
 

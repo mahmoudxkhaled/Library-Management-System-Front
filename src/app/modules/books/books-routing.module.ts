@@ -4,8 +4,8 @@ import { BooksListComponent } from './components/books-list/books-list.component
 import { BookDetailsComponent } from './components/book-details/book-details.component';
 
 const routes: Routes = [
-      { path: '', component: BooksListComponent },
-      { path: ':bookId', component: BookDetailsComponent },
+  { path: '', component: BooksListComponent },
+  { path: ':bookId', component: BookDetailsComponent },
 
 ];
 
