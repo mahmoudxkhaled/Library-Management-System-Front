@@ -13,12 +13,14 @@ import { BookParams } from '../models/BookParams';
 export class BooksService {
 
   constructor(private apiService: ApiService) { }
-  getBooksPaged(first:number,rows:number,BookParams:BookParams):Observable<ApiResult>
-  {
-   return this.apiService.postRequest<ApiResult>(`/Book/${first}/${rows}`,BookParams)
+  getBooksPaged(first: number, rows: number, BookParams: BookParams): Observable<ApiResult> {
+    return this.apiService.postRequest<ApiResult>(`/Book/${first}/${rows}`, BookParams)
   }
-  getBookDetailsById(bookId:number):Observable<ApiResult>
-  {
-   return this.apiService.getByIdRequest<ApiResult>(`/Book`,bookId);
+  getBookDetailsById(bookId: number): Observable<ApiResult> {
+    return this.apiService.getByIdRequest<ApiResult>(`/Book`, bookId);
+  }
+
+  getRelatedBooks(bookId: number): Observable<ApiResult> {
+    return this.apiService.getByIdRequest<ApiResult>(`/Book/GetRelatedBooks`, bookId);
   }
 }

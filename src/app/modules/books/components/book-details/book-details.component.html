@@ -1,34 +1,187 @@
-<div class="row">
-    <div class="card">
-        <h4>Book Details</h4>
-        <h5 class="mt-1">{{bookDetails.title}}</h5>
-    <div class="col-6">
-        <p>{{bookDetails.description}}</p>
-    </div>
-    <div class="col-6">
-        <img style="width: 180px;height:230px;"    [src]="bookDetails.imageUrl ?? 'assets/media/dummy-photo-list.jpg'"  alt="notfound">
-    </div>
-    <div>publicationYear {{bookDetails.publicationYear}}</div>
-    <div>availableCopies : {{bookDetails.availableCopies}}</div>
-    <div>totalCopies : {{bookDetails.totalCopies}}</div>
-</div>
-</div>
-<div class="row mt-3">
-    <div class="card">
-        <h4>Author Details</h4>
-        <div>{{bookDetails.authorFullName}}</div>
-        <div>{{bookDetails.authorDescription}}</div>
-        <div>        <img style="width: 180px;height:230px;"    [src]="bookDetails.authorImageUrl ?? 'assets/media/dummy-photo-list.jpg'"  alt="notfound">
+<div class="book-details-container" *ngIf="bookDetails">
+    <!-- Main Content Section -->
+    <div class="main-content">
+        <!-- Book Details (Left Side) -->
+        <div class="book-section">
+            <div class="book-card">
+                <div class="book-image">
+                    <img [src]="bookDetails?.imageUrl || 'assets/media/dummy-photo-list.jpg'" alt="Book Cover">
+                </div>
+                <div class="book-info">
+                    <h1>{{bookDetails?.title}}</h1>
+                    <div class="book-meta">
+                        <span>Published: {{bookDetails?.publicationYear}}</span>
+                        <span>Available: {{bookDetails?.availableCopies}}/{{bookDetails?.totalCopies}}</span>
+                    </div>
+                    <p class="description">{{bookDetails?.description}}</p>
+                </div>
+            </div>
+
+            <!-- Book Actions and Stats -->
+            <div class="book-actions-stats">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="pi pi-star"></i>
+                        <div class="stat-info">
+                            <span class="stat-value">{{averageRating | number:'1.1-1'}}</span>
+                            <span class="stat-label">Average Rating</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="pi pi-users"></i>
+                        <div class="stat-info">
+                            <span class="stat-value">{{reviews.length}}</span>
+                            <span class="stat-label">Reviews</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="pi pi-book"></i>
+                        <div class="stat-info">
+                            <span class="stat-value">{{bookDetails?.availableCopies}}</span>
+                            <span class="stat-label">Available Copies</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="pi pi-clock"></i>
+                        <div class="stat-info">
+                            <span class="stat-value">14</span>
+                            <span class="stat-label">Days to Borrow</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="borrow-section">
+                    <div class="borrow-info">
+                        <h3>Want to read this book?</h3>
+                        <p *ngIf="bookDetails?.availableCopies > 0">
+                            This book is currently available for borrowing.
+                        </p>
+                        <p *ngIf="bookDetails?.availableCopies === 0" class="unavailable">
+                            Currently unavailable. You can join the waiting list.
+                        </p>
+                    </div>
+                    <div class="action-buttons">
+                        <button pButton type="button"
+                            [label]="bookDetails?.availableCopies > 0 ? 'Borrow Now' : 'Join Waiting List'"
+                            [class]="bookDetails?.availableCopies > 0 ? 'p-button-primary' : 'p-button-secondary'"
+                            (click)="borrowBook()"></button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>authorDateOfBirth {{bookDetails.authorDateOfBirth}}</div>
+
+        <!-- Right Side Info -->
+        <div class="side-section">
+            <!-- Author Info -->
+            <div class="info-card">
+                <h2>About the Author</h2>
+                <div class="author-content">
+                    <div class="author-image">
+                        <img [src]="bookDetails?.authorImageUrl || 'assets/media/dummy-photo-list.jpg'" alt="Author">
+                    </div>
+                    <h3>{{bookDetails?.authorFullName}}</h3>
+                    <p>{{bookDetails?.authorDescription}}</p>
+                    <div class="meta">Born: {{bookDetails?.authorDateOfBirth | date}}</div>
+                </div>
+            </div>
+
+            <!-- Category Info -->
+            <div class="info-card">
+                <h2>Category</h2>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img [src]="bookDetails?.categoryImageUrl || 'assets/media/dummy-photo-list.jpg'"
+                            alt="Category">
+                    </div>
+                    <h3>{{bookDetails?.categoryName}}</h3>
+                    <p>{{bookDetails?.categoryDescription}}</p>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<div class="row mt-3">
-    <div class="card">
-        <h4>Category Details</h4>
-        <div>{{bookDetails.categoryName}}</div>
-        <div>{{bookDetails.categoryDescription}}</div>
-        <div>        <img style="width: 180px;height:230px;"    [src]="bookDetails.categoryImageUrl ?? 'assets/media/dummy-photo-list.jpg'"  alt="notfound">
+
+    <!-- Similar Books Section -->
+    <div class="similar-books-section">
+        <h2>Similar Books in {{bookDetails?.categoryName}}</h2>
+        <div class="similar-books-grid">
+            <div class="book-card" *ngFor="let book of similarBooks">
+                <div class="book-thumbnail">
+                    <img [src]="book.imageUrl || 'assets/media/dummy-photo-list.jpg'" [alt]="book.title">
+                </div>
+                <div class="book-info">
+                    <h3>{{book.title}}</h3>
+                    <p class="author">by {{book.authorFullName}}</p>
+                    <div class="book-meta">
+                        <span class="availability">{{book.availableCopies}}/{{book.totalCopies}} available</span>
+                    </div>
+                    <button pButton type="button" label="View Details" (click)="viewBookDetails(book.id)"
+                        class="p-button-outlined"></button>
+                </div>
+            </div>
+
+            <div class="no-similar-books" *ngIf="!similarBooks?.length">
+                <p>No similar books found in this category.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section" *ngIf="bookDetails">
+        <h2>Reader Reviews</h2>
+
+        <!-- Stats Summary -->
+        <div class="reviews-summary">
+            <div class="rating-stats">
+                <div class="average-rating">
+                    <span class="rating-value">{{averageRating | number:'1.1-1'}}</span>
+                    <p-rating [ngModel]="averageRating" [readonly]="true" [cancel]="false"></p-rating>
+                    <span class="total-reviews">{{reviews?.length || 0}} Reviews</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Review Form -->
+        <div class="review-form">
+            <h3>Write a Review</h3>
+            <div class="rating-input">
+                <span>Your Rating:</span>
+                <p-rating [(ngModel)]="rating" [cancel]="false" [stars]="5"></p-rating>
+            </div>
+            <textarea [(ngModel)]="feedback" placeholder="Share your thoughts about this book (max 1000 characters)..."
+                rows="4" maxlength="1000">
+            </textarea>
+            <button pButton type="button" label="Submit Review" (click)="submitReview()"
+                [disabled]="!rating || !feedback.trim()">
+            </button>
+        </div>
+
+        <!-- Reviews List -->
+        <div class="reviews-list" *ngIf="reviews && reviews.length > 0">
+            <div class="review-card" *ngFor="let review of reviews">
+                <div class="review-header">
+                    <div class="user-info">
+                        <i class="pi pi-user"></i>
+                        <span>{{review.userFirstName}} {{review.userLastName}}</span>
+                    </div>
+                    <p-rating [ngModel]="review.rating" [readonly]="true" [cancel]="false" [stars]="5">
+                    </p-rating>
+                </div>
+                <p class="review-text">{{review.comment}}</p>
+            </div>
+        </div>
+
+        <!-- No Reviews Message -->
+        <div class="no-reviews" *ngIf="!reviews || reviews.length === 0">
+            <p>No reviews yet. Be the first to review this book!</p>
         </div>
     </div>
 </div>
+
+<!-- Loading State -->
+<div class="loading-state" *ngIf="!bookDetails">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Loading book details...</p>
+</div>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>

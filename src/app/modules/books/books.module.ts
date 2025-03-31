@@ -8,7 +8,10 @@ import { FormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
 import { RouterLink } from '@angular/router';
 import { LMSSharedModule } from 'src/app/shared/lms-shared.module';
-
+import { ButtonModule } from 'primeng/button';
+import { RatingModule } from 'primeng/rating';
+import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @NgModule({
   declarations: [
@@ -22,7 +25,11 @@ import { LMSSharedModule } from 'src/app/shared/lms-shared.module';
     PaginatorModule,
     TooltipModule,
     RouterLink,
-    LMSSharedModule
+    LMSSharedModule,
+    ButtonModule,
+    RatingModule,
+    ToastModule,
+    ProgressSpinnerModule
   ]
 })
 export class BooksModule { }
