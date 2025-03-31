@@ -56,6 +56,7 @@ export class BooksListComponent implements OnInit {
       next: (response: ApiResult) => {
         if (response.isSuccess) {
           this.books = response.data.result;
+          console.log(this.books)
           this.totalRecords = response.data.totalCount;
         }
         this.loading = false;

@@ -17,7 +17,7 @@
    <div class="books-grid" *ngIf="!loading">
       <a [routerLink]="['/Books', book.id]" class="book-card" *ngFor="let book of books">
          <div class="book-cover">
-            <img [src]="book.coverImageUrl || 'assets/media/default-book-cover.jpg'" [alt]="book.title">
+            <img [src]="book.coverImageUrl || 'assets/dummy_book_cover.webp'" [alt]="book.title">
             <div class="book-status"
                [ngClass]="{'available': book.availableCopies > 0, 'unavailable': book.availableCopies === 0}">
                {{ book.availableCopies > 0 ? 'Available' : 'Borrowed' }}
@@ -46,7 +46,9 @@
    </div>
 
    <!-- Pagination -->
-   <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="currentPage"
-      (onPageChange)="onPageChange($event)" [rowsPerPageOptions]="[12, 24, 36]" class="pagination">
-   </p-paginator>
+   <div class="flex justify-content-center">
+      <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="currentPage"
+         (onPageChange)="onPageChange($event)" [rowsPerPageOptions]="[12, 24, 36]" class="pagination">
+      </p-paginator>
+   </div>
 </div>
