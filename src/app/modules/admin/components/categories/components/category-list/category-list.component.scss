@@ -45,6 +45,43 @@
                 font-weight: 400;
             }
         }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            justify-content: flex-end;
+            max-width: 400px;
+
+            .p-input-icon-left {
+                flex: 1;
+                max-width: 400px;
+
+                i {
+                    color: var(--primary-color);
+                    font-size: 1rem;
+                    left: 1rem;
+                }
+
+                input {
+                    width: 100%;
+                    padding-left: 2.5rem;
+                    border-radius: 20px;
+                    height: 40px;
+                    
+                    &::placeholder {
+                        color: #999;
+                    }
+                }
+            }
+
+            :host ::ng-deep .p-button {
+                height: 40px;
+                border-radius: 20px;
+                white-space: nowrap;
+            }
+        }
     }
 
     // Category Card Styles
@@ -142,10 +179,11 @@
                 font-size: 1rem;
                 line-height: 1.6;
                 display: -webkit-box;
-                -webkit-line-clamp: 3;
+                -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                max-height: 3.2em;
             }
 
             .category-footer {

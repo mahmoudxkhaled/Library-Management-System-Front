@@ -18,20 +18,17 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'LMS MAIN MENU',
                 items: [
-                    { label: 'Books', icon: 'pi pi-fw pi-home', routerLink: ['admin/Books'] },
-                    { label: 'Categories', icon: 'pi pi-fw pi-home', routerLink: ['admin/categories'] },
-                    { label: 'Feedbacks', icon: 'pi pi-fw pi-home', routerLink: ['admin/feedbacks'] },
-                    { label: 'Transactions', icon: 'pi pi-fw pi-home', routerLink: ['admin/transactions'] },
-                    { label: 'Trending Books', icon: 'pi pi-fw pi-home', routerLink: ['admin/trending-books'] },
-                    { label: 'Users', icon: 'pi pi-fw pi-users', routerLink: ['admin/users'] },
+                    { label: 'Books List', icon: 'pi pi-fw pi-book', routerLink: ['admin/Books'] },
+                    { label: 'Categories List', icon: 'pi pi-fw pi-tags', routerLink: ['admin/categories'] },
+                    { label: 'Transactions List', icon: 'pi pi-fw pi-credit-card', routerLink: ['admin/transactions'] },
+                    { label: 'Users List', icon: 'pi pi-fw pi-users', routerLink: ['admin/users'] },
                 ]
             },
             {
                 label: 'Home',
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
-                    { label: 'Books', icon: 'pi pi-fw pi-home', routerLink: ['/Books'] }
-
+                    { label: 'Books', icon: 'pi pi-fw pi-book', routerLink: ['/Books'] }
                 ]
             },
             {

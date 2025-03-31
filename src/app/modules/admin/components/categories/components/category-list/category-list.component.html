@@ -7,15 +7,23 @@
                 <h2>Categories</h2>
                 <p class="subtitle">Manage your book categories</p>
             </div>
-            <button pButton pRipple label="Add New Category" icon="pi pi-plus" class="p-button-primary"
-                (click)="addCategory()"></button>
+            <div class="header-actions">
+                <span class="p-input-icon-left mr-3">
+                    <input type="text" pInputText placeholder="Search categories..." [(ngModel)]="searchTerm"
+                        (ngModelChange)="onSearch()" />
+                    <i class="pi pi-search"></i>
+                </span>
+                <button pButton pRipple label="Add New Category" icon="pi pi-plus" class="p-button-primary"
+                    (click)="addCategory()"></button>
+            </div>
         </div>
 
         <!-- Loading State -->
         <app-loading-state *ngIf="tableLoadingSpinner" message="Loading categories..."></app-loading-state>
 
         <!-- Categories Grid -->
-        <p-dataView #dv [value]="categories" [paginator]="true" [rows]="10" layout="grid" *ngIf="!tableLoadingSpinner">
+        <p-dataView #dv [value]="filteredCategories" [paginator]="true" [rows]="9" layout="grid"
+            *ngIf="!tableLoadingSpinner">
             <ng-template let-categories pTemplate="gridItem">
                 <div class="grid grid-nogutter">
                     <div class="my-3 px-3 col-12 md:col-4" *ngFor="let category of categories">
@@ -84,7 +92,7 @@
                         <div class="flex flex-column align-items-center justify-content-center">
                             <div class="image-upload-container" (click)="triggerImageUpload()">
                                 <img [src]="imageUrl" alt="Category Image" class="avatar"
-                                    style="width: 300px; height: 225px; max-width: 300px; border-radius: 8px; object-fit: cover; border: 2px dashed #ccc; cursor: pointer;" />
+                                    style="width: 300px; height: 225px; max-width: 300px; border-radius: 8px; object-fit: contain; border: 2px dashed #ccc; cursor: pointer;" />
                                 <div class="upload-hover-text">
                                     <i class="pi pi-upload"></i>
                                     <span>Click to upload image</span>

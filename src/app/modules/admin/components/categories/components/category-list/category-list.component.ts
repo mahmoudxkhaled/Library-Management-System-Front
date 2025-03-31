@@ -25,7 +25,7 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
   isEditing: boolean = false;
 
   categories: ICategory[] = [];
-  category: ICategory;
+  category: ICategory | null = null;
 
   categoryForm: FormGroup;
 
@@ -33,6 +33,9 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
   imageUrl: string = '../../../../../assets/media/upload-photo.jpg';
 
   menuItems: MenuItem[] = [];
+
+  searchTerm: string = '';
+  filteredCategories: ICategory[] = [];
 
   constructor(
     private categoryServ: CategoryService,
@@ -55,7 +58,6 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
       this.tableLoadingSpinner = isLoading;
     });
 
-
     this.menuItems = [
       { label: 'Edit', icon: 'pi pi-pencil', command: () => this.editCategory(this.category) },
       { label: 'Delete', icon: 'pi pi-trash', command: () => this.deleteCategory(this.category) }
@@ -70,10 +72,26 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
     this.tableLoadingService.show();
     this.subs.add(
       this.categoryServ.getAllCategories().subscribe((data) => {
-        this.categories = data.data;
+        if (data.isSuccess) {
+          this.categories = data.data;
+          this.filteredCategories = this.categories;
+        }
         this.ref.detectChanges();
         this.tableLoadingService.hide();
       })
+    );
+  }
+
+  onSearch() {
+    if (!this.searchTerm.trim()) {
+      this.filteredCategories = this.categories;
+      return;
+    }
+
+    const searchLower = this.searchTerm.toLowerCase();
+    this.filteredCategories = this.categories.filter(category =>
+      category.name.toLowerCase().includes(searchLower) ||
+      category.description.toLowerCase().includes(searchLower)
     );
   }
 
@@ -102,7 +120,6 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
     this.categoryDialog = true;
   }
 
-
   saveAddCategory() {
     this.submitted = true;
 
@@ -111,7 +128,7 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
       formData.append('Name', this.categoryForm.value.name);
       formData.append('Description', this.categoryForm.value.description);
       if (this.isEditing) {
-        formData.append('Id', this.category.id);
+        formData.append('Id', this.category!.id);
       }
 
       const categoryImageFile = this.selectedCategoryImage;
@@ -211,8 +228,6 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
   //#endregion
 
   initCategoryModelAndForm() {
-
-
     this.categoryForm = this.formBuilder.group({
       id: [''],
       name: ['', Validators.required],
