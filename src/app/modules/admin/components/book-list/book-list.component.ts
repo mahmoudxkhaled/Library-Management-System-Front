@@ -61,11 +61,9 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   ) {
     this.initBookModelAndForm();
   }
-
   ngAfterViewChecked(): void {
     this.ref.detectChanges();
   }
-
   ngOnInit() {
     this.loadCategories();
     this.loadAuthors();
@@ -94,7 +92,6 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.bookParams.authorId=this.authorId;
     this.bookParams.categoryId=this.categoryId;
     this.tableLoadingService.show();
-    console.log("this.bookParams :",this.bookParams);
     this.subs.add(
       this.bookService.getBooksPaged(event.first,event.rows,this.bookParams).subscribe((res) => {
         this.books = res.data.result;

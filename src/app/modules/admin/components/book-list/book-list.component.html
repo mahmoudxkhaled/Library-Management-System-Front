@@ -186,10 +186,7 @@
                             <small *ngIf="submitted && !bookForm.controls['totalCopies'].valid"
                                 class="ng-dirty ng-invalid text-red-500">Total Copies is required</small>
                         </div>
-
-
                     </div>
-
                     <div class="col-12 md:col-6 mt-2">
                         <p-panel header="Book Image" class="mb-3">
                             <div class="flex flex-column align-items-center justify-content-center">
@@ -204,7 +201,6 @@
                             <input type="file" id="myBookImage" style="display: none"
                                 (change)="handleImageSelection($event)" />
                         </p-panel>
-
                     </div>
                 </div>
             </div>
