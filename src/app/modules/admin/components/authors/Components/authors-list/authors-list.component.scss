@@ -1,0 +1,22 @@
+.Active {
+    background: #c8e6c9;
+    color: #256029;
+  }
+  .Active:hover {
+    background: #256029;
+    color: #c8e6c9;
+    cursor: pointer;
+  }
+  .InActive {
+    background: #ffcdd2;
+    color: #c63737;
+  }
+  .InActive:hover{
+    background: #c63737;
+    color: #ffcdd2;
+    cursor: pointer;
+  }
+  .status{
+    padding: 10px;
+    border-radius: 10px;
+  }

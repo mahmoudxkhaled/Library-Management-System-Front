@@ -13,6 +13,7 @@ const routes: Routes = [
     { path: 'transactions',loadChildren: () => import('src/app/modules/admin/components/transactions/transactions.module').then(m => m.TransactionsModule) },
     { path: 'trending-books', loadChildren: () => import('src/app/modules/admin/components/trending-books/trending-books.module').then(m => m.TrendingBooksModule)  },
     { path: 'users',loadChildren: () => import('src/app/modules/admin/components/users/users.module').then(m => m.UsersModule)  },
+    { path: 'authors',loadChildren: () => import('src/app/modules/admin/components/authors/authors.module').then(m =>m.AuthorsModule)}
 ];
 
 @NgModule({
