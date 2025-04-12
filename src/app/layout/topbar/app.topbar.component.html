@@ -1,4 +1,4 @@
-<div class="layout-topbar">
+<div class="layout-topbar row">
     <a class="layout-topbar-logo" routerLink="">
         <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
             alt="logo">
@@ -6,12 +6,12 @@
     </a>
 
     <!--側邊導覽列控制btn-->
-    <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
+    <button #menubutton class="p-link layout-menu-button layout-topbar-button col-2" (click)="layoutService.onMenuToggle()">
         <i class="pi pi-bars"></i>
     </button>
 
     <!--rwd側邊導覽列控制btn-->
-    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button"
+    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button col-2"
         (click)="layoutService.showProfileSidebar()">
         <i class="pi pi-ellipsis-v"></i>
     </button>
@@ -19,17 +19,111 @@
     <!--topbar menu-->
     <div #topbarmenu class="layout-topbar-menu"
         [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
-        <button class="p-link layout-topbar-button">
-            <i class="pi pi-calendar"></i>
-            <span>Calendar</span>
-        </button>
-        <button class="p-link layout-topbar-button">
-            <i class="pi pi-user"></i>
-            <span>Profile</span>
-        </button>
+        <div class="user-dropdown" (click)="menu.toggle($event)">
+            <div class="user-info">
+                <span>{{ user.firstName }} {{user.lastName}}</span>
+              <img width="35px" height="35px" [src]="user.userImageUrl ?? '/assets/demo/images/avatar/UnknownUser.jpg'"  class="user-img" />
+            </div>
+          </div>
+          <p-menu #menu [popup]="true" [model]="menuItems"></p-menu>
+            <!-- <span>Profile</span> -->
+            <!-- <select>
+                    <div class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">{{user.firstName}} {{user.lastName}}
+                        <img *ngIf="user.userImageUrl!=null" style="border-radius: 50%;width: 50px;height: 50px;" [src]="user.userImageUrl ?? 'src/assets/demo/images/avatar/UnknownUser.jpg' " alt="">
+                    </div>
+                    <option><a class="dropdown-item p-2" href="#"><i class="pi pi-user m-2"></i> My Account</a></option>
+                        <option value=""><a class="dropdown-item p-2" href="#"><i class="pi pi-book m-2"></i>My Borrowed Books </a></option>
+                        <option value=""  (click)="Logout()"><a class="dropdown-item p-2" href="#"><i class="pi pi-sign-out m-2"></i>Logout</a></option>
+            </select>
+               -->
+              </div>
         <button class="p-link layout-topbar-button" [routerLink]="'/documentation'">
             <i class="pi pi-cog"></i>
             <span>Settings</span>
         </button>
     </div>
-</div>
+    <p-dialog [(visible)]="changePasswordDialog" [style]="{ width: '40%', height: '65%' }" header="Change Password" [modal]="true" (onHide)="cancelDialog()"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="changePasswordObj">
+                <div class="align-items-center grid formgrid p-fluid">
+                    <div class="col-12">
+                        <div class="field col">
+                            <label for="title" class="font-medium text-900">Current Password</label>
+                            <input type="text" pInputText id="currentPassword" formControlName="currentPassword" placeholder="Current Password"
+                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && currentPassword.invalid)}" />
+                            <small *ngIf="submitted && currentPassword.hasError('required')"class="ng-dirty ng-invalid text-red-500">Current Password is required</small> 
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="field col">
+                            <label for="title" class="font-medium text-900">New Password</label>
+                            <input type="text" pInputText id="newPassword" formControlName="newPassword" placeholder="New Password"
+                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && newPassword.invalid)}" />
+                            <p *ngIf="submitted && newPassword.hasError('required')"class="ng-dirty ng-invalid text-red-500 text-sm">New Password is required</p> 
+                            <p *ngIf="newPassword.hasError('pattern')" class="ng-dirty ng-invalid text-red-500 text-sm">At least 1 uppercase letter (A–Z),At least 1 lowercase letter (a–z),At least 1 number (0–9),At least 1 symbol from: !&#64;#$%^&*_=+- ,Minimum 8 characters, maximum 12 characters</p> 
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="field col">
+                            <label for="title" class="font-medium text-900">Confirm New Password</label>
+                            <input type="text" pInputText id="confirmNewPassword" formControlName="confirmNewPassword" placeholder="Confirm New Password"
+                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && confirmNewPassword.invalid)}" />
+                            <div class="flex flex-column">
+                            <span *ngIf="submitted && confirmNewPassword.hasError('required')"class="ng-dirty ng-invalid text-red-500 ">Confirm New Password is required</span>                      
+                            <span *ngIf="confirmNewPassword.hasError('passwordMismatch')"class="ng-dirty ng-invalid text-red-500 text-sm">password Mismatch</span> 
+                            <span *ngIf="confirmNewPassword.hasError('pattern')" class="ng-dirty ng-invalid text-red-500 text-sm">At least 1 uppercase letter (A–Z),At least 1 lowercase letter (a–z),At least 1 number (0–9),At least 1 symbol from: !&#64;#$%^&*_=+- ,Minimum 8 characters, maximum 12 characters</span> 
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="cancelDialog()"></button>
+        <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text"
+            (click)="EditPassword()">
+        </button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="userProfileDialog" [style]="{ width: '80%', height: '70%' }" header="User Profile" [modal]="true" (onHide)="cancelUserProfileDialog()"
+    class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="UpdateUserProfileObj">
+                <div class="align-items-center grid formgrid p-fluid">
+                    <div class="col-6">
+                        <div class="field col">
+                            <label for="title" class="font-medium text-900">First Name</label>
+                            <input type="text" pInputText id="FirstName" formControlName="FirstName" placeholder="Current Password"
+                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && currentPassword.invalid)}" />
+                            <small *ngIf="submitted && FirstName.hasError('required')"class="ng-dirty ng-invalid text-red-500">First Name is required</small> 
+                        </div>
+                        <div class="field col">
+                            <label for="title" class="font-medium text-900">Last Name</label>
+                            <input type="text" pInputText id="LastName" formControlName="LastName" placeholder="Last Name"
+                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && LastName.invalid)}" />
+                            <p *ngIf="submitted && LastName.hasError('required')"class="ng-dirty ng-invalid text-red-500 text-sm">Last Name is required</p> 
+                        </div>
+                        <div class="field col">
+                            <label for="title" class="font-medium text-900">User Name</label>
+                            <input type="text" pInputText id="UserName" formControlName="UserName" placeholder="User Name"
+                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && UserName.invalid)}" />
+                            <small *ngIf="submitted && UserName.hasError('required')"class="ng-dirty ng-invalid text-red-500 ">User Name is required</small>                      
+                        </div>
+                    </div>
+                      
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="cancelUserProfileDialog()"></button>
+        <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text"
+            (click)="UpdateUserProfile()">
+        </button>
+    </ng-template>
+</p-dialog>
+<p-toast></p-toast>
+

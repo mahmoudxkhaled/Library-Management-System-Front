@@ -17,6 +17,8 @@ import { AppFooterComponent } from './footer/app.footer.component';
 import { AppConfigModule } from './config/config.module';
 import { AppLayoutComponent } from "./app.layout.component";
 import { AppSidebarComponent } from './sidebar/app.sidebar.component';
+import { MenuModule } from 'primeng/menu';
+import { LMSSharedModule } from '../shared/lms-shared.module';
 
 @NgModule({
     declarations: [
@@ -39,8 +41,9 @@ import { AppSidebarComponent } from './sidebar/app.sidebar.component';
         InputSwitchModule,
         RippleModule,
         RouterModule,
-        AppConfigModule
+        AppConfigModule,
+        MenuModule,
+        LMSSharedModule
     ],
-    exports: [AppLayoutComponent]
-})
+    exports: [AppLayoutComponent]})
 export class AppLayoutModule { }

@@ -2,13 +2,33 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { ApiService } from 'src/app/core/services/api-service.service';
+import { IUser } from '../models/IUser';
+import { IUserLogged } from '../models/UserLogged';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService,private router:Router) { }
 
+  GetCurrentUserDetails():Observable<ApiResult>
+  {
+    return this.apiService.getAllRequest<ApiResult>('/User/GetCurrentUserDetails')
+  }
+  getLoggedInUser():IUserLogged
+  {
+    return JSON.parse(localStorage.getItem("userData"));
+  }
+  changePassword(changePasswordDto:any)
+  {
+    return this.apiService.postRequest('/User/changePassword',changePasswordDto)
+  }
+  Logout()
+  {
+    localStorage.removeItem('userData')
+    this.router.navigate(['/auth/login']);
+  }
   getAllUsers(): Observable<ApiResult> {
     return this.apiService.getAllRequest<ApiResult>('/User/GetAllUsers');
   }
