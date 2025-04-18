@@ -7,6 +7,7 @@ import { IUser } from 'src/app/modules/admin/components/users/models/IUser';
 import { IUserLogged } from 'src/app/modules/admin/components/users/models/UserLogged';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ApiResult } from 'src/app/core/models/ApiResult';
+import { NgxSpinnerService } from 'ngx-spinner';
 export function passwordsMatchValidator(newPassword:string,confirmPassword:string):ValidatorFn
 {
     return (FormGroup:AbstractControl):ValidationErrors | null=>{
@@ -41,7 +42,9 @@ export class AppTopBarComponent implements OnInit{
     changePasswordObj:FormGroup;
     UpdateUserProfileObj:FormGroup;
     changePasswordDialog:boolean=false;
+    selectedUserImage: File | null = null;
     userProfileDialog:boolean=false;
+    imageUrl:string | null;
     menuItems: MenuItem[] = [
         { label: 'Profile', icon: 'pi pi-user-edit', command: ()=>this.showUserProfileDetails()},
         { label: 'Borrowed Books', icon: 'pi pi-book', command: null },
@@ -53,9 +56,10 @@ export class AppTopBarComponent implements OnInit{
     @ViewChild('menubutton') menuButton!: ElementRef;
     @ViewChild('topbarmenubutton') topbarMenuButton!: ElementRef;
     @ViewChild('topbarmenu') menu!: ElementRef;
-    constructor(public layoutService: LayoutService,private router:Router,private UserService:UserService,private fb:FormBuilder,private messageService:MessageService) 
+    constructor(public layoutService: LayoutService,private router:Router,private UserService:UserService,private fb:FormBuilder,private messageService:MessageService,private spinner:NgxSpinnerService) 
     {
        this.user=this.UserService.getLoggedInUser();
+console.log('✌️this.user --->', this.user);
      }
     ngOnInit(): void {
         this.changePasswordObj=this.fb.group({
@@ -65,11 +69,11 @@ export class AppTopBarComponent implements OnInit{
         })
         this.changePasswordObj.setValidators(passwordsMatchValidator('newPassword','confirmNewPassword'));
         this.UpdateUserProfileObj=this.fb.group({
-            FirstName:[''],
-            LastName:[''],
-            UserName:[''],
-            Email:[''],
-            PhoneNumber:['']
+            FirstName:['',[Validators.required,Validators.pattern('^[a-zA-Z0-9]*[a-zA-Z]+[a-zA-Z0-9]*$')]],
+            LastName:['',[Validators.required,Validators.pattern('^[a-zA-Z0-9]*[a-zA-Z]+[a-zA-Z0-9]*$')]],
+            UserName:['',[Validators.required,Validators.pattern('^[A-Za-z][A-Za-z0-9@._-]*$')]],
+            Email:['',[Validators.required,Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')]],
+            PhoneNumber:['',[Validators.pattern('^[0-9]+$')]]
         })
     }
     EditPassword()
@@ -143,6 +147,8 @@ export class AppTopBarComponent implements OnInit{
     cancelUserProfileDialog()
     {
         this.userProfileDialog=false;
+        this.imageUrl=null;
+        this.selectedUserImage=null;
     }
     get FirstName()
     {
@@ -166,15 +172,19 @@ export class AppTopBarComponent implements OnInit{
     }
     showUserProfileDetails()
     {
+        this.spinner.show();
         this.UserService.GetCurrentUserDetails().subscribe(res=>{
-            this.userObj=res;
-console.log('✌️this.userObj --->', this.userObj);
-            
-            console.log("res :",this.userObj.data.firstName);
+            this.userObj=res;            
+console.log('✌️ this.userObj --->',  this.userObj);
             this.UpdateUserProfileObj.patchValue({
                 FirstName:this.userObj.data.firstName,
-                LastName:this.userObj.data.lastName
+                LastName:this.userObj.data.lastName,
+                UserName:this.userObj.data.userName,
+                PhoneNumber:this.userObj.data.phoneNumber,
+                Email:this.userObj.data.email
             })
+            this.imageUrl=this.userObj.data.profileImageUrl
+            this.spinner.hide()
             this.userProfileDialog=true;
         },err=>{
             console.log('err :',err);
@@ -183,7 +193,7 @@ console.log('✌️this.userObj --->', this.userObj);
     UpdateUserProfile()
     {
         this.submitted=true;
-        if(this.changePasswordObj.invalid)
+        if(this.UpdateUserProfileObj.invalid)
         {
             console.log("invalid");
             this.messageService.add({
@@ -194,23 +204,65 @@ console.log('✌️this.userObj --->', this.userObj);
               });
               return;
         }
-        console.log("UpdateUserProfileObj :",this.UpdateUserProfileObj);
-        
-    //     this.UserService.UpdateUserProfile(this.UpdateUserProfileObj).subscribe(res=>{
-    //         this.changePasswordDialog=false;
-    //         this.messageService.add({
-    //             severity: 'success',
-    //             summary: 'Successful',
-    //             detail: 'User Profile Updated',
-    //             life: 3000,
-    //           });
-    //     },err=>{
-    //             this.messageService.add({
-    //                 severity: 'error',
-    //                 summary: 'Error',
-    //                 detail: 'error in Update User Profile',
-    //                 life: 3000,
-    //               });
-    //     });
+        console.log("selectedUserImage :",this.selectedUserImage);
+        if((this.FirstName.value==this.userObj.data.firstName) && (this.LastName.value==this.userObj.data.lastName) && (this.UserName.value==this.userObj.data.userName) && (this.PhoneNumber.value==this.userObj.data.phoneNumber) && (this.Email.value==this.userObj.data.email)&&(this.selectedUserImage==null))
+        {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No changes detected. Please modify at least one field to proceed.',
+                life: 3000,
+              });
+            return;
+        }
+        this.spinner.show();
+        const UpdateUserProfile = new FormData();
+        UpdateUserProfile.append('id', this.userObj.data.id);
+        UpdateUserProfile.append('firstName', this.FirstName.value);
+        UpdateUserProfile.append('lastName', this.LastName.value);
+        UpdateUserProfile.append('userName', this.UserName.value);
+        UpdateUserProfile.append('email', this.Email.value);
+        UpdateUserProfile.append('phoneNumber', this.PhoneNumber.value);
+         if(this.selectedUserImage !=null)    
+              UpdateUserProfile.append('profileImageUrl', this.selectedUserImage, this.selectedUserImage.name);        
+        this.UserService.UpdateUserProfile(UpdateUserProfile).subscribe(res=>{
+            this.user.firstName=this.FirstName.value;
+            this.user.lastName=this.LastName.value;
+            this.user.userImageUrl=this.imageUrl;
+            this.user.email=this.Email.value;
+            this.UserService.updateLoggedUser(this.user);
+            this.userProfileDialog=false;
+            this.spinner.hide();
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'User Profile Updated',
+                life: 3000,
+              });
+        },err=>{
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'error in Update User Profile',
+                    life: 3000,
+                  });
+                  this.spinner.hide();
+        });
     }
+    triggerImageUpload()
+  {
+    const fileInput = document.getElementById('userImage') as HTMLInputElement;
+    fileInput.click();
+  }
+  handleImageSelection(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      this.selectedUserImage = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imageUrl = e.target.result;
+      };
+      reader.readAsDataURL(this.selectedUserImage);
+    }
+  }
 }

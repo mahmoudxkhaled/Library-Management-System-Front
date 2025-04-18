@@ -22,7 +22,7 @@
         <div class="user-dropdown" (click)="menu.toggle($event)">
             <div class="user-info">
                 <span>{{ user.firstName }} {{user.lastName}}</span>
-              <img width="35px" height="35px" [src]="user.userImageUrl ?? '/assets/demo/images/avatar/UnknownUser.jpg'"  class="user-img" />
+              <img style="border-radius: 50%;margin-left: 10px;" width="35px" height="35px" [src]="user.userImageUrl ?? '/assets/demo/images/avatar/UnknownUser.jpg'"  class="user-img" />
             </div>
           </div>
           <p-menu #menu [popup]="true" [model]="menuItems"></p-menu>
@@ -96,22 +96,61 @@
                     <div class="col-6">
                         <div class="field col">
                             <label for="title" class="font-medium text-900">First Name</label>
-                            <input type="text" pInputText id="FirstName" formControlName="FirstName" placeholder="Current Password"
-                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && currentPassword.invalid)}" />
-                            <small *ngIf="submitted && FirstName.hasError('required')"class="ng-dirty ng-invalid text-red-500">First Name is required</small> 
+                            <input type="text" pInputText id="FirstName" formControlName="FirstName" placeholder="First Name"
+                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && FirstName.invalid)}" />
+                                <div class="flex flex-column">
+                                <span *ngIf="submitted && FirstName.hasError('required')"class="ng-dirty ng-invalid text-red-500">First Name is required</span> 
+                                <span *ngIf="FirstName.hasError('pattern')"class="ng-dirty ng-invalid text-red-500">First Name must contain only English letters and numbers</span> 
+                                </div>
                         </div>
                         <div class="field col">
                             <label for="title" class="font-medium text-900">Last Name</label>
                             <input type="text" pInputText id="LastName" formControlName="LastName" placeholder="Last Name"
                                 required [ngClass]="{'ng-invalid ng-dirty': (submitted && LastName.invalid)}" />
-                            <p *ngIf="submitted && LastName.hasError('required')"class="ng-dirty ng-invalid text-red-500 text-sm">Last Name is required</p> 
+                                <div class="flex flex-column">
+                                <span *ngIf="submitted && LastName.hasError('required')"class="ng-dirty ng-invalid text-red-500 text-sm">Last Name is required</span> 
+                                <span *ngIf="LastName.hasError('pattern')"class="ng-dirty ng-invalid text-red-500">Last Name must contain only English letters and numbers</span> 
+                                </div>
                         </div>
                         <div class="field col">
                             <label for="title" class="font-medium text-900">User Name</label>
                             <input type="text" pInputText id="UserName" formControlName="UserName" placeholder="User Name"
                                 required [ngClass]="{'ng-invalid ng-dirty': (submitted && UserName.invalid)}" />
-                            <small *ngIf="submitted && UserName.hasError('required')"class="ng-dirty ng-invalid text-red-500 ">User Name is required</small>                      
+                                <div class="flex flex-column">
+                                 <span *ngIf="submitted && UserName.hasError('required')"class="ng-dirty ng-invalid text-red-500 ">User Name is required</span> 
+                                 <span *ngIf="UserName.hasError('pattern')"class="ng-dirty ng-invalid text-red-500">Name must start with a letter and only contain English letters, numbers, or the symbols &#64; _ . -.</span>            
+                                </div>          
                         </div>
+                        <div class="field col">
+                            <label for="title" class="font-medium text-900">Email</label>
+                            <input type="text" pInputText id="Email" formControlName="Email" placeholder="Email"
+                                required [ngClass]="{'ng-invalid ng-dirty': (submitted && Email.invalid)}" />
+                                <div class="flex flex-column">
+                                    <small *ngIf="submitted && Email.hasError('required')"class="ng-dirty ng-invalid text-red-500 ">Email is required</small> 
+                                    <span *ngIf="Email.hasError('pattern')"class="ng-dirty ng-invalid text-red-500">Invalid Email</span> 
+                                </div>                     
+                        </div>
+                        <div class="field col">
+                            <label for="title" class="font-medium text-900">Phone Number</label>
+                            <input type="text" pInputText id="PhoneNumber" formControlName="PhoneNumber" placeholder="Phone Number" />
+                            <span *ngIf="PhoneNumber.hasError('pattern')"class="ng-dirty ng-invalid text-red-500">Only numbers are allowed. No letters, spaces, or symbols.</span> 
+                        </div>
+                      
+                    </div>
+                    <div class="col-6">
+                            <p-panel header="User Image" class="mb-3">
+                                <div class="flex flex-column align-items-center justify-content-center">
+                                    <div class="image-upload-container"  (click)="triggerImageUpload()">
+                                        <img [src]="imageUrl ?? '/assets/demo/images/avatar/UnknownUser.jpg'" alt="Author Image" class="avatar"
+                                            style="width: 300px; height: 225px; max-width: 300px; border-radius: 50%; object-fit: fill; border: 1px solid #ccc; cursor: pointer;" />
+                                        <div class="text-center upload-hover-text">Upload Image</div>
+                                    </div>
+                                    <small class="text-center block m-2">Recommended Dimensions:
+                                        <strong>800px X 500px</strong></small>
+                                </div>
+                                <input type="file" id="userImage" style="display: none"
+                                    (change)="handleImageSelection($event)" />
+                            </p-panel>
                     </div>
                       
             </div>
@@ -126,4 +165,5 @@
     </ng-template>
 </p-dialog>
 <p-toast></p-toast>
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-spin" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 

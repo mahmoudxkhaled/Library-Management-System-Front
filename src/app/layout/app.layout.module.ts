@@ -19,6 +19,7 @@ import { AppLayoutComponent } from "./app.layout.component";
 import { AppSidebarComponent } from './sidebar/app.sidebar.component';
 import { MenuModule } from 'primeng/menu';
 import { LMSSharedModule } from '../shared/lms-shared.module';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
     declarations: [
@@ -43,7 +44,8 @@ import { LMSSharedModule } from '../shared/lms-shared.module';
         RouterModule,
         AppConfigModule,
         MenuModule,
-        LMSSharedModule
+        LMSSharedModule,
+        NgxSpinnerModule
     ],
     exports: [AppLayoutComponent]})
 export class AppLayoutModule { }

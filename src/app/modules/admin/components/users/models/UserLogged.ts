@@ -5,4 +5,6 @@ export interface IUserLogged{
     lastName:string;
     userImageUrl:string;
     userId:number;
+    userName:string;
+    phoneNumber:string;
 }

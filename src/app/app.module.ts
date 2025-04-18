@@ -16,10 +16,13 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { authInterceptor } from './core/Interceptors/auth.interceptor';
 import { BaseUrlInterceptor } from './core/Interceptors/base-url.service';
 import { AdminModule } from './modules/admin/admin.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
     declarations: [AppComponent, NotfoundComponent],
-    imports: [AppRoutingModule, AppLayoutModule,AdminModule],
+    imports: [AppRoutingModule, AppLayoutModule,AdminModule,   BrowserAnimationsModule,
+        NgxSpinnerModule,],
     providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         CountryService, CustomerService, EventService, IconService, NodeService,
