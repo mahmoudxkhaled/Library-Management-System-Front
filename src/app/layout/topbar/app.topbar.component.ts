@@ -149,6 +149,7 @@ console.log('✌️this.user --->', this.user);
         this.userProfileDialog=false;
         this.imageUrl=null;
         this.selectedUserImage=null;
+        this.submitted=false;
     }
     get FirstName()
     {
