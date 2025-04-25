@@ -2,12 +2,22 @@
    <!-- Header Section -->
    <div class="header-section">
       <h1>Our Library Collection</h1>
+      <br>
       <div class="search-bar">
          <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input pInputText type="text" (input)="onSearch($event)" placeholder="Search books..." />
+            <input pInputText type="text" (input)="onSearch($event)" [(ngModel)]="bookParams.Search" placeholder="Search books..." />
          </span>
       </div>
+      <div class="search-dropdown">
+         <p-dropdown [options]="categories" [(ngModel)]="bookParams.categoryId" optionLabel="name" 
+         [filter]="true" filterBy="name" [showClear]="true"  optionValue="id" placeholder="Select Category" (onChange)="onSearch($event)"></p-dropdown>
+     </div>
+     <div class="search-dropdown">
+         <p-dropdown [options]="authors" [(ngModel)]="bookParams.authorId" optionLabel="fullName"
+             [filter]="true" filterBy="fullName" [showClear]="true" optionValue="id"
+             placeholder="Select an author" (onChange)="onSearch($event)"></p-dropdown>
+     </div>
    </div>
 
    <!-- Loading State -->

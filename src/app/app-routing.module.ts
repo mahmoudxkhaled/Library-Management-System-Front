@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { NotfoundComponent } from './demo/components/notfound/notfound.component';
 import { AppLayoutComponent } from "./layout/app.layout.component";
 import { AuthGuard } from './core/guards/auth.guard.service';
+import { AdminGuard } from './core/guards/admin.guard.service';
 
 @NgModule({
     imports: [
@@ -11,7 +12,7 @@ import { AuthGuard } from './core/guards/auth.guard.service';
                 path: '', component: AppLayoutComponent,
                 children: [
                     { path: '', loadChildren: () => import('./demo/components/dashboard/dashboard.module').then(m => m.DashboardModule) },
-                    {path: 'admin', loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule) },
+                    {path: 'admin', loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule), canActivate: [AdminGuard] },
                     { path: 'Books', loadChildren: () => import('src/app/modules/books/books.module').then(b=>b.BooksModule) },
                     { path: 'user', loadChildren: () => import('src/app/modules/user/user.module').then(u=>u.UserModule) },
                     { path: 'uikit', loadChildren: () => import('./demo/components/uikit/uikit.module').then(m => m.UIkitModule) },
