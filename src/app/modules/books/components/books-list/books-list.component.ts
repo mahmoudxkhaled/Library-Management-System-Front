@@ -50,8 +50,8 @@ export class BooksListComponent implements OnInit {
       sortOrder: 1,
       sortField: 'title',
       Search: '',
-      authorId: 0,
-      categoryId: 0
+      authorId: null,
+      categoryId: null
     };
   }
 
@@ -67,7 +67,7 @@ export class BooksListComponent implements OnInit {
       next: (response: ApiResult) => {
         if (response.isSuccess) {
           this.books = response.data.result;
-          console.log(this.books)
+          console.log("this.books ==> ",this.books)
           this.totalRecords = response.data.totalCount;
         }
         this.loading = false;
@@ -80,8 +80,7 @@ export class BooksListComponent implements OnInit {
   }
 
   onSearch(event: Event): void {
-    this.bookParams.Search = this.searchTerm;
-    this.currentPage = 0; // Reset to first page
+    this.currentPage = 0;
     this.loadBooks();
   }
 

@@ -14,6 +14,7 @@ export class BooksService {
 
   constructor(private apiService: ApiService) { }
   getBooksPaged(first: number, rows: number, BookParams: BookParams): Observable<ApiResult> {
+   console.log('BookParams --->', BookParams);
     return this.apiService.postRequest<ApiResult>(`/Book/${first}/${rows}`, BookParams)
   }
   getBookDetailsById(bookId: number): Observable<ApiResult> {

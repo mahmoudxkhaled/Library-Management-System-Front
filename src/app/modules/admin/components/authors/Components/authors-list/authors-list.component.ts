@@ -155,7 +155,7 @@ this.headerDialog="Add New Author"
               this.messageService.add({
                 severity: 'success',
                 summary: 'Successful',
-                detail: 'Book Added',
+                detail: 'Author Added',
                 life: 3000,
               });
               this.initAuthorForm();

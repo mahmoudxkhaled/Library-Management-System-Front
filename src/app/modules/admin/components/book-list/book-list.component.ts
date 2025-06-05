@@ -106,8 +106,9 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.subs.add(
       this.bookService.getBooksPaged(event.first, event.rows, this.bookParams).subscribe((res) => {
         this.books = res.data.result;
-        this.totalRecords = res.data.totalCount
-        console.log(this.books)
+       console.log('res.data.result --->', res.data.result);
+        this.totalRecords = res.data.totalCount;
+        this.loading=false;
         this.ref.detectChanges();
         this.tableLoadingService.hide();
         this.filteredBooks = this.books;
