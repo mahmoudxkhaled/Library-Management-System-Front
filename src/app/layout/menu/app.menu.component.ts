@@ -8,24 +8,33 @@ import { LayoutService } from '../service/app.layout.service';
 })
 export class AppMenuComponent implements OnInit {
 
-    model: any[] = [];
-
-    constructor(public layoutService: LayoutService) { }
+    AllMenu: MenuModel[] = [];
+    allowedMenu: MenuModel[] = [];
+    loggedUserRole: string = '';
+    constructor(public layoutService: LayoutService) { 
+        let userData : any  = localStorage.getItem('userData');
+        if (userData) {
+            const user = JSON.parse(userData);
+            this.loggedUserRole = user?.role;
+        }
+    }
 
     ngOnInit() {
-        // 側邊導覽列item
-        this.model = [
+        this.AllMenu = [
             {
                 label: 'LMS MAIN MENU',
+                allowedUsers: ["Admin","Librarian"],
                 items: [
                     { label: 'Books List', icon: 'pi pi-fw pi-book', routerLink: ['admin/Books'] },
                     { label: 'Categories List', icon: 'pi pi-fw pi-tags', routerLink: ['admin/categories'] },
                     { label: 'Transactions List', icon: 'pi pi-fw pi-credit-card', routerLink: ['admin/transactions'] },
                     { label: 'Users List', icon: 'pi pi-fw pi-users', routerLink: ['admin/users'] },
+                    { label: 'Authors', icon: 'pi pi-fw pi-user', routerLink: ['admin/authors'] },
                 ]
             },
             {
                 label: 'Home',
+                allowedUsers: ["Admin","Member"],
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Books', icon: 'pi pi-fw pi-book', routerLink: ['/Books'] }
@@ -33,6 +42,7 @@ export class AppMenuComponent implements OnInit {
             },
             {
                 label: 'UI Components',
+                allowedUsers: ["Admin","Librarian"],
                 items: [
                     { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', routerLink: ['/uikit/formlayout'] },
                     { label: 'Input', icon: 'pi pi-fw pi-check-square', routerLink: ['/uikit/input'] },
@@ -54,6 +64,7 @@ export class AppMenuComponent implements OnInit {
             },
             {
                 label: 'Prime Blocks',
+                allowedUsers: ["Admin","Librarian"],
                 items: [
                     { label: 'Free Blocks', icon: 'pi pi-fw pi-eye', routerLink: ['/blocks'], badge: 'NEW' },
                     { label: 'All Blocks', icon: 'pi pi-fw pi-globe', url: ['https://www.primefaces.org/primeblocks-ng'], target: '_blank' },
@@ -61,6 +72,7 @@ export class AppMenuComponent implements OnInit {
             },
             {
                 label: 'Utilities',
+                allowedUsers: ["Admin","Librarian"],
                 items: [
                     { label: 'PrimeIcons', icon: 'pi pi-fw pi-prime', routerLink: ['/utilities/icons'] },
                     { label: 'PrimeFlex', icon: 'pi pi-fw pi-desktop', url: ['https://www.primefaces.org/primeflex/'], target: '_blank' },
@@ -68,7 +80,7 @@ export class AppMenuComponent implements OnInit {
             },
             {
                 label: 'Pages',
-                icon: 'pi pi-fw pi-briefcase',
+                allowedUsers: ["Admin","Librarian"],
                 items: [
                     {
                         label: 'Landing',
@@ -118,59 +130,66 @@ export class AppMenuComponent implements OnInit {
                     },
                 ]
             },
-            {
-                label: 'Hierarchy',
-                items: [
-                    {
-                        label: 'Submenu 1', icon: 'pi pi-fw pi-bookmark',
-                        items: [
-                            {
-                                label: 'Submenu 1.1', icon: 'pi pi-fw pi-bookmark',
-                                items: [
-                                    { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                    { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
-                                    { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' },
-                                ]
-                            },
-                            {
-                                label: 'Submenu 1.2', icon: 'pi pi-fw pi-bookmark',
-                                items: [
-                                    { label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }
-                                ]
-                            },
-                        ]
-                    },
-                    {
-                        label: 'Submenu 2', icon: 'pi pi-fw pi-bookmark',
-                        items: [
-                            {
-                                label: 'Submenu 2.1', icon: 'pi pi-fw pi-bookmark',
-                                items: [
-                                    { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                    { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' },
-                                ]
-                            },
-                            {
-                                label: 'Submenu 2.2', icon: 'pi pi-fw pi-bookmark',
-                                items: [
-                                    { label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' },
-                                ]
-                            },
-                        ]
-                    }
-                ]
-            },
-            {
-                label: 'Get Started',
-                items: [
-                    {
-                        label: 'Documentation', icon: 'pi pi-fw pi-question', routerLink: ['/documentation']
-                    },
-                    {
-                        label: 'View Source', icon: 'pi pi-fw pi-search', url: ['https://github.com/primefaces/sakai-ng'], target: '_blank'
-                    }
-                ]
-            }
+            // {
+            //     label: 'Hierarchy',
+            //     items: [
+            //         {
+            //             label: 'Submenu 1', icon: 'pi pi-fw pi-bookmark',
+            //             items: [
+            //                 {
+            //                     label: 'Submenu 1.1', icon: 'pi pi-fw pi-bookmark',
+            //                     items: [
+            //                         { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
+            //                         { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
+            //                         { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' },
+            //                     ]
+            //                 },
+            //                 {
+            //                     label: 'Submenu 1.2', icon: 'pi pi-fw pi-bookmark',
+            //                     items: [
+            //                         { label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }
+            //                     ]
+            //                 },
+            //             ]
+            //         },
+            //         {
+            //             label: 'Submenu 2', icon: 'pi pi-fw pi-bookmark',
+            //             items: [
+            //                 {
+            //                     label: 'Submenu 2.1', icon: 'pi pi-fw pi-bookmark',
+            //                     items: [
+            //                         { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
+            //                         { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' },
+            //                     ]
+            //                 },
+            //                 {
+            //                     label: 'Submenu 2.2', icon: 'pi pi-fw pi-bookmark',
+            //                     items: [
+            //                         { label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' },
+            //                     ]
+            //                 },
+            //             ]
+            //         }
+            //     ]
+            // },
+            // {
+            //     label: 'Get Started',
+            //     items: [
+            //         {
+            //             label: 'Documentation', icon: 'pi pi-fw pi-question', routerLink: ['/documentation']
+            //         },
+            //         {
+            //             label: 'View Source', icon: 'pi pi-fw pi-search', url: ['https://github.com/primefaces/sakai-ng'], target: '_blank'
+            //         }
+            //     ]
+            // }
         ];
+
+        this.allowedMenu = this.AllMenu.filter(a=> a.allowedUsers.includes(this.loggedUserRole));
     }
+}
+export interface MenuModel{
+    label: string,
+    allowedUsers: string[],
+    items:any[]
 }

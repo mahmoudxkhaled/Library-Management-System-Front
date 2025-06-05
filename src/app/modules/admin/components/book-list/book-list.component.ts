@@ -67,11 +67,9 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   ) {
     this.initBookModelAndForm();
   }
-
   ngAfterViewChecked(): void {
     this.ref.detectChanges();
   }
-
   ngOnInit() {
     this.loadCategories();
     this.loadAuthors();

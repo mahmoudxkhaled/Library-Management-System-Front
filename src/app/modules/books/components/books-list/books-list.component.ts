@@ -3,6 +3,10 @@ import { Router } from '@angular/router';
 import { BooksService } from '../../services/books.service';
 import { BookParams } from '../../models/BookParams';
 import { ApiResult } from 'src/app/core/models/ApiResult';
+import { ICategory } from 'src/app/modules/admin/components/categories/models/ICategory';
+import { Author } from 'src/app/modules/admin/models/Author';
+import { CategoryService } from 'src/app/modules/admin/components/categories/services/category.service';
+import { AuthorService } from 'src/app/modules/admin/services/author.service';
 
 interface Book {
   id: number;
@@ -33,8 +37,13 @@ export class BooksListComponent implements OnInit {
   currentPage: number = 0;
   bookParams: BookParams;
 
+  categories: ICategory[] = [];
+  authors:Author[];
+  
   constructor(
     private booksService: BooksService,
+    private categoryServ: CategoryService,
+    private authorService:AuthorService,
     private router: Router
   ) {
     this.bookParams = {
@@ -47,6 +56,8 @@ export class BooksListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadCategories();
+    this.loadAuthors();
     this.loadBooks();
   }
 
@@ -69,8 +80,6 @@ export class BooksListComponent implements OnInit {
   }
 
   onSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchTerm = input.value;
     this.bookParams.Search = this.searchTerm;
     this.currentPage = 0; // Reset to first page
     this.loadBooks();
@@ -80,5 +89,22 @@ export class BooksListComponent implements OnInit {
     this.currentPage = event.first;
     this.pageSize = event.rows;
     this.loadBooks();
+  }
+
+
+  loadCategories() {
+    this.categoryServ.getAllCategories().subscribe({
+      next: (res) => {
+        this.categories = res.data;
+      },
+    })
+  }
+  loadAuthors()
+  {
+    this.authorService.getAllAuthors().subscribe({
+      next: (res) => {
+        this.authors = res.data;
+      },
+    })
   }
 }

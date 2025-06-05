@@ -15,7 +15,14 @@ $gutter: 1rem; //for primeflex grid system
 
 
 
- 
+.user-info{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.user-info:hover{
+  cursor: pointer;
+}
 .square-image {
     width: 100%;  
     height: 250px;  
@@ -23,8 +30,13 @@ $gutter: 1rem; //for primeflex grid system
     border-radius: 8px;
     border: 1px solid #ccc;
   }
-  
-  
+  .dropdown :hover,
+  .dropdown :focus {
+  background-color: white !important;
+}
+  .dropdown:hover .dropdown-menu {
+    display: block;
+  }
 
 
    
