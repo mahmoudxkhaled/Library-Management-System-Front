@@ -34,7 +34,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   switchActivationBookDialog: boolean = false;
   submitted: boolean = false;
   books: IBook[] = [];
-  search:string='';
+  search: string = '';
   categories: ICategory[] = [];
   selectedCategoryId: string = '';
   book: IBook;
@@ -43,21 +43,27 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   selectedBookImage: File | null = null;
   imageUrl: string = '../../../../../assets/media/upload-photo.jpg';
   menuItems: MenuItem[] = [];
-  authors:Author[];
-  totalRecords:number;
-  categoryId:number;
-  authorId:number;
-  reloadPage={first:0,rows:10,sortField:null,sortOrder:1}
-  sortOrder:number=-1
-    bookParams:BookParams;
+  authors: Author[];
+  totalRecords: number;
+  categoryId: number;
+  authorId: number;
+  reloadPage = { first: 0, rows: 10, sortField: null, sortOrder: 1 }
+  sortOrder: number = -1
+  bookParams: BookParams;
+  filteredBooks: IBook[] = [];
+  selectedBook: IBook | null = null;
+  loading: boolean = true;
+  isEditing: boolean = false;
+  searchTerm: string = '';
+
   constructor(
-    private bookServ: BookService,private bookService:BooksService,
+    private bookServ: BookService, private bookService: BooksService,
     private categoryServ: CategoryService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
     private ref: ChangeDetectorRef,
     private tableLoadingService: TableLoadingService,
-    private authorService:AuthorService
+    private authorService: AuthorService
   ) {
     this.initBookModelAndForm();
   }
@@ -69,44 +75,47 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   ngOnInit() {
     this.loadCategories();
     this.loadAuthors();
-    this.bookParams={sortField:null,sortOrder:1,authorId:0,categoryId:0,Search:''}
+    this.bookParams = { sortField: null, sortOrder: 1, authorId: 0, categoryId: 0, Search: '' }
     this.tableLoadingService.loading$.subscribe((isLoading) => {
       this.tableLoadingSpinner = isLoading;
     });
 
-
-
     this.menuItems = [
-      { label: 'Edit', icon: 'pi pi-pencil', command: () => this.editBook(this.book) },
-      { label: 'Delete', icon: 'pi pi-trash', command: () => this.deleteBook(this.book) }
+      { label: 'Edit', icon: 'pi pi-pencil', command: () => this.editBook(this.selectedBook) },
+      { label: 'Delete', icon: 'pi pi-trash', command: () => this.confirmDeleteBook(this.selectedBook) }
     ];
+
+    this.loadBooks({
+      first: 0,
+      rows: 10,
+      sortField: null,
+      sortOrder: 1
+    });
   }
 
   assignCurrentSelect(book: IBook) {
     this.book = book;
   }
-  loadBooks(event:any)
-  {
-    this.reloadPage.first=event.first;
-    this.reloadPage.rows=event.rows;
-    this.bookParams.sortOrder=this.reloadPage.sortOrder;
-    this.bookParams.Search=this.search;
-    this.bookParams.authorId=this.authorId;
-    this.bookParams.categoryId=this.categoryId;
+  loadBooks(event: any) {
+    this.reloadPage.first = event.first;
+    this.reloadPage.rows = event.rows;
+    this.bookParams.sortOrder = this.reloadPage.sortOrder;
+    this.bookParams.Search = this.search;
+    this.bookParams.authorId = this.authorId;
+    this.bookParams.categoryId = this.categoryId;
     this.tableLoadingService.show();
-    console.log("this.bookParams :",this.bookParams);
+    console.log("this.bookParams :", this.bookParams);
     this.subs.add(
-      this.bookService.getBooksPaged(event.first,event.rows,this.bookParams).subscribe((res) => {
+      this.bookService.getBooksPaged(event.first, event.rows, this.bookParams).subscribe((res) => {
         this.books = res.data.result;
-        this.totalRecords=res.data.totalCount
+        this.totalRecords = res.data.totalCount
         console.log(this.books)
         this.ref.detectChanges();
         this.tableLoadingService.hide();
+        this.filteredBooks = this.books;
       })
     );
-
   }
-
 
   loadCategories() {
     this.subs.add(
@@ -117,11 +126,10 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
       })
     );
   }
-  loadAuthors()
-  {
-    this.authorService.getAllAuthors().subscribe(res=>{
-    this.authors=res.data;
-    },err=>{
+  loadAuthors() {
+    this.authorService.getAllAuthors().subscribe(res => {
+      this.authors = res.data;
+    }, err => {
 
     })
   }
@@ -135,7 +143,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   saveBook() {
     this.submitted = true;
     if (this.bookForm.valid) {
-      console.log("value :",this.bookForm.value)
+      console.log("value :", this.bookForm.value)
       const formData = new FormData();
       formData.append('Title', this.bookForm.value.title);
       formData.append('Description', this.bookForm.value.description);
@@ -152,7 +160,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
       if (this.isEditing) {
         // If editing, update book
-        formData.append('Id', this.book.id);
+        formData.append('Id', this.selectedBook!.id);
         this.subs.add(
           this.bookServ.updateBook(formData).subscribe({
             next: () => {
@@ -199,7 +207,6 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
   }
 
-
   declineAddBookDialog() {
     this.submitted = false;
     this.initBookModelAndForm();
@@ -208,14 +215,10 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
   //#endregion
 
-
   //#region Edit Book
-
-  isEditing: boolean = false;
-
   editBook(book: IBook) {
     this.isEditing = true;
-    this.book = { ...book };
+    this.selectedBook = { ...book };
     this.imageUrl = book.imageUrl ? book.imageUrl : '../../../../../assets/media/upload-photo.jpg';
     this.bookForm.patchValue({
       id: book.id,
@@ -232,20 +235,18 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     this.bookDialog = true;
   }
-
   //#endregion
 
-
   //#region Deletion
-  deleteBook(book: IBook) {
+  confirmDeleteBook(book: IBook) {
+    this.selectedBook = book;
     this.deletionBookDialog = true;
-    this.book = { ...book };
   }
 
   confirmDeletion() {
     this.deletionBookDialog = false;
     this.subs.add(
-      this.bookServ.deleteBook(this.book.id).subscribe({
+      this.bookServ.deleteBook(this.selectedBook!.id).subscribe({
         next: (response: ApiResult) => {
           if (response.code !== 406) {
             this.messageService.add({
@@ -278,14 +279,13 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
   //#endregion
 
- 
   initBookModelAndForm() {
     this.book = {
       id: '',
       title: '',
       description: '',
       authorId: null,
-      authorName:'',
+      authorName: '',
       imageUrl: '',
       publicationYear: 0,
       availableCopies: 0,
@@ -345,8 +345,38 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   filterValue: string = '';
   onFilter(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value;
-    this.search=inputValue;
-    this.reloadPage.first=0;
+    this.search = inputValue;
+    this.reloadPage.first = 0;
     this.loadBooks(this.reloadPage);
+  }
+
+  onSearch() {
+    if (!this.searchTerm.trim()) {
+      this.filteredBooks = this.books;
+      return;
+    }
+
+    const searchLower = this.searchTerm.toLowerCase();
+    this.filteredBooks = this.books.filter(book =>
+      book.title.toLowerCase().includes(searchLower) ||
+      book.authorName.toLowerCase().includes(searchLower) ||
+      book.description.toLowerCase().includes(searchLower)
+    );
+  }
+
+  showAddBookDialog() {
+    this.isEditing = false;
+    this.selectedBook = null;
+    this.bookForm.reset({
+      copies: 1
+    });
+    this.imageUrl = '';
+    this.submitted = false;
+    this.bookDialog = true;
+  }
+
+  hideDialog() {
+    this.bookDialog = false;
+    this.submitted = false;
   }
 }
