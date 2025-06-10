@@ -64,7 +64,7 @@
                         <button pButton type="button"
                             [label]="bookDetails?.availableCopies > 0 ? 'Borrow Now' : 'Join Waiting List'"
                             [class]="bookDetails?.availableCopies > 0 ? 'p-button-primary' : 'p-button-secondary'"
-                            (click)="borrowBook()"></button>
+                            (click)="showBorrowBook()"></button>
                     </div>
                 </div>
             </div>
@@ -196,3 +196,27 @@
 
 <!-- Toast Messages -->
 <p-toast></p-toast>
+<!-- Borrow Book Dialog -->
+<p-dialog [(visible)]="borrowBookDialog" [style]="{ width: '50%', maxHeight: '90vh' }"
+    [header]="'Borrow Book'" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="borrowBookForm" (ngSubmit)="borrowBook()">
+            <div class="p-grid p-fluid">
+                <div class="p-col-12 p-md-12">
+                    <div class="field p-col-12">
+                        <label for="dueDate" class="font-medium text-900">Due Date</label>
+                        <input type="date" pInputText id="dueDate" formControlName="dueDate" required
+                            [ngClass]="{'ng-invalid ng-dirty': submitted && !borrowBookForm.controls['dueDate'].valid}" />
+                        <small *ngIf="submitted && !borrowBookForm.controls['dueDate'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Due Date is required</small>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple [label]="'Request'" icon="pi pi-check" class="p-button-primary"
+            (click)="borrowBook()"></button>
+    </ng-template>
+</p-dialog>

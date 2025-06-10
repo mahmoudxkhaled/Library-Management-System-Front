@@ -3,6 +3,8 @@ import { UserTransactionDto } from '../../models/UserTransactionDto';
 import { UserProfileService } from '../../services/user-profile.service';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { Table } from 'primeng/table';
+import { el } from '@fullcalendar/core/internal-common';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-user-transactions-list',
@@ -14,7 +16,9 @@ export class UserTransactionsListComponent implements OnInit {
   loading: boolean = true;
   @ViewChild('filter') filter!: ElementRef;
 
-  constructor(private userService: UserProfileService) { }
+  constructor(private userService: UserProfileService,
+    private messageService: MessageService
+  ) { }
 
   ngOnInit(): void {
       this.loadTransactions();
@@ -26,7 +30,9 @@ export class UserTransactionsListComponent implements OnInit {
         next: (response: ApiResult) => {
           if (response.isSuccess) {
             this.transactions = response.data;
-            console.log("this.transactions ==> ",this.transactions)
+          }
+          else{
+            this.messageService.add({ key: 'tst', severity: 'error', summary: 'Error Message', detail: response.message });
           }
           this.loading = false;
         },

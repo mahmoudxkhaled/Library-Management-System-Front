@@ -48,7 +48,7 @@ export class AppTopBarComponent implements OnInit{
     menuItems: MenuItem[] = [
         { label: 'Profile', icon: 'pi pi-user-edit', command: ()=>this.showUserProfileDetails()},
         { label: 'Borrowed Books', icon: 'pi pi-book', command: ()=> this.goToTransactions() },
-        { label: 'Reservations', icon: 'pi pi-bookmark-fill', command: null },
+        // { label: 'Reservations', icon: 'pi pi-bookmark-fill', command: null },
         { label: 'Change Password', icon: 'pi pi-key', command: ()=>this.changePasswordDialog=true },
         { separator: true },
         { label: 'Logout', icon: 'pi pi-sign-out', command: () => this.Logout() }
