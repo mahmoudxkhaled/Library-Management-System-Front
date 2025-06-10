@@ -47,7 +47,7 @@ export class AppTopBarComponent implements OnInit{
     imageUrl:string | null;
     menuItems: MenuItem[] = [
         { label: 'Profile', icon: 'pi pi-user-edit', command: ()=>this.showUserProfileDetails()},
-        { label: 'Borrowed Books', icon: 'pi pi-book', command: null },
+        { label: 'Borrowed Books', icon: 'pi pi-book', command: ()=> this.goToTransactions() },
         { label: 'Reservations', icon: 'pi pi-bookmark-fill', command: null },
         { label: 'Change Password', icon: 'pi pi-key', command: ()=>this.changePasswordDialog=true },
         { separator: true },
@@ -265,5 +265,9 @@ console.log('✌️ this.userObj --->',  this.userObj);
       };
       reader.readAsDataURL(this.selectedUserImage);
     }
+  }
+
+  goToTransactions(){
+    this.router.navigate(['user/transactions']);
   }
 }
