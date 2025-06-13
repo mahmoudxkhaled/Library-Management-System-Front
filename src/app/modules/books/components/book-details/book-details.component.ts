@@ -110,6 +110,7 @@ export class BookDetailsComponent implements OnInit {
       next: (res) => {
         if (res.isSuccess) {
           this.bookDetails = res.data;
+console.log('✌️ this.bookDetails --->',  this.bookDetails.isBorrowed);
           console.log(this.bookDetails)
           this.loadSimilarBooks();
         } else {

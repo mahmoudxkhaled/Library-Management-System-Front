@@ -18,8 +18,8 @@
              [filter]="true" filterBy="fullName" [showClear]="true" optionValue="id"
              placeholder="Select an author" (onChange)="onSearch($event)"></p-dropdown>
      </div>
+      <span class="status" (click)="deactivateOrActivateTrendingBooks()" [ngClass]="ActivateTrendingBooks == true ?  'Active': 'InActive'">Trending Books</span>   
    </div>
-
    <!-- Loading State -->
    <app-loading-state *ngIf="loading" message="Loading books..."></app-loading-state>
 
@@ -27,7 +27,7 @@
    <div class="books-grid" *ngIf="!loading">
       <a [routerLink]="['/Books', book.id]" class="book-card" *ngFor="let book of books">
          <div class="book-cover">
-            <img [src]="book.coverImageUrl || 'assets/dummy_book_cover.webp'" [alt]="book.title">
+            <img [src]="book.coverImageUrl || book.imageUrl ||'assets/dummy_book_cover.webp'" [alt]="book.title">
             <div class="book-status"
                [ngClass]="{'available': book.availableCopies > 0, 'unavailable': book.availableCopies === 0}">
                {{ book.availableCopies > 0 ? 'Available' : 'Borrowed' }}

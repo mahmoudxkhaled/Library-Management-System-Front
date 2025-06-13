@@ -46,7 +46,7 @@ export class LoginComponent {
             }).subscribe({
                 next: (result) => {
                   if(result.isSuccess){
-                    localStorage.setItem('userData',JSON.stringify(result.data));
+                    this.userService.updateLoggedUser(result.data);
                       this.router.navigate(['/']);
                   }
                   else{

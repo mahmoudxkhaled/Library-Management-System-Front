@@ -225,3 +225,26 @@ border: #eeee solid ;
         }
     }
 }
+.Active {
+    background: #673AB7;
+    color: white;
+  }
+  .Active:hover {
+    background: white;
+    color: #673AB7;
+    cursor: pointer;
+  }
+  .InActive {
+    background: white;
+    color: #673AB7;
+  }
+  .InActive:hover{
+     background: #673AB7;
+    color: white;
+    cursor: pointer;
+  }
+  .status{
+    padding: 10px;
+    border-radius: 10px;
+  }
+
