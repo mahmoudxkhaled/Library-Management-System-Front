@@ -204,11 +204,11 @@
             <div class="p-grid p-fluid">
                 <div class="p-col-12 p-md-12">
                     <div class="field p-col-12">
-                        <label for="dueDate" class="font-medium text-900">Due Date</label>
-                        <input type="date" pInputText id="dueDate" formControlName="dueDate" required
-                            [ngClass]="{'ng-invalid ng-dirty': submitted && !borrowBookForm.controls['dueDate'].valid}" />
-                        <small *ngIf="submitted && !borrowBookForm.controls['dueDate'].valid"
-                            class="ng-dirty ng-invalid text-red-500">Due Date is required</small>
+                        <label for="borrowDays" class="font-medium text-900">Please enter the number of days you wish to borrow the item for:</label>
+                        <input type="number" pInputText id="borrowDays" formControlName="borrowDays" required
+                            [ngClass]="{'ng-invalid ng-dirty': submitted && !borrowBookForm.controls['borrowDays'].valid}" />
+                        <small *ngIf="submitted && !borrowBookForm.controls['borrowDays'].valid"
+                            class="ng-dirty ng-invalid text-red-500">borrow Days is required</small>
                     </div>
                 </div>
             </div>

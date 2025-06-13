@@ -101,7 +101,7 @@ export class BookDetailsComponent implements OnInit {
 
     this.borrowBookForm = this.formBuilder.group({
       bookId: [this.bookId, Validators.required],
-      dueDate: [null, Validators.required]
+      borrowDays: [null, Validators.required]
     });
   }
 
@@ -242,6 +242,15 @@ export class BookDetailsComponent implements OnInit {
   borrowBook(){
     this.submitted = true;
     if (this.borrowBookForm.valid) {
+      if(this.borrowBookForm.value.borrowDays > 90)
+      {
+         this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'You can not borrow book for more than 90 days'
+            });
+            return;
+      }
       this.borrowService.BorrowBook(this.borrowBookForm.value).subscribe({
             next: (res) => {
           if (res.isSuccess) {

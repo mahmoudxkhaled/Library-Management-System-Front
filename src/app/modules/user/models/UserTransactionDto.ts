@@ -3,8 +3,9 @@ export interface UserTransactionDto {
   bookId: number;
   bookName: string;
   bookImageUrl: string;
-  issueDate: Date;
-  dueDate: Date;
+  requestDate:Date;
+  issueDate?: Date;
+  dueDate?: Date;
   returnDate?: Date;
   status: string;
   isOverdue: boolean;
