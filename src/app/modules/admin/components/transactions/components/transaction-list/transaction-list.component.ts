@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
-import { ITransaction } from '../../models/ITransaction';
+import { ITransaction, ITransactionDetails } from '../../models/ITransaction';
 import { TransactionService } from '../../services/transaction.service';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 
@@ -31,19 +31,19 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   returnBookForm: FormGroup;
 
   addTransactionDialog: boolean = false;
-  updateTransactionDialog: boolean = false;
-  deletionTransactionDialog: boolean = false;
+  transactionDetailsDialog: boolean = false;
   
   switchActivationTransactionDialog: boolean = false;
 
   submitted: boolean = false;
 
   transactions: ITransaction[] = [];
-  selectedTransaction: ITransaction | null = null;
+  selectedTransaction: ITransactionDetails | null = null;
 
   addTransactionForm: FormGroup;
   updateTransactionForm: FormGroup;
 
+  
 
   constructor(
     private transactionServ: TransactionService,
@@ -68,9 +68,6 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
 
   }
 
-  assignCurrentSelect(transaction: ITransaction) {
-    this.selectedTransaction = transaction;
-  }
 
   loadTransactions() {
     this.tableLoadingService.show();
@@ -128,111 +125,8 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   }
   //#endregion
 
-  //#region Update Transaction
-  openUpdateTransactionDialog(transaction: ITransaction) {
-    this.selectedTransaction = transaction;
-    this.updateTransactionForm = this.formBuilder.group({
-      id: [transaction.id],
-      returnDate: [transaction.returnDate],
-      status: [transaction.status, Validators.required],
-    });
-    this.updateTransactionDialog = true;
-  }
-
-  saveUpdateTransaction() {
-    this.submitted = true;
-
-    if (this.updateTransactionForm.valid) {
-      const request = this.updateTransactionForm.value;
-
-      this.subs.add(
-        this.transactionServ.updateTransaction(request).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'Transaction Updated',
-              life: 3000,
-            });
-            this.loadTransactions();
-            this.ref.detectChanges();
-            this.updateTransactionDialog = false;
-          },
-        })
-      );
-    } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Fill all fields please',
-        life: 3000,
-      });
-    }
-  }
-
-  declineUpdateTransactionDialog() {
-    this.submitted = false;
-    this.updateTransactionDialog = false;
-  }
-  //#endregion
-
-  //#region Deletion
-  deleteTransaction(transaction: ITransaction) {
-    this.deletionTransactionDialog = true;
-    this.selectedTransaction = { ...transaction };
-  }
-
-  confirmDeletion() {
-    this.deletionTransactionDialog = false;
-    this.subs.add(
-      this.transactionServ.deleteTransaction(this.selectedTransaction!.id).subscribe({
-        next: (response: ApiResult) => {
-          if (response.code !== 406) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successfully',
-              detail: response.message,
-              life: 3000,
-            });
-            this.loadTransactions();
-            this.ref.detectChanges();
-          } else {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Cannot delete transaction',
-              life: 5000,
-            });
-            this.loadTransactions();
-            this.ref.detectChanges();
-          }
-        },
-      })
-    );
-    this.initTransactionModelAndForm();
-    this.deletionTransactionDialog = false;
-  }
-
-  declineDeletion() {
-    this.deletionTransactionDialog = false;
-    this.initTransactionModelAndForm();
-  }
-  //#endregion
 
   initTransactionModelAndForm() {
-    this.selectedTransaction = {
-      id: '',
-      userId: '',
-      bookId: '',
-      issueDate: new Date(),
-      dueDate: new Date(),
-      returnDate: undefined,
-      status: 'Issued',
-      isActive: false,
-      userFullName:'',
-      bookName:''
-    };
-
     this.addTransactionForm = this.formBuilder.group({
       userId: ['', Validators.required],
       bookId: ['', Validators.required],
@@ -358,7 +252,36 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
             detail: error.error.message? error.error.message: 'Failed to submit Returning book'
           });
         }
-      })
+      });
     }
+  }
+
+  hideDetailsBookDialog() {
+    this.transactionDetailsDialog = false;
+  }
+  getDetails(transactionId: string){
+    this.transactionServ.getTransactionById(transactionId).subscribe({
+            next: (res) => {
+                if (res.isSuccess) {
+                  this.selectedTransaction = res.data;
+                  this.transactionDetailsDialog = true;
+                  //show details dialog
+                } else {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: res.message || 'Failed to get transaction details'
+                  });
+                }
+        },
+        error: (error) => {
+          console.error('Error getting transaction details:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message? error.error.message: 'Failed to get transaction details'
+          });
+        }
+      })
   }
 }

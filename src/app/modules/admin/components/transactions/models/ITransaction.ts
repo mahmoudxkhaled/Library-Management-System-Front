@@ -14,3 +14,10 @@ export interface ITransaction {
     userFullName:string;
     bookName:string;
 }
+
+export interface ITransactionDetails extends ITransaction {
+    borrowDays:number;
+    issuedByUser:string;
+    returnNotes:string;
+    returnedByUser:string;
+}

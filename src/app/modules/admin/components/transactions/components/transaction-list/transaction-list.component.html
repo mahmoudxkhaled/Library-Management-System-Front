@@ -29,9 +29,11 @@
                                 <div class="mb-3">Return Date: {{ transaction.returnDate ? (transaction.returnDate | date:'mediumDate') : '-' }}</div>
 							</div>
 							<div class="flex align-items-center justify-content-between">
+                                <p-button icon="pi pi-info-circle" title="Details" (click)="getDetails(transaction.id)"> </p-button>
 								<p-button *ngIf="transaction.status == 'Pending'" icon="pi pi-plus" title="Issue Book" (click)="issueBook(transaction.id)"> </p-button>
 								<p-button *ngIf="transaction.status == 'Issued'" icon="pi pi-undo" title="Return Book" (click)="returnBook(transaction.id)"> </p-button>
-							</div>
+							
+                            </div>
 						</div>
 					</div>
                 </div>
@@ -104,54 +106,73 @@
     </ng-template>
 </p-dialog>
 
-<!-- Deletion Dialog -->
-<p-dialog [(visible)]="deletionTransactionDialog" header="Delete Transaction" [modal]="true"
-    [style]="{ width: 'auto', maxWidth: '90%' }">
-    <div class="flex align-items-center justify-content-center">
-        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-        <span *ngIf="selectedTransaction">Are you sure you want to delete transaction for <b>{{
-                selectedTransaction.bookId }}</b>?</span>
-    </div>
-    <ng-template pTemplate="footer">
-        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
-            (click)="declineDeletion()"></button>
-        <button pButton pRipple label="Delete" icon="pi pi-check" class="p-button-text"
-            (click)="confirmDeletion()"></button>
-    </ng-template>
-</p-dialog>
 
 
 <!-- Update Transaction Dialog -->
-<p-dialog [(visible)]="updateTransactionDialog" [style]="{ width: '100%', height: '100%' }" header="Update Transaction"
+<p-dialog [(visible)]="transactionDetailsDialog" [style]="{ width: '50%', maxHeight: '90vh' }" header="Transaction Details"
     [modal]="true" class="p-fluid">
     <ng-template pTemplate="content">
-        <form [formGroup]="updateTransactionForm" (ngSubmit)="saveUpdateTransaction()">
-            <div class="col-12">
-                <div class="grid formgrid p-fluid">
-                    <div class="md:col-6">
-                        <div class="field col-12 md:col-12">
-                            <label for="returnDate" class="font-medium text-900">Return Date</label>
-                            <input type="date" pInputText id="returnDate" formControlName="returnDate"
-                                placeholder="Return Date" />
-                        </div>
+        <div class="grid">
+            <div class="col-6">
+                <div class="detail-item">
+                    <i class="pi pi-user"></i>
+                    <span class="label">User:</span> {{selectedTransaction.userFullName}}
+                </div>
+                <div class="detail-item">
+                    <i class="pi pi-calendar"></i>
+                    <span class="label">Request Date:</span> {{selectedTransaction.requestDate | date:'mediumDate'}}
+                </div>
+                <div class="detail-item" *ngIf="selectedTransaction.issueDate">
+                    <i class="pi pi-check-circle"></i>
+                    <span class="label">Issue Date:</span> {{selectedTransaction.issueDate | date:'mediumDate'}}
+                </div>
 
-                        <div class="field col-12 md:col-12">
-                            <label for="status" class="font-medium text-900">Status</label>
-                            <p-dropdown [options]="['Issued', 'Returned', 'Overdue']" formControlName="status"
-                                placeholder="Select Status"></p-dropdown>
-                            <small *ngIf="submitted && !updateTransactionForm.controls['status'].valid"
-                                class="ng-dirty ng-invalid text-red-500">Status is required</small>
-                        </div>
-                    </div>
+                <div class="detail-item" *ngIf="selectedTransaction.issuedByUser">
+                    <i class="pi pi-user-plus"></i>
+                    <span class="label">Issued By:</span> {{selectedTransaction.issuedByUser}}
+                </div>
+
+                <div class="detail-item" *ngIf="selectedTransaction.dueDate">
+                    <i class="pi pi-calendar-plus"></i>
+                    <span class="label">Due Date:</span> {{selectedTransaction.dueDate | date:'mediumDate'}}
+                </div>
+
+                
+
+                <div class="detail-item">
+                    <i class="pi pi-tag"></i>
+                    <span class="label">Status:</span> {{selectedTransaction.status}}
                 </div>
             </div>
-        </form>
+            <div class="col-6">
+                <div class="detail-item">
+                    <i class="pi pi-book"></i>
+                    <span class="label">Book:</span> {{selectedTransaction.bookName}}
+                </div>
+                <div class="detail-item">
+                    <i class="pi pi-send"></i>
+                    <span class="label">Borrow Days:</span> {{selectedTransaction.borrowDays}}
+                </div>
+                <div class="detail-item" *ngIf="selectedTransaction.dueDate">
+                    <i class="pi pi-reply"></i>
+                    <span class="label">Return Date:</span> {{selectedTransaction.returnDate | date:'mediumDate'}}
+                </div>
+
+                <div class="detail-item" *ngIf="selectedTransaction.returnedByUser">
+                    <i class="pi pi-user-minus"></i>
+                    <span class="label">Returned By:</span> {{selectedTransaction.returnedByUser}}
+                </div>
+
+                <div class="detail-item" *ngIf="selectedTransaction.returnNotes">
+                    <i class="pi pi-comments"></i>
+                    <span class="label">Return Notes:</span> {{selectedTransaction.returnNotes}}
+                </div>
+            </div>
+        </div>
     </ng-template>
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
-            (click)="declineUpdateTransactionDialog()"></button>
-        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
-            (click)="saveUpdateTransaction()"></button>
+            (click)="hideDetailsBookDialog()"></button>
     </ng-template>
 </p-dialog>
 
