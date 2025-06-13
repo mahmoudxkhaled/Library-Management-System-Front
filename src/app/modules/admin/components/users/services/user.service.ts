@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { ApiService } from 'src/app/core/services/api-service.service';
 import { IUser } from '../models/IUser';
@@ -13,7 +13,8 @@ import { JsonPipe } from '@angular/common';
 })
 export class UserService {
   constructor(private apiService: ApiService,private router:Router) { }
-
+  private userSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem("userData")));
+  currentUser$ = this.userSubject.asObservable();
   GetCurrentUserDetails():Observable<ApiResult>
   {
     return this.apiService.getAllRequest<ApiResult>('/User/GetCurrentUserDetails')
@@ -26,6 +27,7 @@ export class UserService {
   {
     localStorage.removeItem('userData');
     localStorage.setItem('userData',JSON.stringify(userData))
+    this.userSubject.next(userData);
   }
   changePassword(changePasswordDto:any)
   {

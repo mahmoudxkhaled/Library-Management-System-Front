@@ -98,7 +98,6 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.reloadPage.first = event.first;
     this.reloadPage.rows = event.rows;
     this.bookParams.sortOrder = this.reloadPage.sortOrder;
-    this.bookParams.Search = this.search;
     this.bookParams.authorId = this.authorId;
     this.bookParams.categoryId = this.categoryId;
     this.tableLoadingService.show();
@@ -234,9 +233,6 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     this.bookDialog = true;
   }
-  //#endregion
-
-  //#region Deletion
   confirmDeleteBook(book: IBook) {
     this.selectedBook = book;
     this.deletionBookDialog = true;
@@ -350,17 +346,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   onSearch() {
-    if (!this.searchTerm.trim()) {
-      this.filteredBooks = this.books;
-      return;
-    }
-
-    const searchLower = this.searchTerm.toLowerCase();
-    this.filteredBooks = this.books.filter(book =>
-      book.title.toLowerCase().includes(searchLower) ||
-      book.authorName.toLowerCase().includes(searchLower) ||
-      book.description.toLowerCase().includes(searchLower)
-    );
+    this.loadBooks(this.reloadPage);
   }
 
   showAddBookDialog() {

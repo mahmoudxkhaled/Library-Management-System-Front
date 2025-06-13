@@ -6,11 +6,12 @@
                 <p class="subtitle">Manage your library books</p>
             </div>
             <div class="header-actions">
-                <span class="p-input-icon-left mr-3">
-                    <i class="pi pi-search"></i>
-                    <input type="text" pInputText placeholder="Search books..." [(ngModel)]="searchTerm"
-                        (ngModelChange)="onSearch()" />
-                </span>
+                  <div class="search-bar">
+         <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="onSearch()" [(ngModel)]="bookParams.Search" placeholder="Search books..." />
+         </span>
+      </div>
                 <button pButton pRipple label="Add New Book" icon="pi pi-plus" class="p-button-primary"
                     (click)="showAddBookDialog()"></button>
             </div>
