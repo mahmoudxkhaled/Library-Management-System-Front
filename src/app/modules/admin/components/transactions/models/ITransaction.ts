@@ -5,9 +5,12 @@ export interface ITransaction {
     userId: string;
     bookId: string;
     book?: IBook;
-    issueDate: Date;
+    issueDate?: Date;
     dueDate: Date;
     returnDate?: Date;
-    status: string; // "Issued", "Returned", "Overdue"
+    requestDate?: Date;
+    status: string; // "Pending","Issued", "Returned", "Overdue"
     isActive: boolean;
+    userFullName:string;
+    bookName:string;
 }

@@ -29,4 +29,12 @@ export class TransactionService {
   deleteTransaction(id: string): Observable<ApiResult> {
     return this.apiService.deleteRequest<ApiResult>(`/Transaction/DeleteTransaction`, id);
   }
+
+  issueBook(request: FormData): Observable<ApiResult> {
+    return this.apiService.postRequest<ApiResult>(`/Transaction/IssueBook`, request);
+  }
+
+  returnBook(request: FormData): Observable<ApiResult> {
+    return this.apiService.postRequest<ApiResult>(`/Transaction/ReturnBook`, request);
+  }
 }

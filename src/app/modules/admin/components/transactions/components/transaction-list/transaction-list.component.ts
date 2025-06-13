@@ -23,9 +23,17 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   tableLoadingSpinner: boolean = true;
   subs: Subscription = new Subscription();
 
+  //Issue book
+  issueBookDialog: boolean = false;
+  issueBookForm: FormGroup;
+  //Return book
+  returnBookDialog: boolean = false;
+  returnBookForm: FormGroup;
+
   addTransactionDialog: boolean = false;
   updateTransactionDialog: boolean = false;
   deletionTransactionDialog: boolean = false;
+  
   switchActivationTransactionDialog: boolean = false;
 
   submitted: boolean = false;
@@ -36,7 +44,6 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   addTransactionForm: FormGroup;
   updateTransactionForm: FormGroup;
 
-  menuItems: MenuItem[] = [];
 
   constructor(
     private transactionServ: TransactionService,
@@ -59,20 +66,6 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
       this.tableLoadingSpinner = isLoading;
     });
 
-    const editBtn = {
-      label: 'Edit',
-      icon: 'pi pi-fw pi-pencil',
-      command: () => this.openUpdateTransactionDialog(this.selectedTransaction!),
-    };
-    const deleteBtn = {
-      label: 'Delete',
-      icon: 'pi pi-fw pi-trash',
-      command: () => this.deleteTransaction(this.selectedTransaction!),
-    };
-
-    this.menuItems = [];
-    this.menuItems.push(deleteBtn);
-    this.menuItems.push(editBtn);
   }
 
   assignCurrentSelect(transaction: ITransaction) {
@@ -236,6 +229,8 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
       returnDate: undefined,
       status: 'Issued',
       isActive: false,
+      userFullName:'',
+      bookName:''
     };
 
     this.addTransactionForm = this.formBuilder.group({
@@ -251,5 +246,119 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
 
   ngOnDestroy() {
     this.subs.unsubscribe();
+  }
+
+  getTransactionStatusBadge(status: string){
+      var badge = '';
+      switch(status) { 
+        case "Issued": { 
+            badge = 'qualified'
+            break; 
+        } 
+        case "Returned": { 
+            badge = 'proposal';
+            break; 
+        } 
+        case "Overdue": { 
+            badge = 'unqualified';
+            break; 
+        } 
+        default: { 
+            badge = 'renewal';
+            break; 
+        } 
+      } 
+      return badge;
+    }
+
+
+  hideIssueBookDialog() {
+    this.issueBookDialog = false;
+    this.submitted = false;
+  }
+  issueBook(transactionId: string) {
+    this.submitted = false;
+    this.issueBookDialog = true;
+    this.issueBookForm = this.formBuilder.group({
+      transactionId: [transactionId, Validators.required],
+      issueDate: [null, Validators.required]
+    });
+  }
+  confirmIssueBook() {
+    this.submitted = true;
+    if (this.issueBookForm.valid){
+      this.transactionServ.issueBook(this.issueBookForm.value).subscribe({
+            next: (res) => {
+                if (res.isSuccess) {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: res.message
+                  });
+                  this.hideIssueBookDialog();
+                } else {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: res.message || 'Failed to submit issueing book'
+                  });
+                }
+        },
+        error: (error) => {
+          console.error('Error submitting Issueing Book:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message? error.error.message: 'Failed to submit issueing book'
+          });
+        }
+      })
+    }
+  }
+
+
+  hideReturnBookDialog() {
+    this.returnBookDialog = false;
+    this.submitted = false;
+  }
+  returnBook(transactionId: string) {
+    this.submitted = false;
+    this.returnBookDialog = true;
+    this.returnBookForm = this.formBuilder.group({
+      transactionId: [transactionId, Validators.required],
+      returnDate: [null, Validators.required],
+      notes: [null]
+    });
+  }
+  confirmReturnBook() {
+    this.submitted = true;
+    if (this.returnBookForm.valid){
+      this.transactionServ.returnBook(this.returnBookForm.value).subscribe({
+            next: (res) => {
+                if (res.isSuccess) {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: res.message
+                  });
+                  this.hideReturnBookDialog();
+                } else {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: res.message || 'Failed to submit Returning book'
+                  });
+                }
+        },
+        error: (error) => {
+          console.error('Error submitting Returning Book:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message? error.error.message: 'Failed to submit Returning book'
+          });
+        }
+      })
+    }
   }
 }

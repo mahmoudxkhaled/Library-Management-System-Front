@@ -253,21 +253,21 @@ export class BookDetailsComponent implements OnInit {
       }
       this.borrowService.BorrowBook(this.borrowBookForm.value).subscribe({
             next: (res) => {
-          if (res.isSuccess) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Borrow request has been submitted successfully'
-            });
-            this.loadBookDetails();
-            this.hideDialog();
-          } else {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: res.message || 'Failed to submit borrow request'
-            });
-          }
+                if (res.isSuccess) {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Borrow request has been submitted successfully'
+                  });
+                  this.loadBookDetails();
+                  this.hideDialog();
+                } else {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: res.message || 'Failed to submit borrow request'
+                  });
+                }
         },
         error: (error) => {
           console.error('Error submitting borrow request:', error);
