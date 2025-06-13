@@ -18,6 +18,9 @@ export class TransactionService {
     return this.apiService.getByIdRequest<ApiResult>(`/Transaction/GetTransactionById`, id);
   }
 
+  GetTransactionsByUserId(userId: string): Observable<ApiResult> {
+    return this.apiService.getAllRequest<ApiResult>('/Transaction/GetTransactionsByUserId/' + userId);
+  }
   addTransaction(request: FormData): Observable<ApiResult> {
     return this.apiService.postRequest<ApiResult>('/Transaction/AddTransaction', request);
   }

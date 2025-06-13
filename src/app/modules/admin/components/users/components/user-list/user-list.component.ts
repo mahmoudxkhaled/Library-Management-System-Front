@@ -10,6 +10,8 @@ import { CategoryService } from '../../../categories/services/category.service';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 import { el } from '@fullcalendar/core/internal-common';
 import { Table } from 'primeng/table';
+import { TransactionService } from '../../../transactions/services/transaction.service';
+import { ITransaction } from '../../../transactions/models/ITransaction';
 
 @Component({
   selector: 'app-user-list',
@@ -36,6 +38,8 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   submitted: boolean = false;
 
+  UserTransactionsDialog:boolean = false;
+
   users: IUser[] = [];
   librarians: IUser[] = [];
   members: IUser[] = [];
@@ -55,9 +59,10 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   profileImageUrl: string = '../../../../../assets/media/upload-photo.jpg';
 
   menuItems: MenuItem[] = [];
-
+  userTransactions: ITransaction[] = [];
   constructor(
     private userServ: UserService,
+    private transactionServ: TransactionService,
     private categoryServ: CategoryService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
@@ -349,4 +354,57 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
     this.ref.detectChanges();
   }
+
+
+  hideUserTransactionsDialog(){
+    this.UserTransactionsDialog = false;
+  }
+
+  getUserTransactions(user: IUser){
+    this.transactionServ.GetTransactionsByUserId(user.id).subscribe({
+            next: (res) => {
+                if (res.isSuccess) {
+                  this.userTransactions = res.data;
+                  this.UserTransactionsDialog = true;
+                } else {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: res.message || 'Failed to get user borrowed books'
+                  });
+                }
+        },
+        error: (error) => {
+          console.error('Error getting user borrowed books:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message? error.error.message: 'Failed to get user borrowed books'
+          });
+        }
+      })
+  }
+
+  getTransactionStatusBadge(status: string){
+      var badge = '';
+      switch(status) { 
+        case "Issued": { 
+            badge = 'qualified'
+            break; 
+        } 
+        case "Returned": { 
+            badge = 'proposal';
+            break; 
+        } 
+        case "Overdue": { 
+            badge = 'unqualified';
+            break; 
+        } 
+        default: { 
+            badge = 'renewal';
+            break; 
+        } 
+      } 
+      return badge;
+    }
 }
