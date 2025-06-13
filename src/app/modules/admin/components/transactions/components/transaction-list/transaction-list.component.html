@@ -31,7 +31,7 @@
 							<div class="flex align-items-center justify-content-between">
                                 <p-button icon="pi pi-info-circle" title="Details" (click)="getDetails(transaction.id)"> </p-button>
 								<p-button *ngIf="transaction.status == 'Pending'" icon="pi pi-plus" title="Issue Book" (click)="issueBook(transaction.id)"> </p-button>
-								<p-button *ngIf="transaction.status == 'Issued'" icon="pi pi-undo" title="Return Book" (click)="returnBook(transaction.id)"> </p-button>
+								<p-button *ngIf="transaction.status == 'Issued' || transaction.status == 'Overdue'" icon="pi pi-undo" title="Return Book" (click)="returnBook(transaction.id)"> </p-button>
 							
                             </div>
 						</div>
