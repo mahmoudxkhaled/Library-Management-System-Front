@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
@@ -6,6 +6,7 @@ import { ApiResult } from 'src/app/core/models/ApiResult';
 import { ITransaction, ITransactionDetails } from '../../models/ITransaction';
 import { TransactionService } from '../../services/transaction.service';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
+import { Table } from 'primeng/table';
 
 
 export interface UpdateTransactionDto {
@@ -43,7 +44,10 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   addTransactionForm: FormGroup;
   updateTransactionForm: FormGroup;
 
-  
+  loading: boolean = true;
+  @ViewChild('filter') filter!: ElementRef;
+
+  statuses: string[] = [];
 
   constructor(
     private transactionServ: TransactionService,
@@ -60,6 +64,8 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   }
 
   ngOnInit() {
+
+    this.statuses = ["Pending","Issued","Returned","Overdue"];
     this.loadTransactions();
 
     this.tableLoadingService.loading$.subscribe((isLoading) => {
@@ -71,11 +77,19 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
 
   loadTransactions() {
     this.tableLoadingService.show();
+    this.loading = true;
     this.subs.add(
       this.transactionServ.getAllTransactions().subscribe((data) => {
-        this.transactions = data.data;
+        this.transactions = data.data.map(transaction => ({
+          ...transaction,
+          requestDate: transaction.requestDate? new Date(transaction.requestDate) : null,
+          issueDate: transaction.issueDate? new Date(transaction.issueDate): null,
+          dueDate:  transaction.dueDate? new Date(transaction.dueDate): null,
+          returnDate: transaction.returnDate? new Date(transaction.returnDate) : null
+        }));
         this.ref.detectChanges();
         this.tableLoadingService.hide();
+        this.loading = false;
       })
     );
   }
@@ -190,6 +204,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
                     detail: res.message
                   });
                   this.hideIssueBookDialog();
+                  this.loadTransactions();
                 } else {
                   this.messageService.add({
                     severity: 'error',
@@ -236,6 +251,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
                     detail: res.message
                   });
                   this.hideReturnBookDialog();
+                  this.loadTransactions();
                 } else {
                   this.messageService.add({
                     severity: 'error',
@@ -283,5 +299,14 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
           });
         }
       })
+  }
+
+  onGlobalFilter(table: Table, event: Event) {
+      table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  clear(table: Table) {
+      table.clear();
+      this.filter.nativeElement.value = '';
   }
 }

@@ -16,11 +16,14 @@ export class UserTransactionsListComponent implements OnInit {
   loading: boolean = true;
   @ViewChild('filter') filter!: ElementRef;
 
+  statuses: string[] = [];
+  
   constructor(private userService: UserProfileService,
     private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
+    this.statuses = ["Pending","Issued","Returned","Overdue"];
       this.loadTransactions();
     }
   
@@ -29,7 +32,13 @@ export class UserTransactionsListComponent implements OnInit {
       this.userService.getUserTransactionss().subscribe({
         next: (response: ApiResult) => {
           if (response.isSuccess) {
-            this.transactions = response.data;
+            this.transactions = response.data.map(transaction => ({
+            ...transaction,
+            requestDate: transaction.requestDate? new Date(transaction.requestDate) : null,
+            issueDate: transaction.issueDate? new Date(transaction.issueDate): null,
+            dueDate:  transaction.dueDate? new Date(transaction.dueDate): null,
+            returnDate: transaction.returnDate? new Date(transaction.returnDate) : null
+          }));
           }
           else{
             this.messageService.add({ key: 'tst', severity: 'error', summary: 'Error Message', detail: response.message });

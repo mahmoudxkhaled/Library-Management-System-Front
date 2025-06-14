@@ -218,7 +218,7 @@ console.log('✌️ this.bookDetails --->',  this.bookDetails.isBorrowed);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Failed to submit review'
+            detail:error.error.message? error.error.message: 'Failed to submit review'
           });
         }
       });
