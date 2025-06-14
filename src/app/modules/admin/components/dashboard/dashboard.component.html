@@ -1,0 +1,75 @@
+    <div class="grid">
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Transactions</span>
+                        <div class="text-900 font-medium text-xl">{{dashboard?.transactionCount}}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                        <i class="pi pi-credit-card text-blue-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Returned</span>
+                        <div class="text-900 font-medium text-xl">{{dashboard?.returnedCount}}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-orange-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                        <i class="pi pi-undo text-orange-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Overdue</span>
+                        <div class="text-900 font-medium text-xl">{{dashboard?.overdueCount}}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-cyan-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                        <i class="pi pi-exclamation-triangle text-cyan-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Members</span>
+                        <div class="text-900 font-medium text-xl">{{dashboard?.membersCount}}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                        <i class="pi pi-users text-purple-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6">
+            <div class="card">
+                <h5>Top Books</h5>
+                <p-chart type="bar" [data]="topBooksData" [options]="barOptions"></p-chart>
+            </div>
+            <div class="card flex flex-column align-items-center">
+                <h5 class="text-left w-full">Top Categories</h5>
+                <p-chart type="doughnut" [data]="topCategoriessData" [options]="pieOptions"></p-chart>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6">
+            <div class="card">
+                <h5>Top Users</h5>
+                <p-chart type="bar" [data]="topUsersData" [options]="barOptions"></p-chart>
+            </div>
+            <div class="card flex flex-column align-items-center">
+                <h5 class="text-left w-full">Top Authers</h5>
+                <p-chart type="doughnut" [data]="topAuthersData" [options]="pieOptions"></p-chart>
+            </div>
+        </div>
+</div>
+

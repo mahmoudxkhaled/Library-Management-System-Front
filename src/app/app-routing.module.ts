@@ -12,7 +12,7 @@ import { AdminGuard } from './core/guards/admin.guard.service';
                 path: '', component: AppLayoutComponent,
                 children: [
                     { path: '', loadChildren: () => import('./demo/components/dashboard/dashboard.module').then(m => m.DashboardModule) },
-                    {path: 'admin', loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule), canActivate: [AdminGuard] },
+                    { path: 'admin', loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule), canActivate: [AdminGuard] },
                     { path: 'Books', loadChildren: () => import('src/app/modules/books/books.module').then(b=>b.BooksModule) },
                     { path: 'user', loadChildren: () => import('src/app/modules/user/user.module').then(u=>u.UserModule) },
                     { path: 'uikit', loadChildren: () => import('./demo/components/uikit/uikit.module').then(m => m.UIkitModule) },

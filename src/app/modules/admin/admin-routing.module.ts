@@ -8,6 +8,7 @@ import { TrendingBookListComponent } from './components/trending-books/component
 
 const routes: Routes = [
     { path: 'Books', component: BookListComponent },
+    { path: 'dashboard', loadChildren: () => import('src/app/modules/admin/components/dashboard/dashboard.module').then(m => m.DashboardModule) },
     { path: 'categories',loadChildren: () => import('src/app/modules/admin/components/categories/categories.module').then(m => m.CategoriesModule) },
     { path: 'feedbacks',loadChildren: () => import('src/app/modules/admin/components/feedbacks/feedbacks.module').then(m => m.FeedbacksModule)  },
     { path: 'transactions',loadChildren: () => import('src/app/modules/admin/components/transactions/transactions.module').then(m => m.TransactionsModule) },
