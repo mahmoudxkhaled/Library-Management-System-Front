@@ -7,6 +7,8 @@ import { ITransaction, ITransactionDetails } from '../../models/ITransaction';
 import { TransactionService } from '../../services/transaction.service';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 import { Table } from 'primeng/table';
+import { SelectedFilter } from 'src/app/modules/admin/models/SelectedFilters';
+import { BooksService } from 'src/app/modules/books/services/books.service';
 
 
 export interface UpdateTransactionDto {
@@ -48,8 +50,10 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   @ViewChild('filter') filter!: ElementRef;
 
   statuses: string[] = [];
-
+  selectedFilters:SelectedFilter[]
+  excelColumns:SelectedFilter[]=[{name:"Book"},{name:"User"},{name:"RequestDate"},{name:"IssueDate"},{name:"DueDate"},{name:"ReturnDate"},{name:"Status"},{name:"IssuedByUser"},{name:"ReturnedByUser"}]
   constructor(
+    private BooksService:BooksService,
     private transactionServ: TransactionService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
@@ -74,7 +78,28 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
 
   }
 
-
+ExportToExcel()
+{
+  if(this.selectedFilters===undefined){
+    this.messageService.add({
+                    severity: 'error',
+                    summary: 'Export Requirements',
+                    detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
+                    life: 3000,
+                  });
+                  return;
+  }
+   this.transactionServ.ExportToExcel(this.selectedFilters).subscribe(res=>{
+    this.BooksService.downLoadFile(res,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "UserRecords.xlsx");
+  },err=>{
+ this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed Export to Excel'
+          });
+     }
+  )
+}
   loadTransactions() {
     this.tableLoadingService.show();
     this.loading = true;

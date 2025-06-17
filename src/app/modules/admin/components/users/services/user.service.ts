@@ -7,6 +7,7 @@ import { IUserLogged } from '../models/UserLogged';
 import { Router } from '@angular/router';
 import { UpdateUserProfileDto } from 'src/app/modules/user/models/UpdateUserProfileDto ';
 import { JsonPipe } from '@angular/common';
+import { SelectedFilter } from '../../../models/SelectedFilters';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +42,10 @@ export class UserService {
   getAllUsers(): Observable<ApiResult> {
     return this.apiService.getAllRequest<ApiResult>('/User/GetAllUsers');
   }
-
+  ExportToExcel(SelectedFilters:SelectedFilter[]): Observable<ArrayBuffer>
+  {
+    return this.apiService.ExportToExcel(`/User/ExportToExcel`,SelectedFilters);
+  }
   getUserById(id: string): Observable<ApiResult> {
     return this.apiService.getByIdRequest<ApiResult>('/User/GetUserById', id);
   }

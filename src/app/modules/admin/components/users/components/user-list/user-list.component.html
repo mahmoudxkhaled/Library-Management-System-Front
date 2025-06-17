@@ -1,8 +1,10 @@
 <div class="card p-4">
     <p-toast></p-toast>
-    <div class="flex justify-content-between align-items-center mb-4">
-        <h5>Users List</h5>
-        <button pButton pRipple label="Add New User" icon="pi pi-plus" class="p-button" (click)="addUser()"></button>
+         <div class="grid">
+            <div class="col"><h5>Users List</h5></div>
+            <div class="col col-offset-5"><p-multiSelect  [options]="excelColumns" [(ngModel)]="selectedFilters"   optionLabel="name" placeholder="Select columns" /></div>
+            <div class="col"><button pButton pRipple label="Export to Excel" icon="pi pi-file-excel" class="p-button-success" (click)="ExportToExcel()"></button></div>
+            <div class="col"><button pButton pRipple label="Add New User" icon="pi pi-plus" class="p-button" (click)="addUser()"></button></div>
     </div>
 
     <!-- Loading State -->

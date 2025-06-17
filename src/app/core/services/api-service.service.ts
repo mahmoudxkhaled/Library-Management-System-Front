@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Options } from '@fullcalendar/core/preact';
 import { Observable } from 'rxjs';
+import { SelectedFilter } from 'src/app/modules/admin/models/SelectedFilters';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -11,7 +13,10 @@ export class ApiService {
     BASE_URLII = environment.apiUrlWithoutAPI;
 
     constructor(private httpClient: HttpClient) { }
-
+    ExportToExcel(path:string,SelectedFilters:SelectedFilter[]):Observable<ArrayBuffer>
+    {
+      return  this.httpClient.post(`${this.BASE_URL}${path}`,SelectedFilters,{responseType:'arraybuffer'});
+    }
     getAllRequest<T>(path: string): Observable<T> {
         return this.httpClient.get<T>(`${this.BASE_URL}${path}`);
     }
