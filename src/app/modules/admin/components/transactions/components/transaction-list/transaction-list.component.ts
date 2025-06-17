@@ -90,7 +90,7 @@ ExportToExcel()
                   return;
   }
    this.transactionServ.ExportToExcel(this.selectedFilters).subscribe(res=>{
-    this.BooksService.downLoadFile(res,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "UserRecords.xlsx");
+    this.BooksService.downLoadFile(res,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TransactionRecords.xlsx");
   },err=>{
  this.messageService.add({
             severity: 'error',
