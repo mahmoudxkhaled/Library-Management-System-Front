@@ -8,8 +8,8 @@ export interface IBook {
   title: string;
   description: string;
   authorName: string;
-  authorId:number
-  imageUrl?: string;
+  authorId: number
+  coverImageUrl?: string;
   publicationYear: number;
   availableCopies: number;
   totalCopies: number;

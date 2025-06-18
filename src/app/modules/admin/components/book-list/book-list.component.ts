@@ -1,7 +1,7 @@
 import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
-import { Subscription } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { IBook } from '../../models/IBook';
 import { BookService } from '../../services/book.service';
@@ -67,9 +67,11 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   ) {
     this.initBookModelAndForm();
   }
+
   ngAfterViewChecked(): void {
     this.ref.detectChanges();
   }
+
   ngOnInit() {
     this.loadCategories();
     this.loadAuthors();
@@ -104,7 +106,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.tableLoadingService.show();
     console.log("this.bookParams :", this.bookParams);
     this.subs.add(
-      this.bookService.getBooksPaged(event.first, event.rows, this.bookParams).subscribe((res) => {
+      this.bookService.getBooksPaged(event.first, event.rows, this.bookParams).pipe(finalize(() => this.loading = false)).subscribe((res) => {
         this.books = res.data.result;
         this.totalRecords = res.data.totalCount
         console.log(this.books)
@@ -127,6 +129,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   loadAuthors() {
     this.authorService.getAllAuthors().subscribe(res => {
       this.authors = res.data;
+      console.log("this.authors :", this.authors)
     }, err => {
 
     })
@@ -217,7 +220,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   editBook(book: IBook) {
     this.isEditing = true;
     this.selectedBook = { ...book };
-    this.imageUrl = book.imageUrl ? book.imageUrl : '../../../../../assets/media/upload-photo.jpg';
+    this.imageUrl = book.coverImageUrl ? book.coverImageUrl : '../../../../../assets/media/upload-photo.jpg';
     this.bookForm.patchValue({
       id: book.id,
       title: book.title,
@@ -227,7 +230,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
       availableCopies: book.availableCopies,
       totalCopies: book.totalCopies,
       categoryId: book.categoryId,
-      imageUrl: book.imageUrl,
+      imageUrl: book.coverImageUrl,
       isActive: book.isActive,
     });
 
@@ -284,7 +287,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
       description: '',
       authorId: null,
       authorName: '',
-      imageUrl: '',
+      coverImageUrl: '',
       publicationYear: 0,
       availableCopies: 0,
       totalCopies: 0,
@@ -366,9 +369,11 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.isEditing = false;
     this.selectedBook = null;
     this.bookForm.reset({
-      copies: 1
+      availableCopies: 1,
+      totalCopies: 1,
+      isActive: true
     });
-    this.imageUrl = '';
+    this.imageUrl = '../../../../../assets/media/upload-photo.jpg';
     this.submitted = false;
     this.bookDialog = true;
   }

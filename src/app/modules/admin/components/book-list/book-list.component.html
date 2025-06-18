@@ -26,7 +26,7 @@
                     <div class="my-3 px-3 col-12 md:col-4" *ngFor="let book of books">
                         <div class="book-card">
                             <div class="image-container" (click)="editBook(book)">
-                                <img [src]="book.imageUrl ?? 'assets/media/dummy-book.jpg'" [alt]="book.title"
+                                <img [src]="book.coverImageUrl ?? 'assets/media/dummy-book.jpg'" [alt]="book.title"
                                     class="book-image" />
                                 <div class="image-overlay">
                                     <i class="pi pi-pencil"></i>
@@ -45,7 +45,7 @@
                                 <div class="book-footer">
                                     <div class="book-info">
                                         <i class="pi pi-user"></i>
-                                        <span>{{ book.author }}</span>
+                                        <span>{{ book.authorFullName }}</span>
                                     </div>
                                     <div class="book-status" [ngClass]="{'available': book.availableCopies > 0}">
                                         {{ book.availableCopies > 0 ? 'Available' : 'Borrowed' }}
@@ -77,12 +77,33 @@
                     </div>
 
                     <div class="field p-col-12">
-                        <label for="author" class="font-medium text-900">Author</label>
-                        <input type="text" pInputText id="author" formControlName="author"
-                            placeholder="Enter author name" required
-                            [ngClass]="{'ng-invalid ng-dirty': submitted && !bookForm.controls['author'].valid}" />
-                        <small *ngIf="submitted && !bookForm.controls['author'].valid"
+                        <label for="authorId" class="font-medium text-900">Author</label>
+                        <p-dropdown id="authorId" formControlName="authorId" [options]="authors" optionLabel="fullName"
+                            optionValue="id" placeholder="Select an author" required
+                            [ngClass]="{'ng-invalid ng-dirty': submitted && !bookForm.controls['authorId'].valid}">
+                        </p-dropdown>
+                        <small *ngIf="submitted && !bookForm.controls['authorId'].valid"
                             class="ng-dirty ng-invalid text-red-500">Author is required</small>
+                    </div>
+
+                    <div class="field p-col-12">
+                        <label for="categoryId" class="font-medium text-900">Category</label>
+                        <p-dropdown id="categoryId" formControlName="categoryId" [options]="categories"
+                            optionLabel="name" optionValue="id" placeholder="Select a category" required
+                            [ngClass]="{'ng-invalid ng-dirty': submitted && !bookForm.controls['categoryId'].valid}">
+                        </p-dropdown>
+                        <small *ngIf="submitted && !bookForm.controls['categoryId'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Category is required</small>
+                    </div>
+
+                    <div class="field p-col-12">
+                        <label for="publicationYear" class="font-medium text-900">Publication Year</label>
+                        <p-inputNumber id="publicationYear" formControlName="publicationYear" [min]="1900" [max]="2024"
+                            placeholder="Enter publication year" required
+                            [ngClass]="{'ng-invalid ng-dirty': submitted && !bookForm.controls['publicationYear'].valid}">
+                        </p-inputNumber>
+                        <small *ngIf="submitted && !bookForm.controls['publicationYear'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Publication year is required</small>
                     </div>
 
                     <div class="field p-col-12">
@@ -96,8 +117,17 @@
                     </div>
 
                     <div class="field p-col-12">
-                        <label for="copies" class="font-medium text-900">Number of Copies</label>
-                        <p-inputNumber id="copies" formControlName="copies" [showButtons]="true" [min]="1"
+                        <label for="availableCopies" class="font-medium text-900">Number of Copies</label>
+                        <p-inputNumber id="availableCopies" formControlName="availableCopies" [showButtons]="true"
+                            [min]="1" buttonLayout="horizontal" spinnerMode="horizontal"
+                            decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary"
+                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus">
+                        </p-inputNumber>
+                    </div>
+
+                    <div class="field p-col-12">
+                        <label for="totalCopies" class="font-medium text-900">Total Copies</label>
+                        <p-inputNumber id="totalCopies" formControlName="totalCopies" [showButtons]="true" [min]="1"
                             buttonLayout="horizontal" spinnerMode="horizontal" decrementButtonClass="p-button-secondary"
                             incrementButtonClass="p-button-secondary" incrementButtonIcon="pi pi-plus"
                             decrementButtonIcon="pi pi-minus">
@@ -142,8 +172,8 @@
     </div>
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
-            (click)="deleteBookDialog = false"></button>
+            (click)="declineDeletion()"></button>
         <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger"
-            (click)="deleteBook()"></button>
+            (click)="confirmDeletion()"></button>
     </ng-template>
 </p-dialog>
