@@ -203,6 +203,12 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
     return badge;
   }
 
+  isOverdue(dueDate: Date): boolean {
+    if (!dueDate) return false;
+    const today = new Date();
+    const due = new Date(dueDate);
+    return due < today;
+  }
 
   hideIssueBookDialog() {
     this.issueBookDialog = false;

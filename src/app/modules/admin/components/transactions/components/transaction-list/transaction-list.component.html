@@ -48,21 +48,21 @@
                             placeholder="Search by name"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 12rem">
+                <th style="min-width: 10rem">
                     <div class="flex justify-content-between align-items-center">
                         Request Date
                         <p-columnFilter type="date" field="requestDate" display="menu"
                             placeholder="mm/dd/yyyy"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 12rem">
+                <th style="min-width: 10rem">
                     <div class="flex justify-content-between align-items-center">
                         Issue Date
                         <p-columnFilter type="date" field="issueDate" display="menu"
                             placeholder="mm/dd/yyyy"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 14rem">
+                <th style="min-width: 10rem">
                     <div class="flex justify-content-between align-items-center">
                         Due Date
                         <p-columnFilter type="date" field="dueDate" display="menu"
@@ -76,7 +76,7 @@
                             placeholder="mm/dd/yyyy"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 12rem">
+                <th style="min-width: 10rem">
                     <div class="flex justify-content-between align-items-center">
                         Status
                         <p-columnFilter field="status" matchMode="equals" display="menu">
@@ -131,7 +131,7 @@
                     {{book.dueDate | date: 'MM/dd/yyyy'}}
                 </td>
                 <td>
-                    {{book.returnDate | date: 'MM/dd/yyyy'}}
+                    {{book.returnDate | date: 'short'}}
                 </td>
                 <td>
                     <span
@@ -229,69 +229,100 @@
 
 
 <!-- Update Transaction Dialog -->
-<p-dialog [(visible)]="transactionDetailsDialog" [style]="{ width: '50%', maxHeight: '90vh' }"
+<p-dialog [(visible)]="transactionDetailsDialog" [style]="{ width: '70%', maxHeight: '90vh' }"
     header="Transaction Details" [modal]="true" class="p-fluid">
     <ng-template pTemplate="content">
-        <div class="grid">
-            <div class="col-6">
-                <div class="detail-item">
-                    <i class="pi pi-user"></i>
-                    <span class="label">User:</span> {{selectedTransaction.userFullName}}
+        <div class="transaction-details-container">
+            <!-- Header Section -->
+            <div class="transaction-header mb-4">
+                <div class="book-info">
+                    <i class="pi pi-book text-primary" style="font-size: 1.5rem;"></i>
+                    <h3 class="book-title">{{selectedTransaction.bookName}}</h3>
                 </div>
-                <div class="detail-item">
-                    <i class="pi pi-calendar"></i>
-                    <span class="label">Request Date:</span> {{selectedTransaction.requestDate | date:'mediumDate'}}
-                </div>
-                <div class="detail-item" *ngIf="selectedTransaction.issueDate">
-                    <i class="pi pi-check-circle"></i>
-                    <span class="label">Issue Date:</span> {{selectedTransaction.issueDate | date:'mediumDate'}}
-                </div>
-
-                <div class="detail-item" *ngIf="selectedTransaction.issuedByUser">
-                    <i class="pi pi-user-plus"></i>
-                    <span class="label">Issued By:</span> {{selectedTransaction.issuedByUser}}
-                </div>
-
-                <div class="detail-item" *ngIf="selectedTransaction.dueDate">
-                    <i class="pi pi-calendar-plus"></i>
-                    <span class="label">Due Date:</span> {{selectedTransaction.dueDate | date:'mediumDate'}}
-                </div>
-
-
-
-                <div class="detail-item">
-                    <i class="pi pi-tag"></i>
-                    <span class="label">Status:</span> {{selectedTransaction.status}}
+                <div class="status-badge">
+                    <span [class]="'status-badge status-' + getTransactionStatusBadge(selectedTransaction.status)">
+                        {{selectedTransaction.status}}
+                    </span>
                 </div>
             </div>
-            <div class="col-6">
-                <div class="detail-item">
-                    <i class="pi pi-book"></i>
-                    <span class="label">Book:</span> {{selectedTransaction.bookName}}
-                </div>
-                <div class="detail-item">
-                    <i class="pi pi-send"></i>
-                    <span class="label">Borrow Days:</span> {{selectedTransaction.borrowDays}}
-                </div>
-                <div class="detail-item" *ngIf="selectedTransaction.dueDate">
-                    <i class="pi pi-reply"></i>
-                    <span class="label">Return Date:</span> {{selectedTransaction.returnDate | date:'mediumDate'}}
+
+            <!-- Main Content Grid -->
+            <div class="grid">
+                <!-- Left Column - User & Request Info -->
+                <div class="col-12 md:col-6">
+                    <div class="detail-section">
+                        <h4 class="section-title">
+                            <i class="pi pi-user text-primary"></i>
+                            User Information
+                        </h4>
+                        <div class="detail-item">
+                            <span class="label">User Name:</span>
+                            <span class="value">{{selectedTransaction.userFullName}}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Borrow Days:</span>
+                            <span class="value">{{selectedTransaction.borrowDays}} days</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4 class="section-title">
+                            <i class="pi pi-calendar text-primary"></i>
+                            Request Information
+                        </h4>
+                        <div class="detail-item">
+                            <span class="label">Request Date:</span>
+                            <span class="value">{{selectedTransaction.requestDate | date:'mediumDate'}}</span>
+                        </div>
+                        <div class="detail-item" *ngIf="selectedTransaction.issueDate">
+                            <span class="label">Issue Date:</span>
+                            <span class="value">{{selectedTransaction.issueDate | date:'mediumDate'}}</span>
+                        </div>
+                        <div class="detail-item" *ngIf="selectedTransaction.issuedByUser">
+                            <span class="label">Issued By:</span>
+                            <span class="value">{{selectedTransaction.issuedByUser}}</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="detail-item" *ngIf="selectedTransaction.returnedByUser">
-                    <i class="pi pi-user-minus"></i>
-                    <span class="label">Returned By:</span> {{selectedTransaction.returnedByUser}}
-                </div>
+                <!-- Right Column - Book & Return Info -->
+                <div class="col-12 md:col-6">
+                    <div class="detail-section">
+                        <h4 class="section-title">
+                            <i class="pi pi-clock text-primary"></i>
+                            Due & Return Information
+                        </h4>
+                        <div class="detail-item" *ngIf="selectedTransaction.dueDate">
+                            <span class="label">Due Date:</span>
+                            <span class="value" [ngClass]="{'overdue': isOverdue(selectedTransaction.dueDate)}">
+                                {{selectedTransaction.dueDate | date:'mediumDate'}}
+                            </span>
+                        </div>
+                        <div class="detail-item" *ngIf="selectedTransaction.returnDate">
+                            <span class="label">Return Date:</span>
+                            <span class="value">{{selectedTransaction.returnDate | date:'mediumDate'}}</span>
+                        </div>
+                        <div class="detail-item" *ngIf="selectedTransaction.returnedByUser">
+                            <span class="label">Returned By:</span>
+                            <span class="value">{{selectedTransaction.returnedByUser}}</span>
+                        </div>
+                    </div>
 
-                <div class="detail-item" *ngIf="selectedTransaction.returnNotes">
-                    <i class="pi pi-comments"></i>
-                    <span class="label">Return Notes:</span> {{selectedTransaction.returnNotes}}
+                    <div class="detail-section" *ngIf="selectedTransaction.returnNotes">
+                        <h4 class="section-title">
+                            <i class="pi pi-comments text-primary"></i>
+                            Return Notes
+                        </h4>
+                        <div class="notes-content">
+                            {{selectedTransaction.returnNotes}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </ng-template>
     <ng-template pTemplate="footer">
-        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+        <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-text"
             (click)="hideDetailsBookDialog()"></button>
     </ng-template>
 </p-dialog>
