@@ -6,7 +6,8 @@
     </a>
 
     <!--側邊導覽列控制btn-->
-    <button #menubutton class="p-link layout-menu-button layout-topbar-button col-2" (click)="layoutService.onMenuToggle()">
+    <button #menubutton class="p-link layout-menu-button layout-topbar-button col-2"
+        (click)="layoutService.onMenuToggle()">
         <i class="pi pi-bars"></i>
     </button>
 
@@ -22,12 +23,13 @@
         <div class="user-dropdown" (click)="menu.toggle($event)">
             <div class="user-info">
                 <span>{{ user.firstName }} {{user.lastName}}</span>
-              <img style="border-radius: 50%;margin-left: 10px;" width="35px" height="35px" [src]="user.userImageUrl ?? '/assets/demo/images/avatar/UnknownUser.jpg'"  class="user-img" />
+                <img style="border-radius: 50%;margin-left: 10px;" width="35px" height="35px"
+                    [src]="user.userImageUrl ?? '/assets/demo/images/avatar/UnknownUser.jpg'" class="user-img" />
             </div>
-          </div>
-          <p-menu #menu [popup]="true" [model]="menuItems"></p-menu>
-            <!-- <span>Profile</span> -->
-            <!-- <select>
+        </div>
+        <p-menu #menu [popup]="true" [model]="menuItems"></p-menu>
+        <!-- <span>Profile</span> -->
+        <!-- <select>
                     <div class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">{{user.firstName}} {{user.lastName}}
                         <img *ngIf="user.userImageUrl!=null" style="border-radius: 50%;width: 50px;height: 50px;" [src]="user.userImageUrl ?? 'src/assets/demo/images/avatar/UnknownUser.jpg' " alt="">
                     </div>
@@ -36,13 +38,14 @@
                         <option value=""  (click)="Logout()"><a class="dropdown-item p-2" href="#"><i class="pi pi-sign-out m-2"></i>Logout</a></option>
             </select>
                -->
-              </div>
-        <button class="p-link layout-topbar-button" [routerLink]="'/documentation'">
+    </div>
+    <!-- <button class="p-link layout-topbar-button" [routerLink]="'/documentation'">
             <i class="pi pi-cog"></i>
             <span>Settings</span>
-        </button>
-    </div>
-   
+        </button> -->
+</div>
 
-<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-spin" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="ball-spin" [fullScreen]="true">
+    <p style="color: white"> Loading... </p>
+</ngx-spinner>

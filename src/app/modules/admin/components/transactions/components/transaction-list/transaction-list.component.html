@@ -1,77 +1,98 @@
 <div class="card">
     <p-toast></p-toast>
-        <div class="grid">
-            <div class="col "><h5>Transaction List</h5></div>
-            <div class="col col-offset-6"><p-multiSelect  [options]="excelColumns" [(ngModel)]="selectedFilters"   optionLabel="name" placeholder="Select columns" /></div>
-            <div class="col"><button pButton pRipple label="Export to Excel" icon="pi pi-file-excel" class="p-button-success" (click)="ExportToExcel()"></button></div>
+    <div class="grid">
+        <div class="col ">
+            <h5>Transaction List</h5>
+        </div>
+        <div class="col col-offset-6"><p-multiSelect [options]="excelColumns" [(ngModel)]="selectedFilters"
+                optionLabel="name" placeholder="Select columns" /></div>
+        <div class="col"><button pButton pRipple label="Export to Excel" icon="pi pi-file-excel"
+                class="p-button-success" (click)="ExportToExcel()"></button></div>
     </div>
     <!-- <div class="flex flex-column md:flex-row md:justify-content-between gap-2">
                 <button pButton pRipple label="Add New Transaction" icon="pi pi-plus" class="p-button mr-2"
                     (click)="addTransaction()"></button>
     </div> -->
-    <p-table #dt1 [value]="transactions" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true" styleClass="p-datatable-gridlines" [paginator]="true" [globalFilterFields]="['bookName','status']" responsiveLayout="scroll">
-				<ng-template pTemplate="caption">
-					<div class="flex justify-content-between flex-column sm:flex-row">
-						<button pButton label="Clear" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
-						<span class="p-input-icon-left mb-2">
-							<i class="pi pi-search"></i>
-							<input pInputText type="text" #filter (input)="onGlobalFilter(dt1, $event)" placeholder="Search Keyword" class="w-full"/>
-						</span>
-					</div>
-				</ng-template>
-				<ng-template pTemplate="header">
-					<tr>
-						<th style="min-width: 12rem">
-							<div class="flex justify-content-between align-items-center">
-								Book
-								<p-columnFilter type="text" field="bookName" display="menu" placeholder="Search by name"></p-columnFilter>
-							</div>
-						</th>
-                        <th style="min-width: 12rem">
-							<div class="flex justify-content-between align-items-center">
-								User
-								<p-columnFilter type="text" field="userFullName" display="menu" placeholder="Search by name"></p-columnFilter>
-							</div>
-						</th>
-						<th style="min-width: 12rem">
-							<div class="flex justify-content-between align-items-center">
-								Request Date
-								<p-columnFilter type="date" field="requestDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
-							</div>
-						</th>
-						<th style="min-width: 12rem">
-							<div class="flex justify-content-between align-items-center">
-								Issue Date
-								<p-columnFilter type="date" field="issueDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
-							</div>
-						</th>
-						<th style="min-width: 14rem">
-							<div class="flex justify-content-between align-items-center">
-								Due Date
-								<p-columnFilter type="date" field="dueDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
-							</div>
-						</th>
-						<th style="min-width: 10rem">
-							<div class="flex justify-content-between align-items-center">
-								Return Date
-								<p-columnFilter type="date" field="returnDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
-							</div>
-						</th>
-						<th style="min-width: 12rem">
-							<div class="flex justify-content-between align-items-center">
-								Status
-								<p-columnFilter field="status" matchMode="equals" display="menu">
-									<ng-template pTemplate="filter" let-value let-filter="filterCallback">
-										<p-dropdown [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)" placeholder="Any" [style]="{'min-width': '12rem'}" >
-											<ng-template let-option pTemplate="item">
-												<span [class]="'customer-badge status-' + getTransactionStatusBadge(option)">{{option}}</span>
-											</ng-template>
-										</p-dropdown>
-									</ng-template>
-								</p-columnFilter>
-							</div>
-						</th>
-						<!-- <th style="min-width: 12rem">
+
+    <!-- Loading State -->
+    <app-loading-state *ngIf="loading" message="Loading transactions..."></app-loading-state>
+
+    <!-- Transactions Table -->
+    <p-table #dt1 [value]="transactions" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true"
+        styleClass="p-datatable-gridlines" [paginator]="true" [globalFilterFields]="['bookName','status']"
+        responsiveLayout="scroll" *ngIf="!loading">
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between flex-column sm:flex-row">
+                <button pButton label="Clear" class="p-button-outlined mb-2" icon="pi pi-filter-slash"
+                    (click)="clear(dt1)"></button>
+                <span class="p-input-icon-left mb-2">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" #filter (input)="onGlobalFilter(dt1, $event)"
+                        placeholder="Search Keyword" class="w-full" />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="min-width: 12rem">
+                    <div class="flex justify-content-between align-items-center">
+                        Book
+                        <p-columnFilter type="text" field="bookName" display="menu"
+                            placeholder="Search by name"></p-columnFilter>
+                    </div>
+                </th>
+                <th style="min-width: 12rem">
+                    <div class="flex justify-content-between align-items-center">
+                        User
+                        <p-columnFilter type="text" field="userFullName" display="menu"
+                            placeholder="Search by name"></p-columnFilter>
+                    </div>
+                </th>
+                <th style="min-width: 12rem">
+                    <div class="flex justify-content-between align-items-center">
+                        Request Date
+                        <p-columnFilter type="date" field="requestDate" display="menu"
+                            placeholder="mm/dd/yyyy"></p-columnFilter>
+                    </div>
+                </th>
+                <th style="min-width: 12rem">
+                    <div class="flex justify-content-between align-items-center">
+                        Issue Date
+                        <p-columnFilter type="date" field="issueDate" display="menu"
+                            placeholder="mm/dd/yyyy"></p-columnFilter>
+                    </div>
+                </th>
+                <th style="min-width: 14rem">
+                    <div class="flex justify-content-between align-items-center">
+                        Due Date
+                        <p-columnFilter type="date" field="dueDate" display="menu"
+                            placeholder="mm/dd/yyyy"></p-columnFilter>
+                    </div>
+                </th>
+                <th style="min-width: 10rem">
+                    <div class="flex justify-content-between align-items-center">
+                        Return Date
+                        <p-columnFilter type="date" field="returnDate" display="menu"
+                            placeholder="mm/dd/yyyy"></p-columnFilter>
+                    </div>
+                </th>
+                <th style="min-width: 12rem">
+                    <div class="flex justify-content-between align-items-center">
+                        Status
+                        <p-columnFilter field="status" matchMode="equals" display="menu">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-dropdown [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)"
+                                    placeholder="Any" [style]="{'min-width': '12rem'}">
+                                    <ng-template let-option pTemplate="item">
+                                        <span
+                                            [class]="'customer-badge status-' + getTransactionStatusBadge(option)">{{option}}</span>
+                                    </ng-template>
+                                </p-dropdown>
+                            </ng-template>
+                        </p-columnFilter>
+                    </div>
+                </th>
+                <!-- <th style="min-width: 12rem">
 							<div class="flex justify-content-between align-items-center">
 								Activity
 								<p-columnFilter field="activity" matchMode="between" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
@@ -85,57 +106,60 @@
 								</p-columnFilter>
 							</div>
 						</th> -->
-						<th style="min-width: 8rem">
-							<div class="flex justify-content-between align-items-center">
-								Actions
-							</div>
-						</th>
-					</tr>
-				</ng-template>
-				<ng-template pTemplate="body" let-book>
-					<tr>
-                        <td>
-							<span class="image-text ml-2">{{book.bookName}}</span>
-						</td>
-                        <td>
-							{{book.userFullName}}
-						</td>
-						<td>
-							{{book.requestDate | date: 'MM/dd/yyyy'}}
-						</td>
-						<td>
-							{{book.issueDate | date: 'MM/dd/yyyy'}}
-						</td>
-                        <td>
-							{{book.dueDate | date: 'MM/dd/yyyy'}}
-						</td>
-						<td>
-							{{book.returnDate | date: 'MM/dd/yyyy'}}
-						</td>
-						<td>
-							<span [class]="'customer-badge status-' + getTransactionStatusBadge(book.status)">{{book.status}}</span>
-						</td>
-						<td>
-                            <div class="flex align-items-center justify-content-between">
-                                <p-button icon="pi pi-info-circle" title="Details" (click)="getDetails(book.id)"> </p-button>
-								<p-button *ngIf="book.status == 'Pending'" icon="pi pi-plus" title="Issue Book" (click)="issueBook(book.id)"> </p-button>
-								<p-button *ngIf="book.status == 'Issued' || book.status == 'Overdue'" icon="pi pi-undo" title="Return Book" (click)="returnBook(book.id)"> </p-button>
-							
-                            </div>
-                        </td>
-					</tr>
-				</ng-template>
-				<ng-template pTemplate="emptymessage">
-					<tr>
-						<td colspan="8">No Transactions found.</td>
-					</tr>
-				</ng-template>
-				<ng-template pTemplate="loadingbody">
-					<tr>
-						<td colspan="8">Loading Transactions data. Please wait.</td>
-					</tr>
-				</ng-template>
-    		</p-table>
+                <th style="min-width: 8rem">
+                    <div class="flex justify-content-between align-items-center">
+                        Actions
+                    </div>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-book>
+            <tr>
+                <td>
+                    <span class="image-text ml-2">{{book.bookName}}</span>
+                </td>
+                <td>
+                    {{book.userFullName}}
+                </td>
+                <td>
+                    {{book.requestDate | date: 'MM/dd/yyyy'}}
+                </td>
+                <td>
+                    {{book.issueDate | date: 'MM/dd/yyyy'}}
+                </td>
+                <td>
+                    {{book.dueDate | date: 'MM/dd/yyyy'}}
+                </td>
+                <td>
+                    {{book.returnDate | date: 'MM/dd/yyyy'}}
+                </td>
+                <td>
+                    <span
+                        [class]="'customer-badge status-' + getTransactionStatusBadge(book.status)">{{book.status}}</span>
+                </td>
+                <td>
+                    <div class="flex align-items-center justify-content-between">
+                        <p-button icon="pi pi-info-circle" title="Details" (click)="getDetails(book.id)"> </p-button>
+                        <p-button *ngIf="book.status == 'Pending'" icon="pi pi-plus" title="Issue Book"
+                            (click)="issueBook(book.id)"> </p-button>
+                        <p-button *ngIf="book.status == 'Issued' || book.status == 'Overdue'" icon="pi pi-undo"
+                            title="Return Book" (click)="returnBook(book.id)"> </p-button>
+
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="8">No Transactions found.</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+            <tr>
+                <td colspan="8">Loading Transactions data. Please wait.</td>
+            </tr>
+        </ng-template>
+    </p-table>
 </div>
 
 <!-- Add Transaction Dialog -->
@@ -205,8 +229,8 @@
 
 
 <!-- Update Transaction Dialog -->
-<p-dialog [(visible)]="transactionDetailsDialog" [style]="{ width: '50%', maxHeight: '90vh' }" header="Transaction Details"
-    [modal]="true" class="p-fluid">
+<p-dialog [(visible)]="transactionDetailsDialog" [style]="{ width: '50%', maxHeight: '90vh' }"
+    header="Transaction Details" [modal]="true" class="p-fluid">
     <ng-template pTemplate="content">
         <div class="grid">
             <div class="col-6">
@@ -233,7 +257,7 @@
                     <span class="label">Due Date:</span> {{selectedTransaction.dueDate | date:'mediumDate'}}
                 </div>
 
-                
+
 
                 <div class="detail-item">
                     <i class="pi pi-tag"></i>
@@ -286,7 +310,7 @@
                             <label for="issueDate" class="font-medium text-900">Issue Date</label>
                             <input type="datetime-local" pInputText id="issueDate" formControlName="issueDate" />
                             <small *ngIf="submitted && !issueBookForm.controls['issueDate'].valid"
-                            class="ng-dirty ng-invalid text-red-500">Issue Date is required</small>
+                                class="ng-dirty ng-invalid text-red-500">Issue Date is required</small>
                         </div>
                     </div>
                 </div>
@@ -313,7 +337,7 @@
                             <label for="returnDate" class="font-medium text-900">Return Date</label>
                             <input type="datetime-local" pInputText id="returnDate" formControlName="returnDate" />
                             <small *ngIf="submitted && !returnBookForm.controls['returnDate'].valid"
-                            class="ng-dirty ng-invalid text-red-500">Return Date is required</small>
+                                class="ng-dirty ng-invalid text-red-500">Return Date is required</small>
                         </div>
                     </div>
                     <div class="md:col-12">

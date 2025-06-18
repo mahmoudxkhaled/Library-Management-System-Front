@@ -35,7 +35,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
 
   addTransactionDialog: boolean = false;
   transactionDetailsDialog: boolean = false;
-  
+
   switchActivationTransactionDialog: boolean = false;
 
   submitted: boolean = false;
@@ -50,10 +50,10 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   @ViewChild('filter') filter!: ElementRef;
 
   statuses: string[] = [];
-  selectedFilters:SelectedFilter[]
-  excelColumns:SelectedFilter[]=[{name:"Book"},{name:"User"},{name:"RequestDate"},{name:"IssueDate"},{name:"DueDate"},{name:"ReturnDate"},{name:"Status"},{name:"IssuedByUser"},{name:"ReturnedByUser"}]
+  selectedFilters: SelectedFilter[]
+  excelColumns: SelectedFilter[] = [{ name: "Book" }, { name: "User" }, { name: "RequestDate" }, { name: "IssueDate" }, { name: "DueDate" }, { name: "ReturnDate" }, { name: "Status" }, { name: "IssuedByUser" }, { name: "ReturnedByUser" }]
   constructor(
-    private BooksService:BooksService,
+    private BooksService: BooksService,
     private transactionServ: TransactionService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
@@ -69,7 +69,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
 
   ngOnInit() {
 
-    this.statuses = ["Pending","Issued","Returned","Overdue"];
+    this.statuses = ["Pending", "Issued", "Returned", "Overdue"];
     this.loadTransactions();
 
     this.tableLoadingService.loading$.subscribe((isLoading) => {
@@ -78,28 +78,27 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
 
   }
 
-ExportToExcel()
-{
-  if(this.selectedFilters===undefined){
-    this.messageService.add({
-                    severity: 'error',
-                    summary: 'Export Requirements',
-                    detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
-                    life: 3000,
-                  });
-                  return;
+  ExportToExcel() {
+    if (this.selectedFilters === undefined) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Export Requirements',
+        detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
+        life: 3000,
+      });
+      return;
+    }
+    this.transactionServ.ExportToExcel(this.selectedFilters).subscribe(res => {
+      this.BooksService.downLoadFile(res, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TransactionRecords.xlsx");
+    }, err => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed Export to Excel'
+      });
+    }
+    )
   }
-   this.transactionServ.ExportToExcel(this.selectedFilters).subscribe(res=>{
-    this.BooksService.downLoadFile(res,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TransactionRecords.xlsx");
-  },err=>{
- this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed Export to Excel'
-          });
-     }
-  )
-}
   loadTransactions() {
     this.tableLoadingService.show();
     this.loading = true;
@@ -107,14 +106,14 @@ ExportToExcel()
       this.transactionServ.getAllTransactions().subscribe((data) => {
         this.transactions = data.data.map(transaction => ({
           ...transaction,
-          requestDate: transaction.requestDate? new Date(transaction.requestDate) : null,
-          issueDate: transaction.issueDate? new Date(transaction.issueDate): null,
-          dueDate:  transaction.dueDate? new Date(transaction.dueDate): null,
-          returnDate: transaction.returnDate? new Date(transaction.returnDate) : null
+          requestDate: transaction.requestDate ? new Date(transaction.requestDate) : null,
+          issueDate: transaction.issueDate ? new Date(transaction.issueDate) : null,
+          dueDate: transaction.dueDate ? new Date(transaction.dueDate) : null,
+          returnDate: transaction.returnDate ? new Date(transaction.returnDate) : null
         }));
+        this.loading = false;
         this.ref.detectChanges();
         this.tableLoadingService.hide();
-        this.loading = false;
       })
     );
   }
@@ -181,28 +180,28 @@ ExportToExcel()
     this.subs.unsubscribe();
   }
 
-  getTransactionStatusBadge(status: string){
-      var badge = '';
-      switch(status) { 
-        case "Issued": { 
-            badge = 'qualified'
-            break; 
-        } 
-        case "Returned": { 
-            badge = 'proposal';
-            break; 
-        } 
-        case "Overdue": { 
-            badge = 'unqualified';
-            break; 
-        } 
-        default: { 
-            badge = 'renewal';
-            break; 
-        } 
-      } 
-      return badge;
+  getTransactionStatusBadge(status: string) {
+    var badge = '';
+    switch (status) {
+      case "Issued": {
+        badge = 'qualified'
+        break;
+      }
+      case "Returned": {
+        badge = 'proposal';
+        break;
+      }
+      case "Overdue": {
+        badge = 'unqualified';
+        break;
+      }
+      default: {
+        badge = 'renewal';
+        break;
+      }
     }
+    return badge;
+  }
 
 
   hideIssueBookDialog() {
@@ -219,31 +218,31 @@ ExportToExcel()
   }
   confirmIssueBook() {
     this.submitted = true;
-    if (this.issueBookForm.valid){
+    if (this.issueBookForm.valid) {
       this.transactionServ.issueBook(this.issueBookForm.value).subscribe({
-            next: (res) => {
-                if (res.isSuccess) {
-                  this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: res.message
-                  });
-                  this.hideIssueBookDialog();
-                  this.loadTransactions();
-                } else {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: res.message || 'Failed to submit issueing book'
-                  });
-                }
+        next: (res) => {
+          if (res.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: res.message
+            });
+            this.hideIssueBookDialog();
+            this.loadTransactions();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: res.message || 'Failed to submit issueing book'
+            });
+          }
         },
         error: (error) => {
           console.error('Error submitting Issueing Book:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error.error.message? error.error.message: 'Failed to submit issueing book'
+            detail: error.error.message ? error.error.message : 'Failed to submit issueing book'
           });
         }
       })
@@ -266,31 +265,31 @@ ExportToExcel()
   }
   confirmReturnBook() {
     this.submitted = true;
-    if (this.returnBookForm.valid){
+    if (this.returnBookForm.valid) {
       this.transactionServ.returnBook(this.returnBookForm.value).subscribe({
-            next: (res) => {
-                if (res.isSuccess) {
-                  this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: res.message
-                  });
-                  this.hideReturnBookDialog();
-                  this.loadTransactions();
-                } else {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: res.message || 'Failed to submit Returning book'
-                  });
-                }
+        next: (res) => {
+          if (res.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: res.message
+            });
+            this.hideReturnBookDialog();
+            this.loadTransactions();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: res.message || 'Failed to submit Returning book'
+            });
+          }
         },
         error: (error) => {
           console.error('Error submitting Returning Book:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error.error.message? error.error.message: 'Failed to submit Returning book'
+            detail: error.error.message ? error.error.message : 'Failed to submit Returning book'
           });
         }
       });
@@ -300,38 +299,38 @@ ExportToExcel()
   hideDetailsBookDialog() {
     this.transactionDetailsDialog = false;
   }
-  getDetails(transactionId: string){
+  getDetails(transactionId: string) {
     this.transactionServ.getTransactionById(transactionId).subscribe({
-            next: (res) => {
-                if (res.isSuccess) {
-                  this.selectedTransaction = res.data;
-                  this.transactionDetailsDialog = true;
-                  //show details dialog
-                } else {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: res.message || 'Failed to get transaction details'
-                  });
-                }
-        },
-        error: (error) => {
-          console.error('Error getting transaction details:', error);
+      next: (res) => {
+        if (res.isSuccess) {
+          this.selectedTransaction = res.data;
+          this.transactionDetailsDialog = true;
+          //show details dialog
+        } else {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error.error.message? error.error.message: 'Failed to get transaction details'
+            detail: res.message || 'Failed to get transaction details'
           });
         }
-      })
+      },
+      error: (error) => {
+        console.error('Error getting transaction details:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.error.message ? error.error.message : 'Failed to get transaction details'
+        });
+      }
+    })
   }
 
   onGlobalFilter(table: Table, event: Event) {
-      table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
   clear(table: Table) {
-      table.clear();
-      this.filter.nativeElement.value = '';
+    table.clear();
+    this.filter.nativeElement.value = '';
   }
 }
