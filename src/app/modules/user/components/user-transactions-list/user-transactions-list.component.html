@@ -119,13 +119,16 @@
 						<tr class="table-row">
 							<td class="book-cell">
 								<div class="book-info">
-									<div class="book-cover">
+									<div [routerLink]="['/Books', book.bookId]" class="book-cover"
+										style="cursor: pointer;">
 										<img [alt]="book.bookName"
 											[src]="book.bookImageUrl || 'assets/dummy_book_cover.webp'"
 											class="book-image" />
 									</div>
-									<div class="book-details">
-										<span class="book-title">{{book.bookName}}</span>
+									<div class=" book-details" style="cursor: pointer;">
+										<a [routerLink]="['/Books', book.bookId]" class="book-title-link">
+											<span class="book-title">{{book.bookName}}</span>
+										</a>
 									</div>
 								</div>
 							</td>

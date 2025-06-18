@@ -242,10 +242,22 @@
           }
 
           .book-details {
-            .book-title {
-              font-weight: 600;
-              color: #2c3e50;
-              font-size: 0.95rem;
+            .book-title-link {
+              text-decoration: none;
+              color: inherit;
+              transition: all 0.3s ease;
+
+              &:hover {
+                color: #667eea;
+                text-decoration: underline;
+              }
+
+              .book-title {
+                font-weight: 600;
+                color: #2c3e50;
+                font-size: 0.95rem;
+                cursor: pointer;
+              }
             }
           }
         }
