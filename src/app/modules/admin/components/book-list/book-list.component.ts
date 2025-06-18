@@ -12,6 +12,7 @@ import { AuthorService } from '../../services/author.service';
 import { Author } from '../../models/Author';
 import { BooksService } from 'src/app/modules/books/services/books.service';
 import { BookParams } from 'src/app/modules/books/models/BookParams';
+import { SelectedFilter } from '../../models/SelectedFilters';
 
 @Component({
   selector: 'app-book-list',
@@ -55,7 +56,8 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   loading: boolean = true;
   isEditing: boolean = false;
   searchTerm: string = '';
-
+  selectedFilters:SelectedFilter[]
+  excelColumns:SelectedFilter[]=[{name:"Title"},{name:"Description"},{name:"PublicationYear"},{name:"AvailableCopies"},{name:"TotalCopies"},{name:"Category"},{name:"Author"}]
   constructor(
     private bookServ: BookService, private bookService: BooksService,
     private categoryServ: CategoryService,
@@ -100,23 +102,40 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.reloadPage.first = event.first;
     this.reloadPage.rows = event.rows;
     this.bookParams.sortOrder = this.reloadPage.sortOrder;
-    this.bookParams.Search = this.search;
     this.bookParams.authorId = this.authorId;
     this.bookParams.categoryId = this.categoryId;
     this.tableLoadingService.show();
-    console.log("this.bookParams :", this.bookParams);
+
     this.subs.add(
       this.bookService.getBooksPaged(event.first, event.rows, this.bookParams).pipe(finalize(() => this.loading = false)).subscribe((res) => {
         this.books = res.data.result;
-        this.totalRecords = res.data.totalCount
-        console.log(this.books)
+
+        this.totalRecords = res.data.totalCount;
+        this.loading=false;
         this.ref.detectChanges();
         this.tableLoadingService.hide();
         this.filteredBooks = this.books;
       })
     );
   }
+ExportToExcel()
+{
+  if(this.selectedFilters===undefined){
+    this.messageService.add({
+                    severity: 'error',
+                    summary: 'Export Requirements',
+                    detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
+                    life: 3000,
+                  });
+                  return;
+  }
+  this.bookService.ExportToExcel(this.selectedFilters).subscribe(res=>{
+    this.bookService.downLoadFile(res,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BookRecords.xlsx");
+  },err=>{
 
+    }
+  )
+}
   loadCategories() {
     this.subs.add(
       this.categoryServ.getAllCategories().subscribe({
@@ -144,7 +163,6 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   saveBook() {
     this.submitted = true;
     if (this.bookForm.valid) {
-      console.log("value :", this.bookForm.value)
       const formData = new FormData();
       formData.append('Title', this.bookForm.value.title);
       formData.append('Description', this.bookForm.value.description);
@@ -236,9 +254,6 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     this.bookDialog = true;
   }
-  //#endregion
-
-  //#region Deletion
   confirmDeleteBook(book: IBook) {
     this.selectedBook = book;
     this.deletionBookDialog = true;
@@ -352,17 +367,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   onSearch() {
-    if (!this.searchTerm.trim()) {
-      this.filteredBooks = this.books;
-      return;
-    }
-
-    const searchLower = this.searchTerm.toLowerCase();
-    this.filteredBooks = this.books.filter(book =>
-      book.title.toLowerCase().includes(searchLower) ||
-      book.authorName.toLowerCase().includes(searchLower) ||
-      book.description.toLowerCase().includes(searchLower)
-    );
+    this.loadBooks(this.reloadPage);
   }
 
   showAddBookDialog() {

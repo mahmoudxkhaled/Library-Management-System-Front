@@ -33,10 +33,10 @@ export class BooksListComponent implements OnInit {
   loading: boolean = true;
   searchTerm: string = '';
   totalRecords: number = 0;
+  ActivateTrendingBooks:boolean=false;
   pageSize: number = 12; // Number of books per page
   currentPage: number = 0;
   bookParams: BookParams;
-
   categories: ICategory[] = [];
   authors:Author[];
   
@@ -50,8 +50,8 @@ export class BooksListComponent implements OnInit {
       sortOrder: 1,
       sortField: 'title',
       Search: '',
-      authorId: 0,
-      categoryId: 0
+      authorId: null,
+      categoryId: null
     };
   }
 
@@ -60,14 +60,45 @@ export class BooksListComponent implements OnInit {
     this.loadAuthors();
     this.loadBooks();
   }
-
+  deactivateOrActivateTrendingBooks()
+  {
+    this.ActivateTrendingBooks=!this.ActivateTrendingBooks;
+    this.loading = true;
+    if(this.ActivateTrendingBooks)
+    {
+      this.booksService.GetAllTrendingBooks(this.currentPage, this.pageSize, this.bookParams).subscribe(response=>{
+      this.books=response.data.result;
+      this.totalRecords = response.data.totalCount;
+      this.loading = false;
+      },
+     (error) => {
+        console.error('Error loading books:', error);
+        this.loading = false;
+      }
+    )}
+    else
+    {
+  this.booksService.getBooksPaged(this.currentPage, this.pageSize, this.bookParams).subscribe({
+      next: (response: ApiResult) => {
+        if (response.isSuccess) {
+          this.books = response.data.result;
+          this.totalRecords = response.data.totalCount;
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading books:', error);
+        this.loading = false;
+      }
+    });
+    }
+  }
   loadBooks(): void {
     this.loading = true;
     this.booksService.getBooksPaged(this.currentPage, this.pageSize, this.bookParams).subscribe({
       next: (response: ApiResult) => {
         if (response.isSuccess) {
           this.books = response.data.result;
-          console.log(this.books)
           this.totalRecords = response.data.totalCount;
         }
         this.loading = false;
@@ -80,8 +111,7 @@ export class BooksListComponent implements OnInit {
   }
 
   onSearch(event: Event): void {
-    this.bookParams.Search = this.searchTerm;
-    this.currentPage = 0; // Reset to first page
+    this.currentPage = 0;
     this.loadBooks();
   }
 

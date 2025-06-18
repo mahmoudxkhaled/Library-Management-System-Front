@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { ApiService } from 'src/app/core/services/api-service.service';
 import { IUser } from '../models/IUser';
@@ -7,13 +7,15 @@ import { IUserLogged } from '../models/UserLogged';
 import { Router } from '@angular/router';
 import { UpdateUserProfileDto } from 'src/app/modules/user/models/UpdateUserProfileDto ';
 import { JsonPipe } from '@angular/common';
+import { SelectedFilter } from '../../../models/SelectedFilters';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   constructor(private apiService: ApiService,private router:Router) { }
-
+  private userSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem("userData")));
+  currentUser$ = this.userSubject.asObservable();
   GetCurrentUserDetails():Observable<ApiResult>
   {
     return this.apiService.getAllRequest<ApiResult>('/User/GetCurrentUserDetails')
@@ -26,6 +28,7 @@ export class UserService {
   {
     localStorage.removeItem('userData');
     localStorage.setItem('userData',JSON.stringify(userData))
+    this.userSubject.next(userData);
   }
   changePassword(changePasswordDto:any)
   {
@@ -39,7 +42,10 @@ export class UserService {
   getAllUsers(): Observable<ApiResult> {
     return this.apiService.getAllRequest<ApiResult>('/User/GetAllUsers');
   }
-
+  ExportToExcel(SelectedFilters:SelectedFilter[]): Observable<ArrayBuffer>
+  {
+    return this.apiService.ExportToExcel(`/User/ExportToExcel`,SelectedFilters);
+  }
   getUserById(id: string): Observable<ApiResult> {
     return this.apiService.getByIdRequest<ApiResult>('/User/GetUserById', id);
   }

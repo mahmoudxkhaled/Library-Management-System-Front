@@ -15,4 +15,5 @@
   categoryName: string;
   categoryDescription: string;
   categoryImageUrl?: string;
+  isBorrowed:boolean
   }

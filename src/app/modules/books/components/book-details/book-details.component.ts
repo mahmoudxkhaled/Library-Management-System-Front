@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BookDetailsDto } from '../../models/BookDetailsDto';
 import { FeedbackService, GetFeedbackDto } from '../../services/feedback.service';
 import { MessageService } from 'primeng/api';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BorrowService } from '../../services/borrow.service';
 
 interface Feedback {
   id: string;
@@ -75,12 +77,19 @@ export class BookDetailsComponent implements OnInit {
     }
   ];
 
+  //Borrow Book
+  borrowBookDialog: boolean = false;
+  borrowBookForm: FormGroup;
+  submitted: boolean = false;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private booksService: BooksService,
     private feedbackService: FeedbackService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private borrowService: BorrowService,
+    private formBuilder: FormBuilder
   ) { }
 
   ngOnInit(): void {
@@ -89,6 +98,11 @@ export class BookDetailsComponent implements OnInit {
       this.loadBookDetails();
       this.loadReviews();
     });
+
+    this.borrowBookForm = this.formBuilder.group({
+      bookId: [this.bookId, Validators.required],
+      borrowDays: [null, Validators.required]
+    });
   }
 
   loadBookDetails() {
@@ -96,6 +110,7 @@ export class BookDetailsComponent implements OnInit {
       next: (res) => {
         if (res.isSuccess) {
           this.bookDetails = res.data;
+console.log('✌️ this.bookDetails --->',  this.bookDetails.isBorrowed);
           console.log(this.bookDetails)
           this.loadSimilarBooks();
         } else {
@@ -203,20 +218,68 @@ export class BookDetailsComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Failed to submit review'
+            detail:error.error.message? error.error.message: 'Failed to submit review'
           });
         }
       });
     }
   }
 
-  borrowBook() {
+  showBorrowBook() {
     if (this.bookDetails.availableCopies > 0) {
-      // TODO: Implement actual borrow functionality
-      console.log('Borrowing book:', this.bookId);
+      this.borrowBookDialog = true;
     } else {
-      // TODO: Implement waiting list functionality
-      console.log('Adding to waiting list:', this.bookId);
+      this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'There is no available copies right now'
+          });
+    }
+  }
+  hideDialog() {
+    this.borrowBookDialog = false;
+    this.submitted = false;
+  }
+  borrowBook(){
+    this.submitted = true;
+    if (this.borrowBookForm.valid) {
+      if(this.borrowBookForm.value.borrowDays > 90)
+      {
+         this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'You can not borrow book for more than 90 days'
+            });
+            return;
+      }
+      this.borrowService.BorrowBook(this.borrowBookForm.value).subscribe({
+            next: (res) => {
+                if (res.isSuccess) {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Borrow request has been submitted successfully'
+                  });
+                  this.loadBookDetails();
+                  this.hideDialog();
+                } else {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: res.message || 'Failed to submit borrow request'
+                  });
+                }
+        },
+        error: (error) => {
+          console.error('Error submitting borrow request:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message? error.error.message: 'Failed to submit borrow request'
+          });
+        }
+      })
+
     }
   }
 }

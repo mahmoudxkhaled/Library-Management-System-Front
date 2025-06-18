@@ -46,8 +46,14 @@ export class LoginComponent {
             }).subscribe({
                 next: (result) => {
                   if(result.isSuccess){
-                    localStorage.setItem('userData',JSON.stringify(result.data));
-                      this.router.navigate(['/']);
+                    this.userService.updateLoggedUser(result.data);
+                    if(result.data.role == "Admin" || result.data.role == "Librarian")
+                    {
+                        this.router.navigate(['/admin/dashboard']);
+                    }
+                    else{
+                        this.router.navigate(['/']);
+                    }
                   }
                   else{
                     this.message = result.message;

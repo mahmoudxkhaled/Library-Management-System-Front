@@ -10,6 +10,11 @@ import { CategoryService } from '../../../categories/services/category.service';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 import { el } from '@fullcalendar/core/internal-common';
 import { Table } from 'primeng/table';
+import { TransactionService } from '../../../transactions/services/transaction.service';
+import { ITransaction } from '../../../transactions/models/ITransaction';
+import { SelectedFilter } from 'src/app/modules/admin/models/SelectedFilters';
+import { BookService } from 'src/app/modules/admin/services/book.service';
+import { BooksService } from 'src/app/modules/books/services/books.service';
 
 @Component({
   selector: 'app-user-list',
@@ -25,17 +30,14 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     { label: 'Grid View', value: 'dataview', icon: 'pi pi-th-large' },
     { label: 'Table View', value: 'table', icon: 'pi pi-list' }
   ];
-
   tableLoadingSpinner: boolean = true;
   subs: Subscription = new Subscription();
-
   editUserDialog: boolean = false;
   userDialog: boolean = false;
   deletionUserDialog: boolean = false;
   switchActivationUserDialog: boolean = false;
-
   submitted: boolean = false;
-
+  UserTransactionsDialog:boolean = false;
   users: IUser[] = [];
   librarians: IUser[] = [];
   members: IUser[] = [];
@@ -45,19 +47,19 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     { id: "Member", name: "Member" }
   ];
   selectedCategoryId: string = '';
-
   user: IUser;
-
   userForm: FormGroup;
   editUserForm: FormGroup;
-
   selectedUserImage: File | null = null;
   profileImageUrl: string = '../../../../../assets/media/upload-photo.jpg';
-
   menuItems: MenuItem[] = [];
-
+  userTransactions: ITransaction[] = [];
+   selectedFilters:SelectedFilter[]
+  excelColumns:SelectedFilter[]=[{name:"FirstName"},{name:"LastName"},{name:"Address"},{name:"DateOfBirth"},{name:"Email"},{name:"PhoneNumber"}]
   constructor(
+    private BooksService:BooksService,
     private userServ: UserService,
+    private transactionServ: TransactionService,
     private categoryServ: CategoryService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
@@ -113,7 +115,6 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('Error loading users:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -125,7 +126,28 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
       })
     );
   }
-
+ExportToExcel()
+{
+  if(this.selectedFilters===undefined){
+    this.messageService.add({
+                    severity: 'error',
+                    summary: 'Export Requirements',
+                    detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
+                    life: 3000,
+                  });
+                  return;
+  }
+   this.userServ.ExportToExcel(this.selectedFilters).subscribe(res=>{
+    this.BooksService.downLoadFile(res,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "UserRecords.xlsx");
+  },err=>{
+ this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed Export to Excel'
+          });
+     }
+  )
+}
   applyFilterGlobal(event: any, stringVal: string) {
     const searchValue = (event.target as HTMLInputElement).value;
     if (this.dt) {
@@ -349,4 +371,57 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
     this.ref.detectChanges();
   }
+
+
+  hideUserTransactionsDialog(){
+    this.UserTransactionsDialog = false;
+  }
+
+  getUserTransactions(user: IUser){
+    this.transactionServ.GetTransactionsByUserId(user.id).subscribe({
+            next: (res) => {
+                if (res.isSuccess) {
+                  this.userTransactions = res.data;
+                  this.UserTransactionsDialog = true;
+                } else {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: res.message || 'Failed to get user borrowed books'
+                  });
+                }
+        },
+        error: (error) => {
+          console.error('Error getting user borrowed books:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message? error.error.message: 'Failed to get user borrowed books'
+          });
+        }
+      })
+  }
+
+  getTransactionStatusBadge(status: string){
+      var badge = '';
+      switch(status) { 
+        case "Issued": { 
+            badge = 'qualified'
+            break; 
+        } 
+        case "Returned": { 
+            badge = 'proposal';
+            break; 
+        } 
+        case "Overdue": { 
+            badge = 'unqualified';
+            break; 
+        } 
+        default: { 
+            badge = 'renewal';
+            break; 
+        } 
+      } 
+      return badge;
+    }
 }

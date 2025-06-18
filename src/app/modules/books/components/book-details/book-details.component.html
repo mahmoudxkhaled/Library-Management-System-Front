@@ -64,7 +64,7 @@
                         <button pButton type="button"
                             [label]="bookDetails?.availableCopies > 0 ? 'Borrow Now' : 'Join Waiting List'"
                             [class]="bookDetails?.availableCopies > 0 ? 'p-button-primary' : 'p-button-secondary'"
-                            (click)="borrowBook()"></button>
+                            (click)="showBorrowBook()"></button>
                     </div>
                 </div>
             </div>
@@ -156,16 +156,16 @@
             <h3>Write a Review</h3>
             <div class="rating-input">
                 <span>Your Rating:</span>
-                <p-rating [(ngModel)]="rating" [cancel]="false" [stars]="5"></p-rating>
+                <p-rating [(ngModel)]="rating" [cancel]="false" [stars]="5" [readonly]="!bookDetails.isBorrowed" ></p-rating>
             </div>
-            <textarea [(ngModel)]="feedback" placeholder="Share your thoughts about this book (max 1000 characters)..."
+            <textarea [(ngModel)]="feedback" placeholder="Share your thoughts about this book (max 1000 characters)..." [disabled]="!bookDetails.isBorrowed"
                 rows="4" maxlength="1000">
             </textarea>
             <button pButton type="button" label="Submit Review" (click)="submitReview()"
                 [disabled]="!rating || !feedback.trim()">
             </button>
+                    <div class="flex align-items-center justify-content-center"><p>Only users who have borrowed this book may submit reviews.</p></div>
         </div>
-
         <!-- Reviews List -->
         <div class="reviews-list" *ngIf="reviews && reviews.length > 0">
             <div class="review-card" *ngFor="let review of reviews">
@@ -196,3 +196,27 @@
 
 <!-- Toast Messages -->
 <p-toast></p-toast>
+<!-- Borrow Book Dialog -->
+<p-dialog [(visible)]="borrowBookDialog" [style]="{ width: '50%', maxHeight: '90vh' }"
+    [header]="'Borrow Book'" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="borrowBookForm" (ngSubmit)="borrowBook()">
+            <div class="p-grid p-fluid">
+                <div class="p-col-12 p-md-12">
+                    <div class="field p-col-12">
+                        <label for="borrowDays" class="font-medium text-900">Please enter the number of days you wish to borrow the item for:</label>
+                        <input type="number" pInputText id="borrowDays" formControlName="borrowDays" required
+                            [ngClass]="{'ng-invalid ng-dirty': submitted && !borrowBookForm.controls['borrowDays'].valid}" />
+                        <small *ngIf="submitted && !borrowBookForm.controls['borrowDays'].valid"
+                            class="ng-dirty ng-invalid text-red-500">borrow Days is required</small>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple [label]="'Request'" icon="pi pi-check" class="p-button-primary"
+            (click)="borrowBook()"></button>
+    </ng-template>
+</p-dialog>

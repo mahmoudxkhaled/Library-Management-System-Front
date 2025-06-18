@@ -1,56 +1,141 @@
 <div class="card">
     <p-toast></p-toast>
-    <h5>Transaction List</h5>
-    <p-dataView #dv [value]="transactions" [paginator]="true" [rows]="10" layout="grid">
-        <ng-template pTemplate="header">
-            <div class="flex flex-column md:flex-row md:justify-content-between gap-2">
+        <div class="grid">
+            <div class="col "><h5>Transaction List</h5></div>
+            <div class="col col-offset-6"><p-multiSelect  [options]="excelColumns" [(ngModel)]="selectedFilters"   optionLabel="name" placeholder="Select columns" /></div>
+            <div class="col"><button pButton pRipple label="Export to Excel" icon="pi pi-file-excel" class="p-button-success" (click)="ExportToExcel()"></button></div>
+    </div>
+    <!-- <div class="flex flex-column md:flex-row md:justify-content-between gap-2">
                 <button pButton pRipple label="Add New Transaction" icon="pi pi-plus" class="p-button mr-2"
                     (click)="addTransaction()"></button>
-            </div>
-        </ng-template>
-        <ng-template let-transactions pTemplate="gridItem">
-            <div class="iAware-loading-table-container" style="position: relative">
-                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
-                <div class="grid grid-nogutter">
-                    <div class="col-12 md:col-4" *ngFor="let transaction of transactions">
-                        <div class="p-3">
-                            <div
-                                class="surface-card shadow-3 border-round overflow-hidden hover:shadow-5 transition-all relative">
-                                <button pButton pRipple type="button" icon="pi pi-ellipsis-v"
-                                    class="p-button-rounded p-button-text p-button-plain absolute top-0 right-0 m-2 bg-gray-200 shadow-lg border border-gray-300"
-                                    (click)="iAwareMenu.toggle($event); assignCurrentSelect(transaction)">
-                                </button>
-
-                                <p-menu #iAwareMenu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
-
-                                <div class="text-center mt-3">
-                                    <h4 class="font-semibold text-xl">Status: {{ transaction.status }}</h4>
-                                </div>
-
-                                <div class="text-center mt-2 mb-3">
-                                    <p class="text-md text-gray-700">
-                                        <span style="font-weight: bold;">Book ID:</span> {{ transaction.bookId }}
-                                    </p>
-                                    <p class="text-md text-gray-700">
-                                        <span style="font-weight: bold;">Issue Date:</span> {{ transaction.issueDate |
-                                        date:'mediumDate' }}
-                                    </p>
-                                    <p class="text-md text-gray-700">
-                                        <span style="font-weight: bold;">Due Date:</span> {{ transaction.dueDate |
-                                        date:'mediumDate' }}
-                                    </p>
-                                    <p class="text-md text-gray-700">
-                                        <span style="font-weight: bold;">Return Date:</span> {{ transaction.returnDate ?
-                                        (transaction.returnDate | date:'mediumDate') : 'Not Returned' }}
-                                    </p>
-                                </div>
+    </div> -->
+    <p-table #dt1 [value]="transactions" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true" styleClass="p-datatable-gridlines" [paginator]="true" [globalFilterFields]="['bookName','status']" responsiveLayout="scroll">
+				<ng-template pTemplate="caption">
+					<div class="flex justify-content-between flex-column sm:flex-row">
+						<button pButton label="Clear" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
+						<span class="p-input-icon-left mb-2">
+							<i class="pi pi-search"></i>
+							<input pInputText type="text" #filter (input)="onGlobalFilter(dt1, $event)" placeholder="Search Keyword" class="w-full"/>
+						</span>
+					</div>
+				</ng-template>
+				<ng-template pTemplate="header">
+					<tr>
+						<th style="min-width: 12rem">
+							<div class="flex justify-content-between align-items-center">
+								Book
+								<p-columnFilter type="text" field="bookName" display="menu" placeholder="Search by name"></p-columnFilter>
+							</div>
+						</th>
+                        <th style="min-width: 12rem">
+							<div class="flex justify-content-between align-items-center">
+								User
+								<p-columnFilter type="text" field="userFullName" display="menu" placeholder="Search by name"></p-columnFilter>
+							</div>
+						</th>
+						<th style="min-width: 12rem">
+							<div class="flex justify-content-between align-items-center">
+								Request Date
+								<p-columnFilter type="date" field="requestDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+							</div>
+						</th>
+						<th style="min-width: 12rem">
+							<div class="flex justify-content-between align-items-center">
+								Issue Date
+								<p-columnFilter type="date" field="issueDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+							</div>
+						</th>
+						<th style="min-width: 14rem">
+							<div class="flex justify-content-between align-items-center">
+								Due Date
+								<p-columnFilter type="date" field="dueDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+							</div>
+						</th>
+						<th style="min-width: 10rem">
+							<div class="flex justify-content-between align-items-center">
+								Return Date
+								<p-columnFilter type="date" field="returnDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+							</div>
+						</th>
+						<th style="min-width: 12rem">
+							<div class="flex justify-content-between align-items-center">
+								Status
+								<p-columnFilter field="status" matchMode="equals" display="menu">
+									<ng-template pTemplate="filter" let-value let-filter="filterCallback">
+										<p-dropdown [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)" placeholder="Any" [style]="{'min-width': '12rem'}" >
+											<ng-template let-option pTemplate="item">
+												<span [class]="'customer-badge status-' + getTransactionStatusBadge(option)">{{option}}</span>
+											</ng-template>
+										</p-dropdown>
+									</ng-template>
+								</p-columnFilter>
+							</div>
+						</th>
+						<!-- <th style="min-width: 12rem">
+							<div class="flex justify-content-between align-items-center">
+								Activity
+								<p-columnFilter field="activity" matchMode="between" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+									<ng-template pTemplate="filter" let-filter="filterCallback">
+										<p-slider [ngModel]="activityValues" [range]="true" (onSlideEnd)="filter($event.values)" styleClass="m-3" [style]="{'min-width': '12rem'}" ></p-slider>
+										<div class="flex align-items-center justify-content-between px-2">
+											<span>{{activityValues[0]}}</span>
+											<span>{{activityValues[1]}}</span>
+										</div>
+									</ng-template>
+								</p-columnFilter>
+							</div>
+						</th> -->
+						<th style="min-width: 8rem">
+							<div class="flex justify-content-between align-items-center">
+								Actions
+							</div>
+						</th>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="body" let-book>
+					<tr>
+                        <td>
+							<span class="image-text ml-2">{{book.bookName}}</span>
+						</td>
+                        <td>
+							{{book.userFullName}}
+						</td>
+						<td>
+							{{book.requestDate | date: 'MM/dd/yyyy'}}
+						</td>
+						<td>
+							{{book.issueDate | date: 'MM/dd/yyyy'}}
+						</td>
+                        <td>
+							{{book.dueDate | date: 'MM/dd/yyyy'}}
+						</td>
+						<td>
+							{{book.returnDate | date: 'MM/dd/yyyy'}}
+						</td>
+						<td>
+							<span [class]="'customer-badge status-' + getTransactionStatusBadge(book.status)">{{book.status}}</span>
+						</td>
+						<td>
+                            <div class="flex align-items-center justify-content-between">
+                                <p-button icon="pi pi-info-circle" title="Details" (click)="getDetails(book.id)"> </p-button>
+								<p-button *ngIf="book.status == 'Pending'" icon="pi pi-plus" title="Issue Book" (click)="issueBook(book.id)"> </p-button>
+								<p-button *ngIf="book.status == 'Issued' || book.status == 'Overdue'" icon="pi pi-undo" title="Return Book" (click)="returnBook(book.id)"> </p-button>
+							
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </ng-template>
-    </p-dataView>
+                        </td>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="emptymessage">
+					<tr>
+						<td colspan="8">No Transactions found.</td>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="loadingbody">
+					<tr>
+						<td colspan="8">Loading Transactions data. Please wait.</td>
+					</tr>
+				</ng-template>
+    		</p-table>
 </div>
 
 <!-- Add Transaction Dialog -->
@@ -117,43 +202,91 @@
     </ng-template>
 </p-dialog>
 
-<!-- Deletion Dialog -->
-<p-dialog [(visible)]="deletionTransactionDialog" header="Delete Transaction" [modal]="true"
-    [style]="{ width: 'auto', maxWidth: '90%' }">
-    <div class="flex align-items-center justify-content-center">
-        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-        <span *ngIf="selectedTransaction">Are you sure you want to delete transaction for <b>{{
-                selectedTransaction.bookId }}</b>?</span>
-    </div>
+
+
+<!-- Update Transaction Dialog -->
+<p-dialog [(visible)]="transactionDetailsDialog" [style]="{ width: '50%', maxHeight: '90vh' }" header="Transaction Details"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="grid">
+            <div class="col-6">
+                <div class="detail-item">
+                    <i class="pi pi-user"></i>
+                    <span class="label">User:</span> {{selectedTransaction.userFullName}}
+                </div>
+                <div class="detail-item">
+                    <i class="pi pi-calendar"></i>
+                    <span class="label">Request Date:</span> {{selectedTransaction.requestDate | date:'mediumDate'}}
+                </div>
+                <div class="detail-item" *ngIf="selectedTransaction.issueDate">
+                    <i class="pi pi-check-circle"></i>
+                    <span class="label">Issue Date:</span> {{selectedTransaction.issueDate | date:'mediumDate'}}
+                </div>
+
+                <div class="detail-item" *ngIf="selectedTransaction.issuedByUser">
+                    <i class="pi pi-user-plus"></i>
+                    <span class="label">Issued By:</span> {{selectedTransaction.issuedByUser}}
+                </div>
+
+                <div class="detail-item" *ngIf="selectedTransaction.dueDate">
+                    <i class="pi pi-calendar-plus"></i>
+                    <span class="label">Due Date:</span> {{selectedTransaction.dueDate | date:'mediumDate'}}
+                </div>
+
+                
+
+                <div class="detail-item">
+                    <i class="pi pi-tag"></i>
+                    <span class="label">Status:</span> {{selectedTransaction.status}}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="detail-item">
+                    <i class="pi pi-book"></i>
+                    <span class="label">Book:</span> {{selectedTransaction.bookName}}
+                </div>
+                <div class="detail-item">
+                    <i class="pi pi-send"></i>
+                    <span class="label">Borrow Days:</span> {{selectedTransaction.borrowDays}}
+                </div>
+                <div class="detail-item" *ngIf="selectedTransaction.dueDate">
+                    <i class="pi pi-reply"></i>
+                    <span class="label">Return Date:</span> {{selectedTransaction.returnDate | date:'mediumDate'}}
+                </div>
+
+                <div class="detail-item" *ngIf="selectedTransaction.returnedByUser">
+                    <i class="pi pi-user-minus"></i>
+                    <span class="label">Returned By:</span> {{selectedTransaction.returnedByUser}}
+                </div>
+
+                <div class="detail-item" *ngIf="selectedTransaction.returnNotes">
+                    <i class="pi pi-comments"></i>
+                    <span class="label">Return Notes:</span> {{selectedTransaction.returnNotes}}
+                </div>
+            </div>
+        </div>
+    </ng-template>
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
-            (click)="declineDeletion()"></button>
-        <button pButton pRipple label="Delete" icon="pi pi-check" class="p-button-text"
-            (click)="confirmDeletion()"></button>
+            (click)="hideDetailsBookDialog()"></button>
     </ng-template>
 </p-dialog>
 
 
-<!-- Update Transaction Dialog -->
-<p-dialog [(visible)]="updateTransactionDialog" [style]="{ width: '100%', height: '100%' }" header="Update Transaction"
+
+<!-- Issue Book Dialog -->
+<p-dialog [(visible)]="issueBookDialog" [style]="{ width: '50%', maxHeight: '90vh' }" header="Issue Transaction"
     [modal]="true" class="p-fluid">
     <ng-template pTemplate="content">
-        <form [formGroup]="updateTransactionForm" (ngSubmit)="saveUpdateTransaction()">
+        <form [formGroup]="issueBookForm" (ngSubmit)="confirmIssueBook()">
             <div class="col-12">
                 <div class="grid formgrid p-fluid">
                     <div class="md:col-6">
                         <div class="field col-12 md:col-12">
-                            <label for="returnDate" class="font-medium text-900">Return Date</label>
-                            <input type="date" pInputText id="returnDate" formControlName="returnDate"
-                                placeholder="Return Date" />
-                        </div>
-
-                        <div class="field col-12 md:col-12">
-                            <label for="status" class="font-medium text-900">Status</label>
-                            <p-dropdown [options]="['Issued', 'Returned', 'Overdue']" formControlName="status"
-                                placeholder="Select Status"></p-dropdown>
-                            <small *ngIf="submitted && !updateTransactionForm.controls['status'].valid"
-                                class="ng-dirty ng-invalid text-red-500">Status is required</small>
+                            <label for="issueDate" class="font-medium text-900">Issue Date</label>
+                            <input type="datetime-local" pInputText id="issueDate" formControlName="issueDate" />
+                            <small *ngIf="submitted && !issueBookForm.controls['issueDate'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Issue Date is required</small>
                         </div>
                     </div>
                 </div>
@@ -162,8 +295,41 @@
     </ng-template>
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
-            (click)="declineUpdateTransactionDialog()"></button>
+            (click)="hideIssueBookDialog()"></button>
         <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
-            (click)="saveUpdateTransaction()"></button>
+            (click)="confirmIssueBook()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- Return Book Dialog -->
+<p-dialog [(visible)]="returnBookDialog" [style]="{ width: '50%', maxHeight: '90vh' }" header="Return Transaction"
+    [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <form [formGroup]="returnBookForm" (ngSubmit)="confirmReturnBook()">
+            <div class="col-12">
+                <div class="grid formgrid p-fluid">
+                    <div class="md:col-12">
+                        <div class="field col-12 md:col-12">
+                            <label for="returnDate" class="font-medium text-900">Return Date</label>
+                            <input type="datetime-local" pInputText id="returnDate" formControlName="returnDate" />
+                            <small *ngIf="submitted && !returnBookForm.controls['returnDate'].valid"
+                            class="ng-dirty ng-invalid text-red-500">Return Date is required</small>
+                        </div>
+                    </div>
+                    <div class="md:col-12">
+                        <div class="field col-12 md:col-12">
+                            <label for="notes" class="font-medium text-900">Notes</label>
+                            <textarea id="notes" pInputTextarea formControlName="notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="hideReturnBookDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text"
+            (click)="confirmReturnBook()"></button>
     </ng-template>
 </p-dialog>
