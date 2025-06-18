@@ -52,6 +52,20 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   statuses: string[] = [];
   selectedFilters: SelectedFilter[]
   excelColumns: SelectedFilter[] = [{ name: "Book" }, { name: "User" }, { name: "RequestDate" }, { name: "IssueDate" }, { name: "DueDate" }, { name: "ReturnDate" }, { name: "Status" }, { name: "IssuedByUser" }, { name: "ReturnedByUser" }]
+
+  // Computed properties for statistics
+  get totalTransactions(): number {
+    return this.transactions.length;
+  }
+
+  get pendingTransactions(): number {
+    return this.transactions.filter(t => t.status === 'Pending').length;
+  }
+
+  get issuedTransactions(): number {
+    return this.transactions.filter(t => t.status === 'Issued').length;
+  }
+
   constructor(
     private BooksService: BooksService,
     private transactionServ: TransactionService,
