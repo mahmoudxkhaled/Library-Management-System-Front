@@ -1,24 +1,37 @@
+<div class="welcome-section">
+   <h1 class="welcome-title">Welcome to Our Library</h1>
+   <p class="welcome-subtitle">Discover thousands of books across various genres and categories</p>
+</div>
 <div class="books-container">
    <!-- Header Section -->
    <div class="header-section">
-      <h1>Our Library Collection</h1>
-      <br>
-      <div class="search-bar">
-         <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input pInputText type="text" (input)="onSearch($event)" [(ngModel)]="bookParams.Search" placeholder="Search books..." />
-         </span>
+      <div class="search-section">
+         <div class="search-bar">
+            <span class="p-input-icon-left">
+               <i class="pi pi-search"></i>
+               <input pInputText type="text" (input)="onSearch($event)" [(ngModel)]="bookParams.Search"
+                  placeholder="Search books..." />
+            </span>
+         </div>
       </div>
-      <div class="search-dropdown">
-         <p-dropdown [options]="categories" [(ngModel)]="bookParams.categoryId" optionLabel="name" 
-         [filter]="true" filterBy="name" [showClear]="true"  optionValue="id" placeholder="Select Category" (onChange)="onSearch($event)"></p-dropdown>
-     </div>
-     <div class="search-dropdown">
-         <p-dropdown [options]="authors" [(ngModel)]="bookParams.authorId" optionLabel="fullName"
-             [filter]="true" filterBy="fullName" [showClear]="true" optionValue="id"
-             placeholder="Select an author" (onChange)="onSearch($event)"></p-dropdown>
-     </div>
-      <span class="status" (click)="deactivateOrActivateTrendingBooks()" [ngClass]="ActivateTrendingBooks == true ?  'Active': 'InActive'">Trending Books</span>   
+
+      <div class="trending-section">
+         <span class="status shining-button" (click)="deactivateOrActivateTrendingBooks()"
+            [ngClass]="ActivateTrendingBooks == true ?  'Active': 'InActive'">Trending Books</span>
+      </div>
+
+      <div class="filters-section">
+         <div class="search-dropdown">
+            <p-dropdown [options]="categories" [(ngModel)]="bookParams.categoryId" optionLabel="name" [filter]="true"
+               filterBy="name" [showClear]="true" optionValue="id" placeholder="Select Category"
+               (onChange)="onSearch($event)"></p-dropdown>
+         </div>
+         <div class="search-dropdown">
+            <p-dropdown [options]="authors" [(ngModel)]="bookParams.authorId" optionLabel="fullName" [filter]="true"
+               filterBy="fullName" [showClear]="true" optionValue="id" placeholder="Select an author"
+               (onChange)="onSearch($event)"></p-dropdown>
+         </div>
+      </div>
    </div>
    <!-- Loading State -->
    <app-loading-state *ngIf="loading" message="Loading books..."></app-loading-state>

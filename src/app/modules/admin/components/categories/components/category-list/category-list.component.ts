@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
@@ -7,6 +7,7 @@ import { ICategory } from '../../models/ICategory';
 import { CategoryService } from '../../services/category.service';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
+import { DataView } from 'primeng/dataview';
 
 @Component({
   selector: 'app-category-list',
@@ -36,6 +37,8 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
 
   searchTerm: string = '';
   filteredCategories: ICategory[] = [];
+
+  @ViewChild('dv') dv: DataView | undefined;
 
   constructor(
     private categoryServ: CategoryService,
@@ -93,6 +96,13 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
       category.name.toLowerCase().includes(searchLower) ||
       category.description.toLowerCase().includes(searchLower)
     );
+
+    // Reset pagination to first page when searching
+    setTimeout(() => {
+      if (this.dv) {
+        this.dv.first = 0;
+      }
+    });
   }
 
   //#region Add/Edit Category
