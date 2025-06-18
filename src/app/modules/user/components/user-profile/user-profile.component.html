@@ -1,113 +1,221 @@
-<form [formGroup]="UpdateUserProfileObj">
-                <div class=" grid formgrid p-fluid">
-                    <div class="col-6">
-                        <div class="field col">
-                            <label for="FirstName" class="font-medium text-900">First Name</label>
-                            <input type="text" pInputText id="FirstName" formControlName="FirstName" placeholder="First Name"
-                                required [ngClass]="{'ng-invalid ng-dirty': ( FirstName.invalid)}" />
-                                <div class="flex flex-column">
-                                <span *ngIf="submitUserProfileData && FirstName.hasError('required')"class="ng-dirty ng-invalid text-red-500">First Name is required</span> 
-                                <span *ngIf="FirstName.hasError('pattern')"class="ng-dirty ng-invalid text-red-500">First Name must contain only English letters and numbers</span> 
-                                </div>
+<div class="user-profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar-section">
+            <div class="avatar-container" (click)="triggerImageUpload()">
+                <img [src]="imageUrl ?? '/assets/demo/images/avatar/UnknownUser.jpg'" alt="Profile Image"
+                    class="profile-avatar" />
+                <div class="avatar-overlay">
+                    <i class="pi pi-camera"></i>
+                    <span>Change Photo</span>
+                </div>
+            </div>
+            <input type="file" id="userImage" style="display: none" (change)="handleImageSelection($event)"
+                accept="image/*" />
+        </div>
+        <div class="profile-info">
+            <h1 class="profile-name">{{userObj?.data?.firstName}} {{userObj?.data?.lastName}}</h1>
+            <p class="profile-email">{{userObj?.data?.email}}</p>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <i class="pi pi-calendar"></i>
+                    <span>Member since {{userObj?.data?.dateofBirth | date:'MMM yyyy'}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Form Card -->
+    <div class="profile-card">
+        <div class="card-header">
+            <h2><i class="pi pi-user"></i> Personal Information</h2>
+            <p>Update your personal details and profile information</p>
+        </div>
+
+        <form [formGroup]="UpdateUserProfileObj" class="profile-form">
+            <div class="form-grid">
+                <!-- Left Column -->
+                <div class="form-column">
+                    <div class="form-field">
+                        <label for="FirstName" class="field-label">
+                            <i class="pi pi-user"></i> First Name
+                        </label>
+                        <input type="text" pInputText id="FirstName" formControlName="FirstName"
+                            placeholder="Enter your first name"
+                            [ngClass]="{'field-error': FirstName.invalid && submitUserProfileData}" />
+                        <div class="field-errors" *ngIf="submitUserProfileData && FirstName.invalid">
+                            <span *ngIf="FirstName.hasError('required')" class="error-message">
+                                <i class="pi pi-exclamation-triangle"></i> First Name is required
+                            </span>
+                            <span *ngIf="FirstName.hasError('pattern')" class="error-message">
+                                <i class="pi pi-exclamation-triangle"></i> Only letters and numbers allowed
+                            </span>
                         </div>
-                        <div class="field col">
-                            <label for="LastName" class="font-medium text-900">Last Name</label>
-                            <input type="text" pInputText id="LastName" formControlName="LastName" placeholder="Last Name"
-                                required [ngClass]="{'ng-invalid ng-dirty': (LastName.invalid)}" />
-                                <div class="flex flex-column">
-                                <span *ngIf="submitUserProfileData && LastName.hasError('required')"class="ng-dirty ng-invalid text-red-500 text-sm">Last Name is required</span> 
-                                <span *ngIf="LastName.hasError('pattern')"class="ng-dirty ng-invalid text-red-500">Last Name must contain only English letters and numbers</span> 
-                                </div>
-                        </div>
-                       
-                        <div class="field col">
-                            <label for="PhoneNumber" class="font-medium text-900">Phone Number</label>
-                            <input type="text" pInputText id="PhoneNumber" formControlName="PhoneNumber" placeholder="Phone Number" />
-                            <span *ngIf="PhoneNumber.hasError('pattern')"class="ng-dirty ng-invalid text-red-500">Only numbers are allowed. No letters, spaces, or symbols.</span> 
-                        </div>
-                        <div class="field col">
-                            <label for="DateofBirth" class="font-medium text-900">Date Of Birth</label>
-                            <!-- <input type="date" pInputText id="DateofBirth" formControlName="DateOfBirth" placeholder="Date of Birth" /> -->
-                            <p-calendar   id="DateofBirth"   formControlName="DateOfBirth"  [showIcon]="true"   dateFormat="dd/mm/yy" inputId="birthDate" class="w-full"> </p-calendar>
-                        </div>
-                         <div class="field col">
-                            <label for="Address" class="font-medium text-900">Address</label>
-                            <input type="text" pInputText id="Address" formControlName="Address" placeholder="Address" />
-                        </div>
-                      
                     </div>
-                    <div class="col-6 mt-3">
-                            <p-panel header="User Image" class="mb-3">
-                                <div class="flex flex-column align-items-center justify-content-center">
-                                    <div class="image-upload-container"  (click)="triggerImageUpload()">
-                                        <img [src]="imageUrl ?? '/assets/demo/images/avatar/UnknownUser.jpg'" alt="Author Image" class="avatar"
-                                            style="width: 300px; height: 225px; max-width: 300px; border-radius: 50%; object-fit: fill; border: 1px solid #ccc; cursor: pointer;" />
-                                        <div class="text-center upload-hover-text">Upload Image</div>
-                                    </div>
-                                    <small class="text-center block m-2">Recommended Dimensions:
-                                        <strong>800px X 500px</strong></small>
-                                </div>
-                                <input type="file" id="userImage" style="display: none"
-                                    (change)="handleImageSelection($event)" />
-                            </p-panel>
-                    </div>                    
+
+                    <div class="form-field">
+                        <label for="LastName" class="field-label">
+                            <i class="pi pi-user"></i> Last Name
+                        </label>
+                        <input type="text" pInputText id="LastName" formControlName="LastName"
+                            placeholder="Enter your last name"
+                            [ngClass]="{'field-error': LastName.invalid && submitUserProfileData}" />
+                        <div class="field-errors" *ngIf="submitUserProfileData && LastName.invalid">
+                            <span *ngIf="LastName.hasError('required')" class="error-message">
+                                <i class="pi pi-exclamation-triangle"></i> Last Name is required
+                            </span>
+                            <span *ngIf="LastName.hasError('pattern')" class="error-message">
+                                <i class="pi pi-exclamation-triangle"></i> Only letters and numbers allowed
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="PhoneNumber" class="field-label">
+                            <i class="pi pi-phone"></i> Phone Number
+                        </label>
+                        <input type="tel" pInputText id="PhoneNumber" formControlName="PhoneNumber"
+                            placeholder="Enter your phone number"
+                            [ngClass]="{'field-error': PhoneNumber.invalid && submitUserProfileData}" />
+                        <div class="field-errors" *ngIf="PhoneNumber.invalid">
+                            <span *ngIf="PhoneNumber.hasError('pattern')" class="error-message">
+                                <i class="pi pi-exclamation-triangle"></i> Only numbers are allowed
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="form-column">
+                    <div class="form-field">
+                        <label for="DateofBirth" class="field-label">
+                            <i class="pi pi-calendar"></i> Date of Birth
+                        </label>
+                        <p-calendar id="DateofBirth" formControlName="DateOfBirth" [showIcon]="true"
+                            dateFormat="dd/mm/yy" inputId="birthDate" placeholder="Select your birth date"
+                            class="w-full">
+                        </p-calendar>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="Address" class="field-label">
+                            <i class="pi pi-map-marker"></i> Address
+                        </label>
+                        <textarea pInputTextarea id="Address" formControlName="Address" placeholder="Enter your address"
+                            rows="3" class="w-full">
+                        </textarea>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="field-label">
+                            <i class="pi pi-shield"></i> Account Security
+                        </label>
+                        <div class="security-actions">
+                            <button pButton pRipple label="Change Password" icon="pi pi-key"
+                                class="p-button-outlined p-button-primary" (click)="changePasswordDialogFun()">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <button pButton pRipple label="Save Changes" icon="pi pi-check" class="p-button-primary save-button"
+                    (click)="UpdateUserProfile()">
+                </button>
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-outlined p-button-secondary"
+                    (click)="cancelProfileChanges()">
+                </button>
             </div>
         </form>
-            <div class="grid col-offset-4 mt-3">
-                <div class="col-3">
-                    <button pButton pRipple label="Update Profile"  class="p-button-primary"(click)="UpdateUserProfile()"></button>
-                </div>
-                <div class="col-3">
-                    <button pButton pRipple label="change Password"  class="p-button-primary" (click)="changePasswordDialogFun()"></button>
-                </div>
-            </div>
+    </div>
+</div>
 
-
-
-
- <p-dialog [(visible)]="changePasswordDialog" [style]="{ width: '40%', height: '65%' }" header="Change Password" [modal]="true" (onHide)="cancelDialog()"
-    class="p-fluid">
+<!-- Change Password Dialog -->
+<p-dialog [(visible)]="changePasswordDialog" [style]="{ width: '500px' }" header="Change Password" [modal]="true"
+    (onHide)="cancelDialog()" class="p-fluid password-dialog">
     <ng-template pTemplate="content">
-        <form [formGroup]="changePasswordObj">
-                <div class="align-items-center grid formgrid p-fluid">
-                    <div class="col-12">
-                        <div class="field col">
-                            <label for="title" class="font-medium text-900">Current Password</label>
-                            <input type="text" pInputText id="currentPassword" formControlName="currentPassword" placeholder="Current Password"
-                                required [ngClass]="{'ng-invalid ng-dirty': (submitPassword && currentPassword.invalid)}" />
-                            <small *ngIf="submitPassword && currentPassword.hasError('required')"class="ng-dirty ng-invalid text-red-500">Current Password is required</small> 
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="field col">
-                            <label for="title" class="font-medium text-900">New Password</label>
-                            <input type="text" pInputText id="newPassword" formControlName="newPassword" placeholder="New Password"
-                                required [ngClass]="{'ng-invalid ng-dirty': (submitPassword && newPassword.invalid)}" />
-                            <p *ngIf="submitPassword && newPassword.hasError('required')"class="ng-dirty ng-invalid text-red-500 text-sm">New Password is required</p> 
-                            <p *ngIf="newPassword.hasError('pattern')" class="ng-dirty ng-invalid text-red-500 text-sm">At least 1 uppercase letter (A–Z),At least 1 lowercase letter (a–z),At least 1 number (0–9),At least 1 symbol from: !&#64;#$%^&*_=+- ,Minimum 8 characters, maximum 12 characters</p> 
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="field col">
-                            <label for="title" class="font-medium text-900">Confirm New Password</label>
-                            <input type="text" pInputText id="confirmNewPassword" formControlName="confirmNewPassword" placeholder="Confirm New Password"
-                                required [ngClass]="{'ng-invalid ng-dirty': (submitPassword && confirmNewPassword.invalid)}" />
-                            <div class="flex flex-column">
-                            <span *ngIf="submitPassword && confirmNewPassword.hasError('required')"class="ng-dirty ng-invalid text-red-500 ">Confirm New Password is required</span>                      
-                            <span *ngIf="confirmNewPassword.hasError('passwordMismatch')"class="ng-dirty ng-invalid text-red-500 text-sm">password Mismatch</span> 
-                            <span *ngIf="confirmNewPassword.hasError('pattern')" class="ng-dirty ng-invalid text-red-500 text-sm">At least 1 uppercase letter (A–Z),At least 1 lowercase letter (a–z),At least 1 number (0–9),At least 1 symbol from: !&#64;#$%^&*_=+- ,Minimum 8 characters, maximum 12 characters</span> 
-                            </div>
-                        </div>
-                    </div>
+        <div class="password-form-container">
+            <div class="password-header">
+                <i class="pi pi-shield-check"></i>
+                <h3>Update Your Password</h3>
+                <p>Enter your current password and choose a new secure password</p>
             </div>
-        </form>
+
+            <form [formGroup]="changePasswordObj" class="password-form">
+                <div class="password-field">
+                    <label for="currentPassword" class="field-label">
+                        <i class="pi pi-lock"></i> Current Password
+                    </label>
+                    <p-password id="currentPassword" formControlName="currentPassword"
+                        placeholder="Enter current password" [toggleMask]="true" [feedback]="false"
+                        [ngClass]="{'field-error': submitPassword && currentPassword.invalid}">
+                    </p-password>
+                    <div class="field-errors" *ngIf="submitPassword && currentPassword.invalid">
+                        <span *ngIf="currentPassword.hasError('required')" class="error-message">
+                            <i class="pi pi-exclamation-triangle"></i> Current password is required
+                        </span>
+                    </div>
+                </div>
+
+                <div class="password-field">
+                    <label for="newPassword" class="field-label">
+                        <i class="pi pi-key"></i> New Password
+                    </label>
+                    <p-password id="newPassword" formControlName="newPassword" placeholder="Enter new password"
+                        [toggleMask]="true" [ngClass]="{'field-error': submitPassword && newPassword.invalid}">
+                    </p-password>
+                    <div class="field-errors" *ngIf="submitPassword && newPassword.invalid">
+                        <span *ngIf="newPassword.hasError('required')" class="error-message">
+                            <i class="pi pi-exclamation-triangle"></i> New password is required
+                        </span>
+                        <span *ngIf="newPassword.hasError('pattern')" class="error-message">
+                            <i class="pi pi-exclamation-triangle"></i> Password must meet security requirements
+                        </span>
+                    </div>
+                </div>
+
+                <div class="password-field">
+                    <label for="confirmNewPassword" class="field-label">
+                        <i class="pi pi-check-circle"></i> Confirm New Password
+                    </label>
+                    <p-password id="confirmNewPassword" formControlName="confirmNewPassword"
+                        placeholder="Confirm new password" [toggleMask]="true" [feedback]="false"
+                        [ngClass]="{'field-error': submitPassword && confirmNewPassword.invalid}">
+                    </p-password>
+                    <div class="field-errors" *ngIf="submitPassword && confirmNewPassword.invalid">
+                        <span *ngIf="confirmNewPassword.hasError('required')" class="error-message">
+                            <i class="pi pi-exclamation-triangle"></i> Please confirm your password
+                        </span>
+                        <span *ngIf="confirmNewPassword.hasError('passwordMismatch')" class="error-message">
+                            <i class="pi pi-exclamation-triangle"></i> Passwords do not match
+                        </span>
+                        <span *ngIf="confirmNewPassword.hasError('pattern')" class="error-message">
+                            <i class="pi pi-exclamation-triangle"></i> Password must meet security requirements
+                        </span>
+                    </div>
+                </div>
+
+                <div class="password-requirements">
+                    <h4><i class="pi pi-info-circle"></i> Password Requirements:</h4>
+                    <ul>
+                        <li><i class="pi pi-check"></i> At least 8 characters, maximum 12</li>
+                        <li><i class="pi pi-check"></i> At least 1 uppercase letter (A-Z)</li>
+                        <li><i class="pi pi-check"></i> At least 1 lowercase letter (a-z)</li>
+                        <li><i class="pi pi-check"></i> At least 1 number (0-9)</li>
+                        <li><i class="pi pi-check"></i> At least 1 symbol (!&#64;#$%^&*_=+-)</li>
+                    </ul>
+                </div>
+            </form>
+        </div>
     </ng-template>
     <ng-template pTemplate="footer">
         <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
             (click)="cancelDialog()"></button>
-        <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text"
-            (click)="EditPassword()">
-        </button>
+        <button pButton pRipple label="Update Password" icon="pi pi-check" class="p-button-primary"
+            (click)="EditPassword()"></button>
     </ng-template>
 </p-dialog>
+
 <p-toast></p-toast>
