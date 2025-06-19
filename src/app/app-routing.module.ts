@@ -5,6 +5,8 @@ import { AppLayoutComponent } from "./layout/app.layout.component";
 import { AuthGuard } from './core/guards/auth.guard.service';
 import { AdminGuard } from './core/guards/admin.guard.service';
 
+
+
 @NgModule({
     imports: [
         RouterModule.forRoot([
@@ -13,8 +15,8 @@ import { AdminGuard } from './core/guards/admin.guard.service';
                 children: [
                     { path: '', loadChildren: () => import('./demo/components/dashboard/dashboard.module').then(m => m.DashboardModule) },
                     { path: 'admin', loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule), canActivate: [AdminGuard] },
-                    { path: 'Books', loadChildren: () => import('src/app/modules/books/books.module').then(b=>b.BooksModule) },
-                    { path: 'user', loadChildren: () => import('src/app/modules/user/user.module').then(u=>u.UserModule) },
+                    { path: 'Books', loadChildren: () => import('src/app/modules/books/books.module').then(b => b.BooksModule) },
+                    { path: 'user', loadChildren: () => import('src/app/modules/user/user.module').then(u => u.UserModule) },
                     { path: 'uikit', loadChildren: () => import('./demo/components/uikit/uikit.module').then(m => m.UIkitModule) },
                     { path: 'utilities', loadChildren: () => import('./demo/components/utilities/utilities.module').then(m => m.UtilitiesModule) },
                     { path: 'documentation', loadChildren: () => import('./demo/components/documentation/documentation.module').then(m => m.DocumentationModule) },
@@ -27,7 +29,7 @@ import { AdminGuard } from './core/guards/admin.guard.service';
             { path: 'landing', loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule) },
             { path: 'notfound', component: NotfoundComponent },
             { path: '**', redirectTo: '/notfound' },
-        ], { scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled', onSameUrlNavigation: 'reload' })
+        ], { scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' })
     ],
     exports: [RouterModule]
 })

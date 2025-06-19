@@ -20,3 +20,298 @@
     padding: 10px;
     border-radius: 10px;
   }
+
+:host ::ng-deep {
+    .image-upload-container {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+
+        &:hover {
+            .upload-overlay {
+                opacity: 1;
+            }
+        }
+
+        .upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: white;
+        }
+    }
+
+    .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+
+        &.status-active {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        &.status-inactive {
+            background-color: #FFEBEE;
+            color: #C62828;
+        }
+    }
+
+    .p-dataview {
+        .p-paginator {
+            padding: 1rem;
+        }
+
+        .p-dataview-content {
+            background: transparent;
+            padding: 0;
+        }
+    }
+
+    .p-dialog {
+        .p-dialog-content {
+            padding: 2rem;
+        }
+    }
+
+    .p-calendar {
+        width: 100%;
+    }
+
+    .p-dropdown {
+        background: white;
+    }
+
+    .p-inputtext {
+        &:enabled:focus {
+            box-shadow: 0 0 0 2px #EEF2FF;
+            border-color: #818CF8;
+        }
+    }
+
+    // Responsive adjustments
+    @media screen and (max-width: 576px) {
+        .p-dialog {
+            width: 90% !important;
+        }
+    }
+
+    .authors-grid {
+        .p-dataview-content {
+            padding: 0;
+            background: transparent;
+        }
+
+        .p-paginator {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: white;
+            margin-top: 1rem;
+        }
+    }
+
+    // Card hover effects
+    .surface-card {
+        transition: all 0.3s ease-in-out;
+        
+        &:hover {
+            transform: translateY(-5px);
+
+            .author-image-overlay {
+                opacity: 1;
+            }
+        }
+    }
+
+    // Description tooltip
+    .p-tooltip {
+        max-width: 300px;
+    }
+
+    // Image container
+    .author-image-container {
+        position: relative;
+        overflow: hidden;
+        
+        img {
+            transition: transform 0.3s ease;
+        }
+        
+        &:hover img {
+            transform: scale(1.05);
+        }
+    }
+
+    // Status badge styles
+    .p-tag {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+    }
+
+    // Action buttons
+    .p-button {
+        &.p-button-text {
+            &:enabled:hover {
+                background: rgba(0,0,0,0.05);
+            }
+        }
+    }
+
+    // Empty state
+    .empty-message {
+        background: linear-gradient(180deg, var(--surface-0) 0%, var(--surface-50) 100%);
+    }
+
+    // Author Dialog Styles
+    .author-dialog {
+        .p-dialog-header {
+            padding: 1.5rem 2rem;
+            background: var(--surface-card);
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        .p-dialog-content {
+            padding: 0;
+        }
+
+        .p-dialog-footer {
+            padding: 1.5rem 2rem;
+            background: var(--surface-section);
+            border-top: 1px solid var(--surface-border);
+        }
+
+        // Image Upload Container
+        .image-upload-container {
+            position: relative;
+            transition: all 0.3s ease;
+            border: 2px dashed var(--surface-border);
+            border-radius: 1rem;
+            overflow: hidden;
+
+            &:hover {
+                border-color: var(--primary-color);
+
+                .upload-overlay {
+                    opacity: 1;
+                }
+
+                img {
+                    filter: brightness(0.7);
+                }
+            }
+
+            .upload-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                opacity: 0;
+                transition: all 0.3s ease;
+                color: white;
+            }
+        }
+
+        // Form Controls
+        .p-inputtext {
+            padding: 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+
+            &:enabled:hover {
+                border-color: var(--primary-color);
+            }
+
+            &:enabled:focus {
+                box-shadow: 0 0 0 2px var(--surface-ground), 0 0 0 4px var(--primary-color);
+            }
+        }
+
+        .p-calendar {
+            .p-inputtext {
+                padding-right: 2.5rem;
+            }
+        }
+
+        .p-input-icon-left {
+            > i {
+                left: 1rem;
+                color: var(--text-color-secondary);
+            }
+
+            > .p-inputtext {
+                padding-left: 2.5rem;
+            }
+        }
+
+        // Textarea
+        .p-inputtextarea {
+            &[rows] {
+                min-height: 150px;
+            }
+        }
+
+        // Error Messages
+        .p-error {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            &:before {
+                content: "!";
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 16px;
+                height: 16px;
+                background: var(--red-500);
+                color: white;
+                border-radius: 50%;
+                font-size: 12px;
+                font-weight: bold;
+            }
+        }
+
+        // Buttons
+        .p-button {
+            &.p-button-text {
+                &:enabled:hover {
+                    background: var(--surface-hover);
+                }
+            }
+
+            &.p-button-primary {
+                &:enabled:hover {
+                    background: var(--primary-600);
+                }
+            }
+        }
+    }
+
+    // Responsive Adjustments
+    @media screen and (max-width: 768px) {
+        .author-dialog {
+            .p-dialog-header,
+            .p-dialog-content,
+            .p-dialog-footer {
+                padding: 1rem;
+            }
+        }
+    }
+}

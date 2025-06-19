@@ -24,7 +24,7 @@ border: #eeee solid ;
         
         @media (max-width: 1024px) {
             grid-template-columns: 1fr;
-            gap: 1rem;
+        gap: 1rem;
         }
         
         .search-section {
@@ -32,33 +32,33 @@ border: #eeee solid ;
             
             @media (max-width: 1024px) {
                 justify-self: stretch;
-            }
-            
-            .search-bar {
-                min-width: 300px;
+        }
+        
+        .search-bar {
+            min-width: 300px;
                 
                 @media (max-width: 1024px) {
                     min-width: auto;
                 }
 
-                .p-input-icon-left {
+            .p-input-icon-left {
+                width: 100%;
+
+                i {
+                    color: var(--primary-color);
+                    font-size: 1rem;
+                    left: 1rem;
+                }
+
+                input {
                     width: 100%;
-
-                    i {
-                        color: var(--primary-color);
-                        font-size: 1rem;
-                        left: 1rem;
+                    padding-left: 2.5rem;
+                    border-radius: 20px;
+                    height: 40px;
+                    
+                    &::placeholder {
+                        color: #999;
                     }
-
-                    input {
-                        width: 100%;
-                        padding-left: 2.5rem;
-                        border-radius: 20px;
-                        height: 40px;
-                        
-                        &::placeholder {
-                            color: #999;
-                        }
                     }
                 }
             }
@@ -425,5 +425,5 @@ border: #eeee solid ;
       font-size: 1rem;
     }
   }
-}
+  }
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { ApiService } from 'src/app/core/services/api-service.service';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +10,7 @@ import { ApiService } from 'src/app/core/services/api-service.service';
 export class AuthorService {
   constructor(private apiService: ApiService) { }
 
-  getAllAuthors():Observable<ApiResult>
-  {
-   return this.apiService.getAllRequest("/Author");
+  getAllAuthors(): Observable<ApiResult> {
+    return this.apiService.getAllRequest("/Author");
   }
 }

@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { AuthorService } from '../../Services/author.service';
 import { GetAuthorDto } from '../../Models/GetAuthorDto ';
 import { AuthorParams } from '../../Models/AuthorParams';
 import { MenuItem, MessageService } from 'primeng/api';
-import { FormBuilder, FormGroup, MaxLengthValidator, Validators } from '@angular/forms';
-import { finalize, first } from 'rxjs';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize } from 'rxjs';
+import { DataView } from 'primeng/dataview';
 
 @Component({
   selector: 'app-authors-list',
@@ -12,234 +13,309 @@ import { finalize, first } from 'rxjs';
   styleUrl: './authors-list.component.scss'
 })
 export class AuthorsListComponent implements OnInit {
-  authors: GetAuthorDto[]
+  @ViewChild('dv') dataView: DataView;
+
+  authors: GetAuthorDto[] = [];
   selectedAuthorImage: File | null = null;
-  TotalCount: number;
+  TotalCount: number = 0;
   author: GetAuthorDto;
   headerDialog: string = '';
-  AuthorParams: AuthorParams
-  reloadPage: { first: number, rows: number }
-  menuItems: MenuItem[] = [];
-  layout: string = 'list';
+  AuthorParams: AuthorParams;
+  currentPage: number = 0;
   deletionAuthorDialog: boolean = false;
   authorDialog: boolean = false;
   switchActivationAuthorDialog: boolean = false;
   authorForm: FormGroup;
   submitted: boolean = false;
-  imageUrl: string = '../../../../../assets/media/upload-photo.jpg';
+  imageUrl: string = 'assets/media/upload-photo.jpg';
   isEditing: boolean = false;
-  loading: boolean = true;
-  sortOptions: any[] = [
-    { label: 'Full Name', value: 'FullName' },
-    { label: 'Date Of Birth', value: 'DateOfBirth' },
-    { label: 'Inserted Time', value: 'InsertedTime' }
-  ]; constructor(private AuthorService: AuthorService, private fb: FormBuilder, private messageService: MessageService,
-  ) { }
-  ngOnInit(): void {
-    this.AuthorParams = { search: '', sortField: '', sortOrder: 1, isActive: null }
-    this.reloadPage = { first: 0, rows: 10 }
-    this.AuthorParams.sortField = "FullName";
-    this.menuItems = [
-      { label: 'Edit', icon: 'pi pi-pencil', command: () => this.editAuthor(this.author) },
-      { label: 'Delete', icon: 'pi pi-trash', command: () => this.deleteAuthor(this.author) }
-    ];
-    this.initAuthorForm();
-    this.loadAuthors(this.reloadPage);
-  }
-  initAuthorForm() {
-    this.authorForm = this.fb.group(
-      {
-        fullName: ['', [Validators.required, Validators.maxLength(50)]],
-        description: ['', Validators.required],
-        dateOfBirth: ['', Validators.required]
-      })
-  }
-  loadAuthors(event: any) {
-    this.reloadPage.first = event.first;
-    this.reloadPage.rows = event.rows;
+  loading: boolean = false;
+  maxDate: Date = new Date();
 
-    this.AuthorService.getAuthorsPaged(this.reloadPage.first, this.reloadPage.rows, this.AuthorParams)
+  sortOptions: any[] = [
+    { label: 'Name A-Z', value: 'FullName' },
+    { label: 'Name Z-A', value: '-FullName' },
+    { label: 'Newest First', value: '-DateOfBirth' },
+    { label: 'Oldest First', value: 'DateOfBirth' }
+  ];
+
+  constructor(
+    private authorService: AuthorService,
+    private fb: FormBuilder,
+    private messageService: MessageService,
+    private ref: ChangeDetectorRef
+  ) { }
+
+  ngOnInit(): void {
+    this.initializeParams();
+    this.initAuthorForm();
+    this.loadAuthors({ first: 0, rows: 12 });
+  }
+
+  private initializeParams(): void {
+    this.AuthorParams = {
+      search: '',
+      sortField: 'FullName',
+      sortOrder: 1,
+      isActive: null
+    };
+  }
+
+  initAuthorForm(): void {
+    this.authorForm = this.fb.group({
+      fullName: ['', [Validators.required, Validators.maxLength(50)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      dateOfBirth: ['', Validators.required]
+    });
+  }
+
+  onPageChange(event: any): void {
+    this.currentPage = Math.floor(event.first / event.rows);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.loadAuthors(event);
+  }
+
+  loadAuthors(event: any): void {
+    this.loading = true;
+    const first = event.first || 0;
+    const rows = event.rows || 12;
+
+    this.authorService.getAuthorsPaged(first, rows, this.AuthorParams)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.ref.detectChanges();
+        })
+      )
       .subscribe({
-        next: authorResult => {
-          console.log("authorResult :", authorResult)
-          this.authors = authorResult.data.result;
-          this.TotalCount = authorResult.data.totalCount;
-          this.loading = false;
+        next: (authorResult) => {
+          if (authorResult && authorResult.data) {
+            this.authors = authorResult.data.result;
+            this.TotalCount = authorResult.data.totalCount;
+            console.log('Authors loaded:', this.authors);
+            this.loading = false;
+            this.ref.detectChanges();
+          }
         },
-        error: err => {
-          this.loading = false;
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load authors',
+            life: 3000
+          });
         }
       });
   }
 
-  addAuthor() {
+  addAuthor(): void {
+    this.isEditing = false;
     this.authorDialog = true;
-    this.headerDialog = "Add New Author"
+    this.headerDialog = "Add New Author";
+    this.imageUrl = 'assets/media/upload-photo.jpg';
+    this.initAuthorForm();
   }
-  onSortChange(event: any) {
-    (event.value)
+
+  onSortChange(event: any): void {
+    this.loading = true;
     this.AuthorParams.sortField = event.value;
-    this.loadAuthors(this.reloadPage)
+    this.currentPage = 0;
+    if (this.dataView) {
+      this.dataView.first = 0;
+    }
+    this.loadAuthors({ first: 0, rows: 12 });
   }
-  triggerImageUpload() {
+
+  triggerImageUpload(): void {
     const fileInput = document.getElementById('myBookImage') as HTMLInputElement;
     fileInput.click();
   }
+
   handleImageSelection(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
-      this.selectedAuthorImage = input.files[0];
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imageUrl = e.target.result;
-      };
-      reader.readAsDataURL(this.selectedAuthorImage);
+      const file = input.files[0];
+      if (this.isValidImageFile(file)) {
+        this.selectedAuthorImage = file;
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.imageUrl = e.target.result;
+        };
+        reader.readAsDataURL(this.selectedAuthorImage);
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Invalid File',
+          detail: 'Please select a valid image file (jpg, jpeg, png, or webp)',
+          life: 3000
+        });
+      }
     }
   }
-  onFilter(event: any) {
+
+  private isValidImageFile(file: File): boolean {
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    return validTypes.includes(file.type);
+  }
+
+  onFilter(event: any): void {
+    this.loading = true;
     const inputValue = (event.target as HTMLInputElement).value;
     this.AuthorParams.search = inputValue;
-    this.reloadPage.first = 0;
-    this.loadAuthors(this.reloadPage);
+    this.currentPage = 0;
+    if (this.dataView) {
+      this.dataView.first = 0;
+    }
+    this.loadAuthors({ first: 0, rows: 12 });
   }
-  deleteAuthor(author: GetAuthorDto) {
+
+  deleteAuthor(author: GetAuthorDto): void {
     this.deletionAuthorDialog = true;
     this.author = author;
   }
-  editAuthor(author: GetAuthorDto) {
+
+  editAuthor(author: GetAuthorDto): void {
     this.isEditing = true;
-    this.imageUrl = author.imageURL;
     this.authorDialog = true;
-    this.headerDialog = "Update Author"
+    this.headerDialog = "Update Author";
     this.author = author;
+    this.imageUrl = author.imageURL || 'assets/media/upload-photo.jpg';
+
     this.authorForm.patchValue({
       fullName: author.fullName,
       description: author.description,
-      dateOfBirth: author.dateOfBirth,
-      imageUrl: this.selectedAuthorImage
-    })
-  }
-  assignCurrentSelect(author: GetAuthorDto) {
-    this.author = author;
+      dateOfBirth: new Date(author.dateOfBirth)
+    });
   }
 
-  saveAuthor() {
+  saveAuthor(): void {
     this.submitted = true;
     if (this.authorForm.valid) {
       const formData = new FormData();
       formData.append('fullName', this.authorForm.value.fullName);
       formData.append('description', this.authorForm.value.description);
-      formData.append('dateOfBirth', this.authorForm.value.dateOfBirth);
-      const bookImageFile = this.selectedAuthorImage;
-      if (bookImageFile) {
-        formData.append('imageUrl', bookImageFile, bookImageFile.name);
+
+      // Format date to YYYY-MM-DD
+      const date = new Date(this.authorForm.value.dateOfBirth);
+      const formattedDate = date.toISOString().split('T')[0];
+      formData.append('dateOfBirth', formattedDate);
+
+      if (this.selectedAuthorImage) {
+        formData.append('imageUrl', this.selectedAuthorImage, this.selectedAuthorImage.name);
       }
+
+      formData.forEach((value, key) => {
+        console.log(key, value);
+      });
       if (this.isEditing) {
         formData.append('id', this.author.id.toString());
-        this.AuthorService.updateAuthor(formData).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'author Updated',
-              life: 3000,
-            });
-            this.loadAuthors(this.reloadPage);
-            this.authorDialog = false;
-            this.isEditing = false;
-            this.imageUrl = null;
-            this.submitted = false;
-          },
-        })
+        this.updateAuthor(formData);
       } else {
-        // If adding new book
-        this.AuthorService.addAuthor(formData).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'Author Added',
-              life: 3000,
-            });
-            this.initAuthorForm();
-            this.loadAuthors(this.reloadPage);
-            this.authorDialog = false;
-            this.submitted = false;
-          },
-        })
-
+        this.createAuthor(formData);
       }
-    } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Fill all fields please',
-        life: 3000,
-      });
     }
+  }
 
-  }
-  declineDeletion() {
-    this.deletionAuthorDialog = false;
-  }
-  confirmDeletion(autherId: number) {
-    this.AuthorService.deleteAuthor(autherId).subscribe(res => {
-      this.AuthorParams.search = '';
-      this.loadAuthors(this.reloadPage)
-      this.deletionAuthorDialog = false;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Successful',
-        detail: 'Auther Deleted',
-        life: 3000,
-      });
-    }, err => {
-      this.deletionAuthorDialog = false;
-      var message = "";
-      if (err.error.message != null)
-        message = err.error.message;
-      else
-        message = err.message;
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: message,
-        life: 3000,
-      });
+  private createAuthor(formData: FormData): void {
+    this.authorService.addAuthor(formData).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Author added successfully',
+          life: 3000
+        });
+        this.closeDialog();
+        this.loadAuthors({ first: 0, rows: 12 });
+      },
+      error: (error) => this.handleError(error)
     });
   }
-  declineActivation() {
+
+  private updateAuthor(formData: FormData): void {
+    this.authorService.updateAuthor(formData).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Author updated successfully',
+          life: 3000
+        });
+        this.closeDialog();
+        this.loadAuthors({ first: 0, rows: 12 });
+      },
+      error: (error) => this.handleError(error)
+    });
+  }
+
+  private handleError(error: any): void {
+    const message = error.error?.message || 'An error occurred';
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: message,
+      life: 3000
+    });
+  }
+
+  private closeDialog(): void {
+    this.authorDialog = false;
+    this.submitted = false;
+    this.isEditing = false;
+    this.selectedAuthorImage = null;
+    this.imageUrl = 'assets/media/upload-photo.jpg';
+    this.initAuthorForm();
+  }
+
+  declineDeletion(): void {
+    this.deletionAuthorDialog = false;
+  }
+
+  confirmDeletion(authorId: number): void {
+    this.authorService.deleteAuthor(authorId).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Author deleted successfully',
+          life: 3000
+        });
+        this.deletionAuthorDialog = false;
+        this.loadAuthors({ first: 0, rows: 12 });
+      },
+      error: (error) => this.handleError(error)
+    });
+  }
+
+  declineActivation(): void {
     this.switchActivationAuthorDialog = false;
   }
-  confirmActivation(authorId: number) {
-    this.AuthorService.ActivateOrDeactivateAuthor(authorId).subscribe(res => {
-      this.loadAuthors(this.reloadPage);
-      this.switchActivationAuthorDialog = false;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Successful',
-        detail: 'Author Updated',
-        life: 3000,
-      });
-    }, err => {
 
-    })
+  confirmActivation(authorId: number): void {
+    this.authorService.ActivateOrDeactivateAuthor(authorId).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: `Author ${this.author.isActive ? 'deactivated' : 'activated'} successfully`,
+          life: 3000
+        });
+        this.switchActivationAuthorDialog = false;
+        this.loadAuthors({ first: 0, rows: 12 });
+      },
+      error: (error) => this.handleError(error)
+    });
   }
-  declineAddAuthorDialog() {
-    this.submitted = false;
-    this.authorDialog = false;
-    this.imageUrl = null;
-    this.initAuthorForm();
-    this.isEditing = false;
+
+  declineAddAuthorDialog(): void {
+    this.closeDialog();
   }
-  DeactivateOrActivate(author: any) {
+
+  DeactivateOrActivate(author: GetAuthorDto): void {
     this.author = author;
     this.switchActivationAuthorDialog = true;
   }
-  get fullName() {
-    return this.authorForm.controls['fullName'];
-  }
-  get description() {
-    return this.authorForm.controls['description'];
-  }
+
+  get fullName() { return this.authorForm.get('fullName'); }
+  get description() { return this.authorForm.get('description'); }
 }
