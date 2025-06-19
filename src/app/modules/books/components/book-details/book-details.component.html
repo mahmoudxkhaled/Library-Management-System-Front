@@ -125,7 +125,7 @@
                                 <i class="pi pi-book"></i> {{book.availableCopies}}/{{book.totalCopies}}
                             </span>
                         </div>
-                        <a [routerLink]="['/books', book.id]" pButton class="p-button-outlined">View Details</a>
+                        <a [routerLink]="['/Books', book.id]" pButton class="p-button-outlined">View Details</a>
                     </div>
                 </div>
             </ng-template>
@@ -156,15 +156,18 @@
             <h3>Write a Review</h3>
             <div class="rating-input">
                 <span>Your Rating:</span>
-                <p-rating [(ngModel)]="rating" [cancel]="false" [stars]="5" [readonly]="!bookDetails.isBorrowed" ></p-rating>
+                <p-rating [(ngModel)]="rating" [cancel]="false" [stars]="5"
+                    [readonly]="!bookDetails.isBorrowed"></p-rating>
             </div>
-            <textarea [(ngModel)]="feedback" placeholder="Share your thoughts about this book (max 1000 characters)..." [disabled]="!bookDetails.isBorrowed"
-                rows="4" maxlength="1000">
+            <textarea [(ngModel)]="feedback" placeholder="Share your thoughts about this book (max 1000 characters)..."
+                [disabled]="!bookDetails.isBorrowed" rows="4" maxlength="1000">
             </textarea>
             <button pButton type="button" label="Submit Review" (click)="submitReview()"
                 [disabled]="!rating || !feedback.trim()">
             </button>
-                    <div class="flex align-items-center justify-content-center"><p>Only users who have borrowed this book may submit reviews.</p></div>
+            <div class="flex align-items-center justify-content-center">
+                <p>Only users who have borrowed this book may submit reviews.</p>
+            </div>
         </div>
         <!-- Reviews List -->
         <div class="reviews-list" *ngIf="reviews && reviews.length > 0">
@@ -197,14 +200,15 @@
 <!-- Toast Messages -->
 <p-toast></p-toast>
 <!-- Borrow Book Dialog -->
-<p-dialog [(visible)]="borrowBookDialog" [style]="{ width: '50%', maxHeight: '90vh' }"
-    [header]="'Borrow Book'" [modal]="true" class="p-fluid">
+<p-dialog [(visible)]="borrowBookDialog" [style]="{ width: '50%', maxHeight: '90vh' }" [header]="'Borrow Book'"
+    [modal]="true" class="p-fluid">
     <ng-template pTemplate="content">
         <form [formGroup]="borrowBookForm" (ngSubmit)="borrowBook()">
             <div class="p-grid p-fluid">
                 <div class="p-col-12 p-md-12">
                     <div class="field p-col-12">
-                        <label for="borrowDays" class="font-medium text-900">Please enter the number of days you wish to borrow the item for:</label>
+                        <label for="borrowDays" class="font-medium text-900">Please enter the number of days you wish to
+                            borrow the item for:</label>
                         <input type="number" pInputText id="borrowDays" formControlName="borrowDays" required
                             [ngClass]="{'ng-invalid ng-dirty': submitted && !borrowBookForm.controls['borrowDays'].valid}" />
                         <small *ngIf="submitted && !borrowBookForm.controls['borrowDays'].valid"

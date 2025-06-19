@@ -1,37 +1,96 @@
-<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
-    <div class="flex flex-column align-items-center justify-content-center">
-        <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
-            alt="LMS logo" class="mb-5 w-6rem flex-shrink-0">
-        <div
-            style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
-            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
-                <div class="text-center mb-5">
-                    <div class="text-900 text-3xl font-medium mb-3">Sign in</div>
-                    <span class="text-red-500 font-medium text-danger">{{message}}</span>
+<div class="login-container">
+    <!-- Background Pattern -->
+    <div class="background-pattern"></div>
+
+    <!-- Main Login Card -->
+    <div class="login-card">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
+                alt="LMS logo" class="logo">
+            <h1 class="welcome-text">Welcome Back</h1>
+            <p class="subtitle">Sign in to access your library account</p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="form-section">
+            <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">
+                <!-- Email Field -->
+                <div class="form-field">
+                    <label for="email1" class="field-label">
+                        <i class="pi pi-envelope"></i>
+                        Email Address
+                    </label>
+                    <div class="input-wrapper">
+                        <input id="email1" type="email" formControlName="email" placeholder="Enter your email"
+                            pInputText class="form-input"
+                            [ngClass]="{'input-error': submitted && loginForm.get('email')?.invalid}">
+                        <i class="pi pi-envelope input-icon"></i>
+                    </div>
+                    <small *ngIf="submitted && loginForm.get('email')?.invalid" class="error-message">
+                        Please enter a valid email address
+                    </small>
                 </div>
 
-                <div>
-                    <form [formGroup]="loginForm" (ngSubmit)="login()">
-                        <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
-                        <input id="email1" type="text" formControlName="email" placeholder="Email address" pInputText class="w-full md:w-30rem mb-5"
-                            style="padding:1rem">
-                        
-                        <label for="password1" class="block text-900 font-medium text-xl mb-2">Password</label>
-                        <p-password id="password1" formControlName="password" placeholder="Password" [toggleMask]="true"
-                            styleClass="mb-5" inputStyleClass="w-full p-3 md:w-30rem"></p-password>
-                        
-                        <div class="flex align-items-center justify-content-between mb-5 gap-5">
-                            <!-- <div class="flex align-items-center">
-                                <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox>
-                                <label for="rememberme1">Remember me</label>
-                            </div> -->
-                            <a routerLink="/auth/register" class="font-medium no-underline ml-2 text-right cursor-pointer"
-                                style="color: var(--primary-color)">Create new account</a>
-                        </div>
-                        <button type="submit" pButton pRipple label="Sign In" class="w-full p-3 text-xl"></button>
-    
-                    </form>
+                <!-- Password Field -->
+                <div class="form-field">
+                    <label for="password1" class="field-label">
+                        <i class="pi pi-lock"></i>
+                        Password
+                    </label>
+                    <div class="input-wrapper">
+                        <p-password id="password1" formControlName="password" placeholder="Enter your password"
+                            [toggleMask]="true" styleClass="password-field" inputStyleClass="form-input"
+                            [ngClass]="{'input-error': submitted && loginForm.get('password')?.invalid}"
+                            [feedback]="false"></p-password>
+                        <i class="pi pi-lock input-icon"></i>
+                    </div>
+                    <small *ngIf="submitted && loginForm.get('password')?.invalid" class="error-message">
+                        Password is required
+                    </small>
                 </div>
+
+                <!-- Error Message -->
+                <div *ngIf="message" class="error-banner">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>{{message}}</span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" pButton pRipple class="submit-button" [disabled]="submitted && loginForm.invalid">
+                    <i class="pi pi-sign-in"></i>
+                    <span>Sign In</span>
+                </button>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <!-- Register Link -->
+                <div class="register-section">
+                    <p>Don't have an account?</p>
+                    <a routerLink="/auth/register" class="register-link">
+                        <i class="pi pi-user-plus"></i>
+                        Create New Account
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <div class="feature-item">
+                <i class="pi pi-book"></i>
+                <span>Access thousands of books</span>
+            </div>
+            <div class="feature-item">
+                <i class="pi pi-clock"></i>
+                <span>Borrow for up to 14 days</span>
+            </div>
+            <div class="feature-item">
+                <i class="pi pi-star"></i>
+                <span>Rate and review books</span>
             </div>
         </div>
     </div>

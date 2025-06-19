@@ -1,80 +1,178 @@
-<p-toast key="tst"></p-toast>
-<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
-    <div class="flex flex-column align-items-center justify-content-center">
-        <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
-            alt="LMS logo" class="mb-5 w-6rem flex-shrink-0">
-        <div
-            style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
-            <div class="w-full md:w-30rem surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
-                <div class="text-center">
-                    <div class="text-900 text-3xl font-medium">Create new Account</div>
-                    <span class="text-red-500 font-medium text-danger">{{message}}</span>
+<div class="register-container">
+    <!-- Background Pattern -->
+    <div class="background-pattern"></div>
+
+    <!-- Main Register Card -->
+    <div class="register-card">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
+                alt="LMS logo" class="logo">
+            <h1 class="welcome-text">Create Account</h1>
+            <p class="subtitle">Join our library community today</p>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-section">
+            <form [formGroup]="registerForm" (ngSubmit)="register()" class="register-form">
+                <!-- Name Fields Row -->
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="firstName" class="field-label">
+                            <i class="pi pi-user"></i>
+                            First Name
+                        </label>
+                        <div class="input-wrapper">
+                            <input id="firstName" type="text" formControlName="firstName"
+                                placeholder="Enter your first name" pInputText class="form-input"
+                                [ngClass]="{'input-error': submitted && registerForm.get('firstName')?.invalid}">
+                            <i class="pi pi-user input-icon"></i>
+                        </div>
+                        <small *ngIf="submitted && registerForm.get('firstName')?.invalid" class="error-message">
+                            First name is required
+                        </small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="lastName" class="field-label">
+                            <i class="pi pi-user"></i>
+                            Last Name
+                        </label>
+                        <div class="input-wrapper">
+                            <input id="lastName" type="text" formControlName="lastName"
+                                placeholder="Enter your last name" pInputText class="form-input"
+                                [ngClass]="{'input-error': submitted && registerForm.get('lastName')?.invalid}">
+                            <i class="pi pi-user input-icon"></i>
+                        </div>
+                        <small *ngIf="submitted && registerForm.get('lastName')?.invalid" class="error-message">
+                            Last name is required
+                        </small>
+                    </div>
                 </div>
 
-                <div>
-                    <form [formGroup]="registerForm" (ngSubmit)="register()">
-                            <div class="col-12 md:col-12">
-                                <label for="firstName" class="block text-900 text-xl font-medium mb-2">Firt Name</label>
-                                <input pInputText class="w-full" type="text" pInputText id="firstName" formControlName="firstName" placeholder="firstName"
-                                    required
-                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['firstName'].valid}" />
-                                <small *ngIf="submitted && !registerForm.controls['firstName'].valid"
-                                    class="ng-dirty ng-invalid text-red-500">Firt Name is required</small>
-                            </div>
-                            <div class="col-12 md:col-12">
-                                <label for="lastName" class="block text-900 text-xl font-medium mb-2">Last Name</label>
-                                <input pInputText class="w-full" type="text" pInputText id="lastName" formControlName="lastName" placeholder="lastName"
-                                    required
-                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['lastName'].valid}" />
-                                <small *ngIf="submitted && !registerForm.controls['lastName'].valid"
-                                    class="ng-dirty ng-invalid text-red-500">Last Name is required</small>
-                            </div>
-                            <div class="col-12 md:col-12">
-                                <label for="phoneNumber" class="block text-900 text-xl font-medium mb-2">Phone Number</label>
-                                <input pInputText class="w-full" type="text" pInputText id="phoneNumber" formControlName="phoneNumber" placeholder="Phone Number"
-                                    required
-                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['phoneNumber'].valid}" />
-                                <small *ngIf="submitted && !registerForm.controls['phoneNumber'].valid"
-                                    class="ng-dirty ng-invalid text-red-500">Phone Number is required</small>
-                            </div>
-                            <div class="col-12 md:col-12">
-                                <label for="email" class="block text-900 text-xl font-medium mb-2">Email Address</label>
-                                <input pInputText class="w-full" type="text" pInputText id="email" formControlName="email" placeholder="email"
-                                    required
-                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['email'].valid}" />
-                                <small *ngIf="submitted && !registerForm.controls['email'].valid && registerForm.controls['email'].errors?.['required']"
-                                    class="ng-dirty ng-invalid text-red-500">Email Address is required</small>
-                                    <small *ngIf="submitted && !registerForm.controls['confirmPassword'].valid && registerForm.controls['email'].errors?.['email']"
-                                    class="ng-dirty ng-invalid text-red-500">Invalid email format</small>
-                            </div>
-                            <div class="col-12 md:col-12">
-                                <label for="password" class="block text-900 text-xl font-medium mb-2">Password</label>
-                                <input pInputText class="w-full" type="password" pInputText id="password" formControlName="password" placeholder="password"
-                                    required
-                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['password'].valid}" />
-                                <small *ngIf="submitted && !registerForm.controls['password'].valid"
-                                    class="ng-dirty ng-invalid text-red-500">Password is required</small>
-                            </div>
-                            <div class="col-12 md:col-12">
-                                <label for="confirmPassword" class="block text-900 text-xl font-medium mb-2">Confirm Password</label>
-                                <input pInputText class="w-full" type="password" pInputText id="confirmPassword" formControlName="confirmPassword" placeholder="Confirm Password"
-                                    required
-                                    [ngClass]="{'ng-invalid ng-dirty': submitted && !registerForm.controls['confirmPassword'].valid}" />
-                                    <small *ngIf="submitted && registerForm.errors?.['mismatch']"
-                                    class="ng-dirty ng-invalid text-red-500">Passwords do not match</small>
-                            </div>
-                            <div class="flex align-items-center justify-content-between mb-5 gap-5">
-                                <!-- <div class="flex align-items-center">
-                                    <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox>
-                                    <label for="rememberme1">Remember me</label>
-                                </div> -->
-                                <a routerLink="/auth/login" class="font-medium no-underline ml-2 text-right cursor-pointer"
-                                    style="color: var(--primary-color)">back to login</a>
-                            </div>
-                            <button type="submit" pButton pRipple label="Register" class="w-full p-3 text-xl"></button>
-                    </form>
+                <!-- Phone Number Field -->
+                <div class="form-field">
+                    <label for="phoneNumber" class="field-label">
+                        <i class="pi pi-phone"></i>
+                        Phone Number
+                    </label>
+                    <div class="input-wrapper">
+                        <input id="phoneNumber" type="tel" formControlName="phoneNumber"
+                            placeholder="Enter your phone number" pInputText class="form-input"
+                            [ngClass]="{'input-error': submitted && registerForm.get('phoneNumber')?.invalid}">
+                        <i class="pi pi-phone input-icon"></i>
+                    </div>
+                    <small *ngIf="submitted && registerForm.get('phoneNumber')?.invalid" class="error-message">
+                        Phone number is required
+                    </small>
                 </div>
+
+                <!-- Email Field -->
+                <div class="form-field">
+                    <label for="email" class="field-label">
+                        <i class="pi pi-envelope"></i>
+                        Email Address
+                    </label>
+                    <div class="input-wrapper">
+                        <input id="email" type="email" formControlName="email" placeholder="Enter your email address"
+                            pInputText class="form-input"
+                            [ngClass]="{'input-error': submitted && registerForm.get('email')?.invalid}">
+                        <i class="pi pi-envelope input-icon"></i>
+                    </div>
+                    <small
+                        *ngIf="submitted && registerForm.get('email')?.invalid && registerForm.get('email')?.errors?.['required']"
+                        class="error-message">
+                        Email address is required
+                    </small>
+                    <small
+                        *ngIf="submitted && registerForm.get('email')?.invalid && registerForm.get('email')?.errors?.['email']"
+                        class="error-message">
+                        Please enter a valid email format
+                    </small>
+                </div>
+
+                <!-- Password Fields Row -->
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="password" class="field-label">
+                            <i class="pi pi-lock"></i>
+                            Password
+                        </label>
+                        <div class="input-wrapper">
+                            <p-password id="password" formControlName="password" placeholder="Create a password"
+                                [toggleMask]="true" styleClass="password-field" inputStyleClass="form-input"
+                                [ngClass]="{'input-error': submitted && registerForm.get('password')?.invalid}"></p-password>
+                            <i class="pi pi-lock input-icon"></i>
+                        </div>
+                        <small *ngIf="submitted && registerForm.get('password')?.invalid" class="error-message">
+                            Password is required
+                        </small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="confirmPassword" class="field-label">
+                            <i class="pi pi-lock"></i>
+                            Confirm Password
+                        </label>
+                        <div class="input-wrapper">
+                            <p-password id="confirmPassword" formControlName="confirmPassword"
+                                placeholder="Confirm your password" [toggleMask]="true" styleClass="password-field"
+                                inputStyleClass="form-input"
+                                [ngClass]="{'input-error': submitted && registerForm.get('confirmPassword')?.invalid}"></p-password>
+                            <i class="pi pi-lock input-icon"></i>
+                        </div>
+                        <small *ngIf="submitted && registerForm.errors?.['mismatch']" class="error-message">
+                            Passwords do not match
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div *ngIf="message" class="error-banner">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>{{message}}</span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" pButton pRipple class="submit-button"
+                    [disabled]="submitted && registerForm.invalid">
+                    <i class="pi pi-user-plus"></i>
+                    <span>Create Account</span>
+                </button>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <!-- Login Link -->
+                <div class="login-section">
+                    <p>Already have an account?</p>
+                    <a routerLink="/auth/login" class="login-link">
+                        <i class="pi pi-sign-in"></i>
+                        Sign In Instead
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <div class="feature-item">
+                <i class="pi pi-shield"></i>
+                <span>Secure account creation</span>
+            </div>
+            <div class="feature-item">
+                <i class="pi pi-book"></i>
+                <span>Access to all library resources</span>
+            </div>
+            <div class="feature-item">
+                <i class="pi pi-clock"></i>
+                <span>Borrow books for 14 days</span>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Toast Messages -->
+<p-toast key="tst"></p-toast>
