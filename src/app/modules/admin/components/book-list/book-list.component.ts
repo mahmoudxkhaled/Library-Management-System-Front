@@ -67,6 +67,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     private tableLoadingService: TableLoadingService,
     private authorService: AuthorService
   ) {
+    this.selectedFilters=this.excelColumns;
     this.initBookModelAndForm();
   }
 
@@ -89,14 +90,14 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     this.loadBooks({
       first: 0,
-      rows: 10,
+      rows: 9,
       sortField: null,
       sortOrder: 1
     });
   }
 
   assignCurrentSelect(book: IBook) {
-    this.book = book;
+    this.selectedBook = book;
   }
   loadBooks(event: any) {
     this.reloadPage.first = event.first;
@@ -108,11 +109,10 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     this.subs.add(
       this.bookService.getBooksPaged(event.first, event.rows, this.bookParams).pipe(finalize(() => this.loading = false)).subscribe((res) => {
-        this.books = res.data.result;
 
+        this.books = res.data.result;
         this.totalRecords = res.data.totalCount;
         this.loading=false;
-        this.ref.detectChanges();
         this.tableLoadingService.hide();
         this.filteredBooks = this.books;
       })
@@ -238,7 +238,7 @@ ExportToExcel()
   editBook(book: IBook) {
     this.isEditing = true;
     this.selectedBook = { ...book };
-    this.imageUrl = book.coverImageUrl ? book.coverImageUrl : '../../../../../assets/media/upload-photo.jpg';
+    this.imageUrl = book.coverImageUrl ? book.coverImageUrl : '../../ assets/media/upload-photo.jpg';
     this.bookForm.patchValue({
       id: book.id,
       title: book.title,
@@ -367,6 +367,8 @@ ExportToExcel()
   }
 
   onSearch() {
+    this.reloadPage.first=0;
+    this.reloadPage.rows=9;
     this.loadBooks(this.reloadPage);
   }
 

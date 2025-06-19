@@ -22,42 +22,50 @@
         <app-loading-state *ngIf="loading" message="Loading books..."></app-loading-state>
 
         <!-- Books Grid -->
-        <p-dataView #dv [value]="filteredBooks" [paginator]="true" [rows]="9" layout="grid" *ngIf="!loading">
-            <ng-template let-books pTemplate="gridItem">
-                <div class="grid grid-nogutter">
-                    <div class="my-3 px-3 col-12 md:col-4" *ngFor="let book of books">
-                        <div class="book-card">
-                            <div class="image-container" (click)="editBook(book)">
-                                <img [src]="book.coverImageUrl ?? 'assets/media/dummy-book.jpg'" [alt]="book.title"
-                                    class="book-image" />
-                                <div class="image-overlay">
-                                    <i class="pi pi-pencil"></i>
-                                </div>
+
+        <p-dataView #dv [value]="filteredBooks" [lazy]="true" (onLazyLoad)="loadBooks($event)"   [totalRecords]="totalRecords" [paginator]="true" [rows]="10"  [layout]="layout"  *ngIf="!loading">
+        
+                <ng-template let-book pTemplate="listItem">
+            <div class="iAware-loading-table-container" style="position: relative">
+                <app-table-loading-spinner *ngIf="tableLoadingSpinner"></app-table-loading-spinner>
+                <div class="p-col-12" *ngFor="let book of books">
+                    <div class="flex flex-column md:flex-row align-items-center p-3 w-full">
+                        <img (click)="editBook(book)" style="width: 200px; height: 100px;cursor: pointer;"
+                            [src]="book.coverImageUrl ?? 'assets/media/dummy-book.jpg'" [alt]="book.title"
+                            class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5" />
+                        <div class="flex-1 flex flex-column align-items-start text-center md:text-left">
+                            <div class="font-bold text-2xl">{{ book.title }}</div>
+                            <div class="mb-2">
+                                <span class="font-semibold">Description:</span> {{ book.description }}
                             </div>
-                            <div class="book-content">
-                                <div class="book-header">
-                                    <h3>{{ book.title }}</h3>
-                                    <button pButton pRipple type="button" icon="pi pi-ellipsis-v"
-                                        class="p-button-rounded p-button-text p-button-plain"
-                                        (click)="menu.toggle($event); selectedBook = book">
-                                    </button>
-                                </div>
-                                <p-menu #menu [model]="menuItems" [popup]="true" [appendTo]="'body'"></p-menu>
-                                <p class="description">{{ book.description }}</p>
-                                <div class="book-footer">
-                                    <div class="book-info">
-                                        <i class="pi pi-user"></i>
-                                        <span>{{ book.authorFullName }}</span>
-                                    </div>
-                                    <div class="book-status" [ngClass]="{'available': book.availableCopies > 0}">
+                             <div class="mb-2">
+                                <span class="font-semibold">Author:</span> {{ book.authorFullName }}
+                            </div>
+                             <div class="mb-2">
+                                <span class="font-semibold">Category:</span> {{ book.categoryName }}
+                            </div>
+                             <div class="mb-2">
+                                <span class="font-semibold">Publication Year:</span> {{ book.publicationYear }}
+                            </div>
+                             <div class="mb-2">
+                                <span class="font-semibold">Total Copies:</span> {{ book.totalCopies }}
+                            </div>
+                             <div  [ngClass]="book.availableCopies > 0?'available':'unavailable'">
                                         {{ book.availableCopies > 0 ? 'Available' : 'Borrowed' }}
                                     </div>
-                                </div>
-                            </div>
+                        </div>
+                        <div
+                            class="flex flex-row md:flex-column justify-content-between w-full md:w-auto align-items-center md:align-items-end mt-5 md:mt-0">
+                            <button pButton pRipple type="button" icon="pi pi-ellipsis-v"
+                                class="p-button-rounded p-button-text p-button-plain mt-2"
+                                (click)="iAwareMenu.toggle($event); assignCurrentSelect(book)"></button>
+                            <p-menu #iAwareMenu [model]="menuItems" [appendTo]="'body'" [popup]="true"></p-menu>
                         </div>
                     </div>
+                    <hr>
                 </div>
-            </ng-template>
+            </div>
+        </ng-template>
         </p-dataView>
     </div>
 </div>
