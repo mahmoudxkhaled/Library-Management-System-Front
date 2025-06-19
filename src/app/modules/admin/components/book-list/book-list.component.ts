@@ -56,8 +56,8 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
   loading: boolean = true;
   isEditing: boolean = false;
   searchTerm: string = '';
-  selectedFilters:SelectedFilter[]
-  excelColumns:SelectedFilter[]=[{name:"Title"},{name:"Description"},{name:"PublicationYear"},{name:"AvailableCopies"},{name:"TotalCopies"},{name:"Category"},{name:"Author"}]
+  selectedFilters: SelectedFilter[]
+  excelColumns: SelectedFilter[] = [{ name: "Title" }, { name: "Description" }, { name: "PublicationYear" }, { name: "AvailableCopies" }, { name: "TotalCopies" }, { name: "Category" }, { name: "Author" }]
   constructor(
     private bookServ: BookService, private bookService: BooksService,
     private categoryServ: CategoryService,
@@ -67,7 +67,7 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     private tableLoadingService: TableLoadingService,
     private authorService: AuthorService
   ) {
-    this.selectedFilters=this.excelColumns;
+    this.selectedFilters = this.excelColumns;
     this.initBookModelAndForm();
   }
 
@@ -107,35 +107,36 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.bookParams.categoryId = this.categoryId;
     this.tableLoadingService.show();
 
+    // Smooth scroll to top when changing pages
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     this.subs.add(
       this.bookService.getBooksPaged(event.first, event.rows, this.bookParams).pipe(finalize(() => this.loading = false)).subscribe((res) => {
-
         this.books = res.data.result;
         this.totalRecords = res.data.totalCount;
-        this.loading=false;
+        this.loading = false;
         this.tableLoadingService.hide();
         this.filteredBooks = this.books;
       })
     );
   }
-ExportToExcel()
-{
-  if(this.selectedFilters===undefined){
-    this.messageService.add({
-                    severity: 'error',
-                    summary: 'Export Requirements',
-                    detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
-                    life: 3000,
-                  });
-                  return;
-  }
-  this.bookService.ExportToExcel(this.selectedFilters).subscribe(res=>{
-    this.bookService.downLoadFile(res,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BookRecords.xlsx");
-  },err=>{
+  ExportToExcel() {
+    if (this.selectedFilters === undefined) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Export Requirements',
+        detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
+        life: 3000,
+      });
+      return;
+    }
+    this.bookService.ExportToExcel(this.selectedFilters).subscribe(res => {
+      this.bookService.downLoadFile(res, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BookRecords.xlsx");
+    }, err => {
 
     }
-  )
-}
+    )
+  }
   loadCategories() {
     this.subs.add(
       this.categoryServ.getAllCategories().subscribe({
@@ -238,7 +239,7 @@ ExportToExcel()
   editBook(book: IBook) {
     this.isEditing = true;
     this.selectedBook = { ...book };
-    this.imageUrl = book.coverImageUrl ? book.coverImageUrl : '../../ assets/media/upload-photo.jpg';
+    this.imageUrl = book.coverImageUrl ? book.coverImageUrl : 'assets/dummy_book_cover.webp';
     this.bookForm.patchValue({
       id: book.id,
       title: book.title,
@@ -327,7 +328,7 @@ ExportToExcel()
   }
 
   triggerImageUpload() {
-    const fileInput = document.getElementById('myBookImage') as HTMLInputElement;
+    const fileInput = document.getElementById('bookCoverImage') as HTMLInputElement;
     fileInput.click();
   }
 
@@ -367,8 +368,8 @@ ExportToExcel()
   }
 
   onSearch() {
-    this.reloadPage.first=0;
-    this.reloadPage.rows=9;
+    this.reloadPage.first = 0;
+    this.reloadPage.rows = 9;
     this.loadBooks(this.reloadPage);
   }
 
@@ -380,7 +381,7 @@ ExportToExcel()
       totalCopies: 1,
       isActive: true
     });
-    this.imageUrl = '../../../../../assets/media/upload-photo.jpg';
+    this.imageUrl = 'assets/dummy_book_cover.webp';
     this.submitted = false;
     this.bookDialog = true;
   }
@@ -388,5 +389,15 @@ ExportToExcel()
   hideDialog() {
     this.bookDialog = false;
     this.submitted = false;
+  }
+
+  getAuthorName(authorId: number): string {
+    const author = this.authors?.find(a => a.id === authorId);
+    return author ? author.fullName : '';
+  }
+
+  getCategoryName(categoryId: string): string {
+    const category = this.categories?.find(c => c.id === categoryId);
+    return category ? category.name : '';
   }
 }

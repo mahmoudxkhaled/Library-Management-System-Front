@@ -61,9 +61,21 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
       this.tableLoadingSpinner = isLoading;
     });
 
+    this.initializeMenuItems();
+  }
+
+  initializeMenuItems() {
     this.menuItems = [
-      { label: 'Edit', icon: 'pi pi-pencil', command: () => this.editCategory(this.category) },
-      { label: 'Delete', icon: 'pi pi-trash', command: () => this.deleteCategory(this.category) }
+      {
+        label: 'Edit Category',
+        icon: 'pi pi-pencil',
+        command: () => this.editCategory(this.category!)
+      },
+      {
+        label: 'Delete Category',
+        icon: 'pi pi-trash',
+        command: () => this.deleteCategory(this.category!)
+      }
     ];
   }
 
@@ -156,7 +168,7 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
             this.messageService.add({
               severity: 'success',
               summary: 'Successful',
-              detail: this.isEditing ? 'Category Updated' : 'Category Added',
+              detail: this.isEditing ? 'Category Updated Successfully' : 'Category Added Successfully',
               life: 3000,
             });
             this.loadCategories();

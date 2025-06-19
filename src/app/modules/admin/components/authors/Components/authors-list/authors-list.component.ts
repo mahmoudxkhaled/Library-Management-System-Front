@@ -31,6 +31,8 @@ export class AuthorsListComponent implements OnInit {
   isEditing: boolean = false;
   loading: boolean = false;
   maxDate: Date = new Date();
+  currentAuthor: GetAuthorDto;
+  menuItems: MenuItem[];
 
   sortOptions: any[] = [
     { label: 'Name A-Z', value: 'FullName' },
@@ -50,6 +52,7 @@ export class AuthorsListComponent implements OnInit {
     this.initializeParams();
     this.initAuthorForm();
     this.loadAuthors({ first: 0, rows: 12 });
+    this.initializeMenuItems();
   }
 
   private initializeParams(): void {
@@ -318,4 +321,15 @@ export class AuthorsListComponent implements OnInit {
 
   get fullName() { return this.authorForm.get('fullName'); }
   get description() { return this.authorForm.get('description'); }
+
+  private initializeMenuItems(): void {
+    this.menuItems = [
+      { label: 'Edit', icon: 'pi pi-pencil', command: () => this.editAuthor(this.currentAuthor) },
+      { label: 'Delete', icon: 'pi pi-trash', command: () => this.deleteAuthor(this.currentAuthor) }
+    ];
+  }
+
+  assignCurrentAuthor(author: GetAuthorDto): void {
+    this.currentAuthor = author;
+  }
 }
