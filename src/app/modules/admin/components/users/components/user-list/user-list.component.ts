@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
@@ -23,6 +23,8 @@ import { BooksService } from 'src/app/modules/books/services/books.service';
 })
 export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('dt') dt: Table;
+  @ViewChild('filterLibrarians') filterLibrarians!: ElementRef;
+  @ViewChild('filterMembers') filterMembers!: ElementRef;
 
   layout: string = 'dataview';
   loading: boolean = true;
@@ -37,7 +39,7 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   deletionUserDialog: boolean = false;
   switchActivationUserDialog: boolean = false;
   submitted: boolean = false;
-  UserTransactionsDialog:boolean = false;
+  UserTransactionsDialog: boolean = false;
   users: IUser[] = [];
   librarians: IUser[] = [];
   members: IUser[] = [];
@@ -54,10 +56,22 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   profileImageUrl: string = '../../../../../assets/media/upload-photo.jpg';
   menuItems: MenuItem[] = [];
   userTransactions: ITransaction[] = [];
-   selectedFilters:SelectedFilter[]
-  excelColumns:SelectedFilter[]=[{name:"FirstName"},{name:"LastName"},{name:"Address"},{name:"DateOfBirth"},{name:"Email"},{name:"PhoneNumber"}]
+  selectedFilters: SelectedFilter[]
+  excelColumns: SelectedFilter[] = [{ name: "FirstName" }, { name: "LastName" }, { name: "Address" }, { name: "DateOfBirth" }, { name: "Email" }, { name: "PhoneNumber" }]
+
+  // Status options for filtering
+  statusOptions = [
+    { label: 'Active', value: true },
+    { label: 'Inactive', value: false }
+  ];
+
+  // Computed properties for statistics
+  get totalUsers(): number {
+    return this.users.length;
+  }
+
   constructor(
-    private BooksService:BooksService,
+    private BooksService: BooksService,
     private userServ: UserService,
     private transactionServ: TransactionService,
     private categoryServ: CategoryService,
@@ -66,7 +80,7 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     private ref: ChangeDetectorRef,
     private tableLoadingService: TableLoadingService,
   ) {
-    this.selectedFilters=this.excelColumns;
+    this.selectedFilters = this.excelColumns;
     this.initUserModelAndForm();
   }
 
@@ -127,28 +141,45 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
       })
     );
   }
-ExportToExcel()
-{
-  if(this.selectedFilters===undefined){
-    this.messageService.add({
-                    severity: 'error',
-                    summary: 'Export Requirements',
-                    detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
-                    life: 3000,
-                  });
-                  return;
+
+  ExportToExcel() {
+    if (this.selectedFilters === undefined) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Export Requirements',
+        detail: 'Please select at least one filter from the dropdown before exporting to Excel.',
+        life: 3000,
+      });
+      return;
+    }
+    this.userServ.ExportToExcel(this.selectedFilters).subscribe(res => {
+      this.BooksService.downLoadFile(res, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "UserRecords.xlsx");
+    }, err => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed Export to Excel'
+      });
+    }
+    )
   }
-   this.userServ.ExportToExcel(this.selectedFilters).subscribe(res=>{
-    this.BooksService.downLoadFile(res,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "UserRecords.xlsx");
-  },err=>{
- this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed Export to Excel'
-          });
-     }
-  )
-}
+
+  // Table filtering methods
+  onGlobalFilter(table: Table, event: Event) {
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  onGlobalFilterBorrowedBooks(table: Table, event: Event) {
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  clear(table: Table) {
+    table.clear();
+    if (table === this.dt) {
+      this.filterValue = '';
+    }
+  }
+
   applyFilterGlobal(event: any, stringVal: string) {
     const searchValue = (event.target as HTMLInputElement).value;
     if (this.dt) {
@@ -174,6 +205,7 @@ ExportToExcel()
 
   //#region Add User
   addUser() {
+    this.isEditing = false;
     this.initUserModelAndForm();
     this.profileImageUrl = '../../../../../assets/media/upload-photo.jpg';
     this.selectedUserImage = null;
@@ -374,55 +406,86 @@ ExportToExcel()
   }
 
 
-  hideUserTransactionsDialog(){
+  hideUserTransactionsDialog() {
     this.UserTransactionsDialog = false;
   }
 
-  getUserTransactions(user: IUser){
+  getUserTransactions(user: IUser) {
     this.transactionServ.GetTransactionsByUserId(user.id).subscribe({
-            next: (res) => {
-                if (res.isSuccess) {
-                  this.userTransactions = res.data;
-                  this.UserTransactionsDialog = true;
-                } else {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: res.message || 'Failed to get user borrowed books'
-                  });
-                }
-        },
-        error: (error) => {
-          console.error('Error getting user borrowed books:', error);
+      next: (res) => {
+        if (res.isSuccess) {
+          this.userTransactions = res.data;
+          this.UserTransactionsDialog = true;
+        } else {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error.error.message? error.error.message: 'Failed to get user borrowed books'
+            detail: res.message || 'Failed to get user borrowed books'
           });
         }
-      })
+      },
+      error: (error) => {
+        console.error('Error getting user borrowed books:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.error.message ? error.error.message : 'Failed to get user borrowed books'
+        });
+      }
+    })
   }
 
-  getTransactionStatusBadge(status: string){
-      var badge = '';
-      switch(status) { 
-        case "Issued": { 
-            badge = 'qualified'
-            break; 
-        } 
-        case "Returned": { 
-            badge = 'proposal';
-            break; 
-        } 
-        case "Overdue": { 
-            badge = 'unqualified';
-            break; 
-        } 
-        default: { 
-            badge = 'renewal';
-            break; 
-        } 
-      } 
-      return badge;
+  getTransactionStatusBadge(status: string) {
+    var badge = '';
+    switch (status) {
+      case "Issued": {
+        badge = 'qualified'
+        break;
+      }
+      case "Returned": {
+        badge = 'proposal';
+        break;
+      }
+      case "Overdue": {
+        badge = 'unqualified';
+        break;
+      }
+      default: {
+        badge = 'renewal';
+        break;
+      }
     }
+    return badge;
+  }
+
+  isOverdue(dueDate: Date): boolean {
+    if (!dueDate) return false;
+    const today = new Date();
+    const due = new Date(dueDate);
+    return due < today;
+  }
+
+  //#region Activation
+  switchActivation(user: IUser) {
+    this.switchActivationUserDialog = true;
+    this.user = { ...user };
+  }
+
+  confirmActivation() {
+    this.switchActivationUserDialog = false;
+    // Add activation logic here when backend is ready
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: `User ${this.user.isActive ? 'deactivated' : 'activated'} successfully`,
+      life: 3000,
+    });
+    this.loadUsers();
+    this.ref.detectChanges();
+  }
+
+  declineActivation() {
+    this.switchActivationUserDialog = false;
+  }
+  //#endregion
 }
