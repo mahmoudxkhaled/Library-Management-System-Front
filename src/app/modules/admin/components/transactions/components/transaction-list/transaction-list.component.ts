@@ -60,6 +60,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
     private ref: ChangeDetectorRef,
     private tableLoadingService: TableLoadingService,
   ) {
+    this.selectedFilters=this.excelColumns;
     this.initTransactionModelAndForm();
   }
 

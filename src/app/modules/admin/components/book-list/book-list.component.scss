@@ -451,3 +451,16 @@
   background: #ffcdd2;
   color: #c63737;
 }
+ .available {
+                    background-color: #4caf50;
+                    color: white;
+                        padding: 5px;
+    border-radius: 10px;
+                }
+
+                .unavailable {
+                    background-color: #f44336;
+                    color: white;
+                        padding: 5px;
+    border-radius: 10px;
+                }

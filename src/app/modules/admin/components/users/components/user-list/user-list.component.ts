@@ -66,6 +66,7 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     private ref: ChangeDetectorRef,
     private tableLoadingService: TableLoadingService,
   ) {
+    this.selectedFilters=this.excelColumns;
     this.initUserModelAndForm();
   }
 
