@@ -6,6 +6,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { DataView } from 'primeng/dataview';
+import { BooksService } from 'src/app/modules/books/services/books.service';
 
 @Component({
   selector: 'app-authors-list',
@@ -42,6 +43,7 @@ export class AuthorsListComponent implements OnInit {
   ];
 
   constructor(
+    private BooksService:BooksService,
     private authorService: AuthorService,
     private fb: FormBuilder,
     private messageService: MessageService,
@@ -54,7 +56,17 @@ export class AuthorsListComponent implements OnInit {
     this.loadAuthors({ first: 0, rows: 12 });
     this.initializeMenuItems();
   }
-
+ExportToExcel(){ 
+  this.authorService.ExportToExcelWithoutParams().subscribe(res => {
+      this.BooksService.downLoadFile(res, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AuthorRecords.xlsx");
+    }, err => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed Export to Excel'
+      });
+    }
+    )}
   private initializeParams(): void {
     this.AuthorParams = {
       search: '',

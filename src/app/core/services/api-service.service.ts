@@ -13,9 +13,13 @@ export class ApiService {
     BASE_URLII = environment.apiUrlWithoutAPI;
 
     constructor(private httpClient: HttpClient) { }
-    ExportToExcel(path:string,SelectedFilters:SelectedFilter[]):Observable<ArrayBuffer>
+    ExportToExcel(path:string,SelectedFilters:SelectedFilter[]=null):Observable<ArrayBuffer>
     {
       return  this.httpClient.post(`${this.BASE_URL}${path}`,SelectedFilters,{responseType:'arraybuffer'});
+    }
+     ExportToExcelWithoutParams(path:string):Observable<ArrayBuffer>
+    {
+      return  this.httpClient.get(`${this.BASE_URL}${path}`,{responseType:'arraybuffer'});
     }
     getAllRequest<T>(path: string): Observable<T> {
         return this.httpClient.get<T>(`${this.BASE_URL}${path}`);

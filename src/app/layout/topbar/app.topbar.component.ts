@@ -8,6 +8,7 @@ import { IUserLogged } from 'src/app/modules/admin/components/users/models/UserL
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { GalleriaThumbnails } from 'primeng/galleria';
 
 @Component({
     selector: 'app-topbar',

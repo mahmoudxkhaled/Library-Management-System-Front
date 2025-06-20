@@ -105,19 +105,39 @@
                 gap: 1rem;
                 flex-wrap: wrap;
 
-                .add-btn {
+                .export-select {
+                    min-width: 200px;
+                }
+
+                .export-btn, .add-btn {
                     height: 44px;
                     border-radius: 12px;
                     font-weight: 600;
                     padding: 0 1.5rem;
                     transition: all 0.3s ease;
                     border: none;
+                    
+                    &:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                    }
+                }
+
+                .export-btn {
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    border: none;
+                    
+                    &:hover {
+                        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                    }
+                }
+
+                .add-btn {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border: none;
                     
                     &:hover {
                         background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-                        transform: translateY(-2px);
-                        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
                     }
                 }
             }

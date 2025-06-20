@@ -7,4 +7,5 @@ export interface IUserLogged{
     userId:number;
     userName:string;
     phoneNumber:string;
+    role:string;
 }

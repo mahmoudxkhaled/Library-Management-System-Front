@@ -61,9 +61,12 @@ export class BooksListComponent implements OnInit {
     this.loadBooks();
   }
   deactivateOrActivateTrendingBooks() {
+        this.currentPage = 0;
     this.ActivateTrendingBooks = !this.ActivateTrendingBooks;
     this.loading = true;
     if (this.ActivateTrendingBooks) {
+      console.log("GetAllTrendingBooks");
+      
       this.booksService.GetAllTrendingBooks(this.currentPage, this.pageSize, this.bookParams).subscribe(response => {
         this.books = response.data.result;
         this.totalRecords = response.data.totalCount;
@@ -76,6 +79,8 @@ export class BooksListComponent implements OnInit {
       )
     }
     else {
+      console.log("getBooksPaged");
+      
       this.booksService.getBooksPaged(this.currentPage, this.pageSize, this.bookParams).subscribe({
         next: (response: ApiResult) => {
           if (response.isSuccess) {
@@ -93,6 +98,19 @@ export class BooksListComponent implements OnInit {
   }
   loadBooks(): void {
     this.loading = true;
+    if (this.ActivateTrendingBooks) {
+      this.booksService.GetAllTrendingBooks(this.currentPage, this.pageSize, this.bookParams).subscribe(response => {
+        this.books = response.data.result;
+        this.totalRecords = response.data.totalCount;
+        this.loading = false;
+      },
+        (error) => {
+          console.error('Error loading books:', error);
+          this.loading = false;
+        }
+      )
+    }
+    else {
     this.booksService.getBooksPaged(this.currentPage, this.pageSize, this.bookParams).subscribe({
       next: (response: ApiResult) => {
         if (response.isSuccess) {
@@ -107,6 +125,7 @@ export class BooksListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
   }
 
   onSearch(event: Event): void {

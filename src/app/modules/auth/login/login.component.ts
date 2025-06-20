@@ -44,7 +44,7 @@ export class LoginComponent {
                         if (result.data.role == "Admin" || result.data.role == "Librarian") {
                             this.router.navigate(['/admin/dashboard']);
                         } else {
-                            this.router.navigate(['/']);
+                            this.router.navigate(['/Books']);
                         }
                     } else {
                         this.message = result.message;

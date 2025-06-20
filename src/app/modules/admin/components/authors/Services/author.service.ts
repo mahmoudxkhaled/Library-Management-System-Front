@@ -22,6 +22,10 @@ export class AuthorService {
     {
       return this.apiService.postRequest<ApiResult>(`/author`,authorForm);
     }
+    ExportToExcelWithoutParams()
+    {
+      return this.apiService.ExportToExcelWithoutParams('/author/ExportToExcel');
+    }
     deleteAuthor(autherId:number):Observable<ApiResult>
     {
       return this.apiService.deleteRequest<ApiResult>(`/author`,autherId);

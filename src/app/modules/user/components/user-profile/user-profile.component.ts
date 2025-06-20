@@ -6,6 +6,7 @@ import { MessageService } from 'primeng/api';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { IUserLogged } from 'src/app/modules/admin/components/users/models/UserLogged';
 import { UserService } from 'src/app/modules/admin/components/users/services/user.service';
+import { Location } from '@angular/common';
 export function passwordsMatchValidator(newPassword: string, confirmPassword: string): ValidatorFn {
   return (FormGroup: AbstractControl): ValidationErrors | null => {
     var newPass = FormGroup.get(newPassword)?.value;
@@ -42,7 +43,7 @@ export class UserProfileComponent implements OnInit {
   selectedUserImage: File | null = null;
   userProfileDialog: boolean = false;
   imageUrl: string | null;
-  constructor(private UserService: UserService, private fb: FormBuilder, private messageService: MessageService, private spinner: NgxSpinnerService) {
+  constructor(private UserService: UserService, private fb: FormBuilder, private messageService: MessageService, private spinner: NgxSpinnerService,private location: Location) {
 
   }
   ngOnInit(): void {
@@ -195,6 +196,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   cancelProfileChanges() {
+        console.log("cancelDialog")
     // Reset form to original values
     this.UpdateUserProfileObj.patchValue({
       FirstName: this.userObj.data.firstName,
@@ -206,6 +208,7 @@ export class UserProfileComponent implements OnInit {
     this.imageUrl = this.userObj.data.profileImageUrl;
     this.selectedUserImage = null;
     this.submitUserProfileData = false;
+        this.location.back();
   }
   changePasswordDialogFun() {
     this.changePasswordDialog = true;

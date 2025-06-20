@@ -8,6 +8,8 @@ import { CategoryService } from '../../services/category.service';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { TableLoadingService } from 'src/app/core/services/table-loading.service';
 import { DataView } from 'primeng/dataview';
+import { SelectedFilter } from 'src/app/modules/admin/models/SelectedFilters';
+import { BooksService } from 'src/app/modules/books/services/books.service';
 
 @Component({
   selector: 'app-category-list',
@@ -37,10 +39,9 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
 
   searchTerm: string = '';
   filteredCategories: ICategory[] = [];
-
   @ViewChild('dv') dv: DataView | undefined;
 
-  constructor(
+  constructor(private BooksService:BooksService,
     private categoryServ: CategoryService,
     private messageService: MessageService,
     private formBuilder: FormBuilder,
@@ -78,7 +79,19 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
       }
     ];
   }
+ExportToExcel(){
 
+    this.categoryServ.ExportToExcel().subscribe(res => {
+      this.BooksService.downLoadFile(res, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "CategoryRecords.xlsx");
+    }, err => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed Export to Excel'
+      });
+    }
+    )
+}
   assignCurrentSelect(category: ICategory) {
     this.category = category;
   }

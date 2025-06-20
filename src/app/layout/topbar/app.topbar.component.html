@@ -5,7 +5,7 @@
         <span>LMS</span>
     </a>
 
-    <button #menubutton class="p-link layout-menu-button layout-topbar-button col-2"
+    <button *ngIf="this.user.role=='Admin'" #menubutton class="p-link layout-menu-button layout-topbar-button col-2"
         (click)="layoutService.onMenuToggle()">
         <i class="pi pi-bars"></i>
     </button>
