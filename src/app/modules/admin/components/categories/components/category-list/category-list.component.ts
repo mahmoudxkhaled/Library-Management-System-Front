@@ -2,7 +2,7 @@ import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit, View
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
-import { finalize, Subscription } from 'rxjs';
+import { finalize, first, Subscription } from 'rxjs';
 import { ICategory } from '../../models/ICategory';
 import { CategoryService } from '../../services/category.service';
 import { ApiResult } from 'src/app/core/models/ApiResult';
@@ -43,6 +43,7 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
   @ViewChild('dv') dv: DataView | undefined;
  categoryParams:categoryParams;
  TotalCount:number;
+ reloadObj={first:0,rows:12}
   constructor(private BooksService:BooksService,
     private categoryServ: CategoryService,
     private messageService: MessageService,
@@ -114,9 +115,7 @@ ExportToExcel(){
    loadCategories(event: any): void {
     this.tableLoadingSpinner = true;
     const first = event.first || 0;
-    const rows = event.rows || 12;
-    console.log("categoryParams ===>",this.categoryParams);
-    
+    const rows = event.rows || 12;    
     this.categoryServ.getCategoriesPaged(first, rows, this.categoryParams)
       .pipe(
         finalize(() => {
@@ -145,23 +144,8 @@ ExportToExcel(){
       });
   }
   onSearch() {
-    if (!this.searchTerm.trim()) {
-      this.filteredCategories = this.categories;
-      return;
-    }
-
-    const searchLower = this.searchTerm.toLowerCase();
-    this.filteredCategories = this.categories.filter(category =>
-      category.name.toLowerCase().includes(searchLower) ||
-      category.description.toLowerCase().includes(searchLower)
-    );
-
-    // Reset pagination to first page when searching
-    setTimeout(() => {
-      if (this.dv) {
-        this.dv.first = 0;
-      }
-    });
+     this.currentPage = 0;
+    this.loadCategories({first:0,rows:12});
   }
 
   //#region Add/Edit Category
@@ -218,8 +202,9 @@ ExportToExcel(){
               detail: this.isEditing ? 'Category Updated Successfully' : 'Category Added Successfully',
               life: 3000,
             });
-            this.currentPage=0;
-            this.loadCategories({ first: 0, rows: 12 });
+            if(!this.isEditing) this.currentPage=0;
+            
+            this.loadCategories({first:this.currentPage*12,rows:12});
             this.ref.detectChanges();
             this.initCategoryModelAndForm();
             this.categoryDialog = false;
@@ -272,6 +257,7 @@ ExportToExcel(){
               detail: 'Category Deleted Successfully',
               life: 3000,
             });
+            this.currentPage=0;
             this.loadCategories({ first: 0, rows: 12 });
             this.ref.detectChanges();
           } else {

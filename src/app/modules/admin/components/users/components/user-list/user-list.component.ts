@@ -58,13 +58,12 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   userTransactions: ITransaction[] = [];
   selectedFilters: SelectedFilter[]
   excelColumns: SelectedFilter[] = [{ name: "FirstName" }, { name: "LastName" }, { name: "Address" }, { name: "DateOfBirth" }, { name: "Email" }, { name: "PhoneNumber" }]
-
+  imageUrl:string='';
   // Status options for filtering
   statusOptions = [
     { label: 'Active', value: true },
     { label: 'Inactive', value: false }
   ];
-
   // Computed properties for statistics
   get totalUsers(): number {
     return this.users.length;
@@ -211,28 +210,38 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.selectedUserImage = null;
     this.userDialog = true;
   }
-  saveUser() {
+  saveUser() {    
     this.submitted = true;
     if (this.userForm.valid) {
       if (this.isEditing) {
-        // If editing, update user
-        // this.subs.add(
-        //   this.userServ.updateUser(formData).subscribe({
-        //     next: () => {
-        //       this.messageService.add({
-        //         severity: 'success',
-        //         summary: 'Successful',
-        //         detail: 'User Updated',
-        //         life: 3000,
-        //       });
-        //       this.loadUsers();
-        //       this.ref.detectChanges();
-        //       this.initUserModelAndForm();
-        //       this.userDialog = false;
-        //       this.isEditing = false;
-        //     },
-        //   })
-        // );
+       // If editing, update user
+      const formData = new FormData();
+            formData.append('Id', this.user.id);
+      formData.append('firstName', this.userForm.value.firstName);
+      formData.append('lastName', this.userForm.value.lastName);
+      formData.append('Email', this.userForm.value.email);
+      formData.append('Role', this.userForm.value.role);
+      formData.append('PhoneNumber', this.userForm.value.phoneNumber);      
+      if (this.selectedUserImage) {
+        formData.append('ProfileImageUrl', this.selectedUserImage, this.selectedUserImage.name);
+      
+        this.subs.add(
+          this.userServ.updateUser(formData).subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'User Updated',
+                life: 3000,
+              });
+              this.loadUsers();
+              this.ref.detectChanges();
+              this.initUserModelAndForm();
+              this.userDialog = false;
+              this.isEditing = false;
+            },
+          })
+        );
       } else {
         // If adding new user
         this.subs.add(
@@ -260,14 +269,11 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
         life: 3000,
       });
     }
-  }
+  }}
 
 
   declineAddUserDialog() {
-    this.submitted = false;
-    this.initUserModelAndForm();
-    this.userDialog = false;
-    this.isEditing = false;
+    this.closeDialog();
   }
   //#endregion
 
@@ -279,8 +285,7 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
   editUser(user: IUser) {
     this.isEditing = true;
     this.user = { ...user };
-    this.profileImageUrl = user.profileImageUrl ? user.profileImageUrl : '../../../../../assets/media/upload-photo.jpg';
-
+    this.imageUrl = user.profileImageUrl ? user.profileImageUrl : '../../../../../assets/media/upload-photo.jpg';
     this.userForm.patchValue({
       id: user.id,
       firstName: user.firstName,
@@ -292,7 +297,14 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     this.userDialog = true;
   }
-
+  private closeDialog(): void {
+    this.userDialog = false;
+    this.submitted = false;
+    this.isEditing = false;
+    this.selectedUserImage = null;
+    this.imageUrl = 'assets/media/upload-photo.jpg';
+    this.initUserModelAndForm();
+  }
   //#endregion
 
 
@@ -373,7 +385,7 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.selectedUserImage = input.files[0];
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.profileImageUrl = e.target.result;
+        this.imageUrl = e.target.result;
         this.ref.detectChanges();
       };
       reader.readAsDataURL(this.selectedUserImage);
