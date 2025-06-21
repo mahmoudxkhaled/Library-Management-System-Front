@@ -129,9 +129,7 @@
                         <ng-template pTemplate="body" let-user>
                             <tr class="table-row">
                                 <td class="name-cell" style="text-align: start;">
-                                    <div style="
-                                    justify-content: start;
-                                " class=" user-info">
+                                    <div style="justify-content: start; " class=" user-info">
                                         <div class="user-avatar">
                                             <img [alt]="user.firstName + ' ' + user.lastName"
                                                 [src]="user.profileImageUrl || 'assets/demo/images/avatar/amyelsner.png'"
@@ -331,18 +329,78 @@
 
 <!-- Add User Dialog -->
 <p-dialog [(visible)]="userDialog" [style]="{ width: '70%', maxHeight: '90vh' }"
-    [header]="isEditing ? 'Edit User' : 'Add New User'" [modal]="true" class="p-fluid enhanced-dialog">
+    [header]="isEditing ? 'Edit User' : 'Add New User'" [modal]="true" class="p-fluid enhanced-dialog"  (onHide)="declineAddUserDialog()"> 
     <ng-template pTemplate="content">
         <div class="dialog-content">
-            <form [formGroup]="userForm" (ngSubmit)="saveUser()">
-                <div class="grid">
+            <form [formGroup]="userForm" class="enhanced-form" (ngSubmit)="saveUser()">
+              <div class="dialog-content-wrapper">
+               <div class="image-section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="pi pi-image"></i>
+                        </div>
+                        <div class="section-title-group">
+                            <h3 class="section-title">User Photo</h3>
+                            <p class="section-subtitle">Upload a professional photo of the User</p>
+                        </div>
+                    </div>
+
+                    <div class="image-upload-container" (click)="triggerImageUpload()">
+                        <div class="image-preview-wrapper">
+                            <img [src]="imageUrl" alt="Author Photo Preview" class="upload-preview-image"
+                                [ngClass]="{'has-image': imageUrl !== '../../../../../assets/media/upload-photo.jpg'}" />
+
+                            <div class="upload-overlay"
+                                [ngClass]="{'hidden': imageUrl !== '../../../../../assets/media/upload-photo.jpg'}">
+                                <div class="upload-content">
+                                    <div class="upload-icon">
+                                        <i class="pi pi-cloud-upload"></i>
+                                    </div>
+                                    <h4>Upload User Photo</h4>
+                                    <p>Click to browse or drag image here</p>
+                                    <div class="upload-specs">
+                                        <span class="spec-item">
+                                            <i class="pi pi-check-circle"></i> JPG, PNG, WebP
+                                        </span>
+                                        <span class="spec-item">
+                                            <i class="pi pi-check-circle"></i> Max 5MB
+                                        </span>
+                                        <span class="spec-item">
+                                            <i class="pi pi-check-circle"></i> 800x500px recommended
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="upload-actions" *ngIf="imageUrl !== 'assets/media/upload-photo.jpg'">
+                            <button type="button" class="change-image-btn" (click)="triggerImageUpload()">
+                                <i class="pi pi-refresh"></i> Change Photo
+                            </button>
+                        </div>
+                    </div>
+
+                    <input type="file" id="myUserImage" style="display: none" accept="image/*"
+                        (change)="handleImageSelection($event)" />
+                </div>
+                <div class="form-section category-info-section">
+                     <div class="section-header">
+                        <div class="section-icon">
+                            <i class="pi pi-user"></i>
+                        </div>
+                        <div class="section-title-group">
+                            <h3 class="section-title">User Information</h3>
+                            <p class="section-subtitle">Fill in the essential details about the User</p>
+                        </div>
+                    </div>
+                <div class="grid">                 
                     <div class="col-12 md:col-6">
                         <div class="field">
                             <label for="role" class="field-label">
                                 <i class="pi pi-users field-icon"></i>
                                 Role
                             </label>
-                            <p-dropdown [options]="roles" formControlName="role" optionLabel="name" optionValue="id"
+                            <p-dropdown [options]="roles" formControlName="role" optionLabel="name" optionValue="name"
                                 placeholder="Select Role" class="enhanced-dropdown"></p-dropdown>
                             <small *ngIf="submitted && !userForm.controls['role'].valid" class="error-message">
                                 <i class="pi pi-exclamation-triangle"></i>
@@ -405,6 +463,8 @@
                         </div>
                     </div>
                 </div>
+                </div>
+              </div>
             </form>
         </div>
     </ng-template>

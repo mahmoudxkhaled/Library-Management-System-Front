@@ -55,7 +55,7 @@ export class UserService {
   }
 
   updateUser(request: FormData): Observable<ApiResult> {
-    return this.apiService.putRequest<ApiResult>('/User/UpdateUser', request);
+    return this.apiService.putRequest<ApiResult>('/User/admin', request);
   }
 
   deleteUser(id: string): Observable<ApiResult> {
@@ -74,6 +74,6 @@ export class UserService {
   }
   UpdateUserProfile(UpdateUserProfile:any)
   {    
-    return this.apiService.putRequest<ApiResult>('/User', UpdateUserProfile);
+    return this.apiService.putRequest<ApiResult>('/User/Profile', UpdateUserProfile);
   }
 }
