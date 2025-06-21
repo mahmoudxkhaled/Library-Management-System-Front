@@ -169,12 +169,12 @@
                         </td>
                         <td class="date-cell">
                             <div class="date-info">
-                                <i class="pi pi-calendar-plus date-icon"></i>
+                                <i *ngIf="book.issueDate" class="pi pi-calendar-plus date-icon"></i>
                                 <span>{{book.issueDate | date: 'MMM dd, yyyy'}}</span>
                             </div>
                         </td>
                         <td class="date-cell">
-                            <div class="date-info" [ngClass]="{'overdue-warning': isOverdue(book.dueDate)}">
+                            <div class="date-info" *ngIf="book.dueDate" [ngClass]="{'overdue-warning': isOverdue(book.dueDate)}">
                                 <i class="pi pi-clock date-icon"
                                     [ngClass]="{'text-red-500': isOverdue(book.dueDate)}"></i>
                                 <span [ngClass]="{'text-red-500 font-semibold': isOverdue(book.dueDate)}">{{book.dueDate
@@ -183,7 +183,7 @@
                         </td>
                         <td class="date-cell">
                             <div class="date-info">
-                                <i class="pi pi-calendar-minus date-icon"></i>
+                                <i *ngIf="book.returnDate" class="pi pi-calendar-minus date-icon"></i>
                                 <span>{{book.returnDate | date: 'MMM dd, yyyy'}}</span>
                             </div>
                         </td>
