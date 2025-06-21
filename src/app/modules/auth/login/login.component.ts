@@ -41,9 +41,14 @@ export class LoginComponent {
                 next: (result) => {
                     if (result.isSuccess) {
                         this.userService.updateLoggedUser(result.data);
-                        if (result.data.role == "Admin" || result.data.role == "Librarian") {
-                            this.router.navigate(['/admin/dashboard']);
-                        } else {
+                        if (result.data.role == "Admin") {
+                            this.router.navigate(['/admin/dashboard']);                      
+                        } 
+                        else if(result.data.role == "Librarian")
+                            {
+                             this.router.navigate(['/admin/transactions']);                      
+                            }
+                        else {
                             this.router.navigate(['/Books']);
                         }
                     } else {

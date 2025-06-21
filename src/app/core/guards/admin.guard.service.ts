@@ -16,7 +16,7 @@ export class AdminGuard implements CanActivate {
         const user = JSON.parse(userData);
         const currentTime = Math.floor(Date.now() / 1000); // Convert milliseconds to seconds
   
-        if (user.role == "Admin") {
+        if (user.role == "Admin"|| user.role == "Librarian") {
           return true; // User is authenticated
         }
       }

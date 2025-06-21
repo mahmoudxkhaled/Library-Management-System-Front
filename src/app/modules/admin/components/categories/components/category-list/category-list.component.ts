@@ -2,7 +2,7 @@ import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit, View
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
-import { Subscription } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { ICategory } from '../../models/ICategory';
 import { CategoryService } from '../../services/category.service';
 import { ApiResult } from 'src/app/core/models/ApiResult';
@@ -10,6 +10,7 @@ import { TableLoadingService } from 'src/app/core/services/table-loading.service
 import { DataView } from 'primeng/dataview';
 import { SelectedFilter } from 'src/app/modules/admin/models/SelectedFilters';
 import { BooksService } from 'src/app/modules/books/services/books.service';
+import { categoryParams } from '../../models/categoryParams';
 
 @Component({
   selector: 'app-category-list',
@@ -36,11 +37,12 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
   imageUrl: string = '../../../../../assets/media/upload-photo.jpg';
 
   menuItems: MenuItem[] = [];
-
+  currentPage: number = 0;
   searchTerm: string = '';
   filteredCategories: ICategory[] = [];
   @ViewChild('dv') dv: DataView | undefined;
-
+ categoryParams:categoryParams;
+ TotalCount:number;
   constructor(private BooksService:BooksService,
     private categoryServ: CategoryService,
     private messageService: MessageService,
@@ -56,15 +58,22 @@ export class CategoryListComponent implements OnInit, AfterViewChecked, OnDestro
   }
 
   ngOnInit() {
-    this.loadCategories();
-
+    this.initializeParams();
+    this.loadCategories({ first: 0, rows: 12 });
     this.tableLoadingService.loading$.subscribe((isLoading) => {
       this.tableLoadingSpinner = isLoading;
     });
 
     this.initializeMenuItems();
   }
-
+ private initializeParams(): void {
+    this.categoryParams = {
+      search: '',
+      sortField: 'FullName',
+      sortOrder: 1,
+      isActive: null
+    };
+  }
   initializeMenuItems() {
     this.menuItems = [
       {
@@ -96,20 +105,45 @@ ExportToExcel(){
     this.category = category;
   }
 
-  loadCategories() {
-    this.tableLoadingService.show();
-    this.subs.add(
-      this.categoryServ.getAllCategories().subscribe((data) => {
-        if (data.isSuccess) {
-          this.categories = data.data;
-          this.filteredCategories = this.categories;
-        }
-        this.ref.detectChanges();
-        this.tableLoadingService.hide();
-      })
-    );
-  }
 
+   onPageChange(event: any): void {
+    this.currentPage = Math.floor(event.first / event.rows);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.loadCategories(event);
+  }
+   loadCategories(event: any): void {
+    this.tableLoadingSpinner = true;
+    const first = event.first || 0;
+    const rows = event.rows || 12;
+    console.log("categoryParams ===>",this.categoryParams);
+    
+    this.categoryServ.getCategoriesPaged(first, rows, this.categoryParams)
+      .pipe(
+        finalize(() => {
+          this.tableLoadingSpinner = false;
+          this.ref.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (authorResult) => {
+          if (authorResult && authorResult.data) {
+            this.categories = authorResult.data.result;
+            this.TotalCount = authorResult.data.totalCount;
+            console.log('categories loaded:', this.categories);
+            this.tableLoadingSpinner = false;
+            this.ref.detectChanges();
+          }
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load categories',
+            life: 3000
+          });
+        }
+      });
+  }
   onSearch() {
     if (!this.searchTerm.trim()) {
       this.filteredCategories = this.categories;
@@ -184,7 +218,8 @@ ExportToExcel(){
               detail: this.isEditing ? 'Category Updated Successfully' : 'Category Added Successfully',
               life: 3000,
             });
-            this.loadCategories();
+            this.currentPage=0;
+            this.loadCategories({ first: 0, rows: 12 });
             this.ref.detectChanges();
             this.initCategoryModelAndForm();
             this.categoryDialog = false;
@@ -237,7 +272,7 @@ ExportToExcel(){
               detail: 'Category Deleted Successfully',
               life: 3000,
             });
-            this.loadCategories();
+            this.loadCategories({ first: 0, rows: 12 });
             this.ref.detectChanges();
           } else {
             this.messageService.add({
@@ -246,7 +281,6 @@ ExportToExcel(){
               detail: 'Cannot delete because there are books associated with this category',
               life: 5000,
             });
-            this.loadCategories();
             this.ref.detectChanges();
           }
         },

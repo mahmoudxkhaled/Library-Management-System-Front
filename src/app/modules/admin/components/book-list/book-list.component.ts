@@ -120,8 +120,8 @@ export class BookListComponent implements OnInit, AfterViewChecked, OnDestroy {
       })
     );
   }
-  ExportToExcel() {
-    if (this.selectedFilters === undefined) {
+  ExportToExcel() {    
+    if (this.selectedFilters === undefined || this.selectedFilters.length==0) {
       this.messageService.add({
         severity: 'error',
         summary: 'Export Requirements',

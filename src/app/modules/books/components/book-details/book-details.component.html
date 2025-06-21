@@ -165,7 +165,7 @@
             <button pButton type="button" label="Submit Review" (click)="submitReview()"
                 [disabled]="!rating || !feedback.trim()">
             </button>
-            <div class="flex align-items-center justify-content-center">
+            <div [disabled]="!bookDetails.isBorrowed" class="flex align-items-center justify-content-center">
                 <p>Only users who have borrowed this book may submit reviews.</p>
             </div>
         </div>

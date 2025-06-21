@@ -1,44 +1,62 @@
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { LayoutService } from '../service/app.layout.service';
+import { BookService } from 'src/app/modules/admin/services/book.service';
+import { BooksService } from 'src/app/modules/books/services/books.service';
+import { UserService } from 'src/app/modules/admin/components/users/services/user.service';
+import { IUserLogged } from 'src/app/modules/admin/components/users/models/UserLogged';
 
 @Component({
     selector: 'app-menu',
     templateUrl: './app.menu.component.html'
 })
 export class AppMenuComponent implements OnInit {
-
+    
     AllMenu: MenuModel[] = [];
     allowedMenu: MenuModel[] = [];
     loggedUserRole: string = '';
-    constructor(public layoutService: LayoutService) {
-        let userData: any = localStorage.getItem('userData');
-        if (userData) {
-            const user = JSON.parse(userData);
-            this.loggedUserRole = user?.role;
-        }
+    user:IUserLogged
+    constructor(public layoutService: LayoutService,private UserService:UserService) {
+        let userData: any ;
+        this.UserService.currentUser$.subscribe(userData=>{
+             this.user=userData;
+            this.loggedUserRole=this.user.role;
+            }
+        );        
     }
 
     ngOnInit() {
         this.AllMenu = [
             {
                 label: 'LMS Admin MENU',
-                allowedUsers: ["Admin", "Librarian"],
+                allowedUsers: ["Admin",],
                 items: [
-                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['admin/dashboard'] },
+                  { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['admin/dashboard']},
                     { label: 'Books List', icon: 'pi pi-fw pi-book', routerLink: ['admin/Books'] },
                     { label: 'Categories List', icon: 'pi pi-fw pi-tags', routerLink: ['admin/categories'] },
                     { label: 'Transactions List', icon: 'pi pi-fw pi-credit-card', routerLink: ['admin/transactions'] },
                     { label: 'Users List', icon: 'pi pi-fw pi-users', routerLink: ['admin/users'] },
                     { label: 'Authors', icon: 'pi pi-fw pi-user', routerLink: ['admin/authors'] },
+                   { label: 'Books', icon: 'pi pi-fw pi-book', routerLink: ['/Books'] }
                 ]
             },
             {
                 label: 'Website',
-                allowedUsers: ["Admin", "Member"],
+                allowedUsers: ["Member"],
                 items: [
                     // { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Books', icon: 'pi pi-fw pi-book', routerLink: ['/Books'] }
+                ]
+            },
+             {
+                label: 'Website',
+                allowedUsers: ["Librarian"],
+                items: [
+                      { label: 'Books List', icon: 'pi pi-fw pi-book', routerLink: ['admin/Books'] },
+                    { label: 'Categories List', icon: 'pi pi-fw pi-tags', routerLink: ['admin/categories'] },
+                    { label: 'Transactions List', icon: 'pi pi-fw pi-credit-card', routerLink: ['admin/transactions'] },
+                    { label: 'Authors', icon: 'pi pi-fw pi-user', routerLink: ['admin/authors'] },
+                   { label: 'Books', icon: 'pi pi-fw pi-book', routerLink: ['/Books'] }
                 ]
             },
             // {

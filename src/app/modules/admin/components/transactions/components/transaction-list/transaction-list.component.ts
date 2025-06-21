@@ -94,7 +94,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   }
 
   ExportToExcel() {
-    if (this.selectedFilters === undefined) {
+    if (this.selectedFilters === undefined || this.selectedFilters.length==0) {
       this.messageService.add({
         severity: 'error',
         summary: 'Export Requirements',

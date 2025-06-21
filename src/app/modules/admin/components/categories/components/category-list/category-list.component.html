@@ -34,11 +34,11 @@
             message="Loading your category collection..."></app-loading-state>
 
         <!-- Categories Grid -->
-        <p-dataView #dv [value]="filteredCategories" [paginator]="true" [rows]="12" layout="grid"
-            *ngIf="!tableLoadingSpinner" class="categories-grid">
+        <p-dataView #dv [value]="categories" [paginator]="true" [rows]="12" layout="grid" [totalRecords]="TotalCount" [lazy]="true" (onPage)="onPageChange($event)" 
+         [first]="currentPage * 12"  *ngIf="!tableLoadingSpinner" class="categories-grid">
             <ng-template pTemplate="grid">
                 <div class="grid-container">
-                    <div class="category-card" *ngFor="let category of filteredCategories">
+                    <div class="category-card" *ngFor="let category of categories">
                         <!-- Category Image Container -->
                         <div class="category-image-container" (click)="editCategory(category)">
                             <img [src]="category.imageUrl ?? 'assets/media/dummy-photo-list.jpg'" [alt]="category.name"

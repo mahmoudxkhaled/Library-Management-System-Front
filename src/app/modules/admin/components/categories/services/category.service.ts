@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { ApiResult } from 'src/app/core/models/ApiResult';
 import { ApiService } from 'src/app/core/services/api-service.service';
 import { SelectedFilter } from '../../../models/SelectedFilters';
+import { categoryParams } from '../models/categoryParams';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,10 @@ import { SelectedFilter } from '../../../models/SelectedFilters';
 export class CategoryService {
 
   constructor(private apiService: ApiService) { }
-
+getCategoriesPaged(first:number,rows:number,categoryParams:categoryParams):Observable<ApiResult>
+{ 
+       return this.apiService.postRequest<ApiResult>(`/Category/${first}/${rows}`,categoryParams)     
+}
   getAllCategories(): Observable<ApiResult> {
     return this.apiService.getAllRequest<ApiResult>('/Category/GetAllCategories');
   }

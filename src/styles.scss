@@ -19,6 +19,11 @@ $gutter: 1rem; //for primeflex grid system
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 10px;
+  border-radius: 15px;
+}
+.User-info{
+  display: flex;
 }
 .user-info:hover{
   cursor: pointer;
@@ -66,6 +71,68 @@ $gutter: 1rem; //for primeflex grid system
   .image-upload-container:hover .upload-hover-text {
     opacity: 1;  
   }
+  .sub-menu-wrap{
+    display: none;
+     z-index: 1000;  
+    position: absolute;
+    top:100%;
+    right: 0px;
+    width: 250px;
+  }
+  .sub-menu{
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 20px;
+    margin-top: -5px;
+    margin-right: 10px;
+  }
+  .User-info{
+    display: flex;
+    align-items: center;
+  }
+  .User-info h3{
+    font-weight: 500px;
+  }
+  .User-info img{
+    width: 80px;
+    border-radius: 50%;
+    margin-right: 15px;
+  }
+  .sub-menu-link{
+    display: flex;
+    align-items: center;
+    color: #525252;
+    margin: 12px 0;
+    cursor: pointer;
+  }
+  .sub-menu-link p{
+    width: 100%;
+  }
+  .sub-menu-link .img{
+    width: 40px;
+    background: #e5e5e5;
+    padding: 8px;
+    margin-right: 15px;
+  }
+  .sub-menu-link span{
+    font-size: 22px;
+    transition: transform 0.5s;
+  }
+  .sub-menu-link:hover span{
+    transform: translateX(5px);
+  }
+  .sub-menu-link:hover span,p{
+    font-weight: 600;
+  }
+  .user-info:hover .sub-menu-wrap{
+    display: block;
+  }
+   .sub-menu-wrap:hover{
+    display: block;
+  }
+  .user-info:hover{
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  }
+  
   
  
  
