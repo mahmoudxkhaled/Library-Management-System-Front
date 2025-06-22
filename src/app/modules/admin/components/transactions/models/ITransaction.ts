@@ -13,10 +13,10 @@ export interface ITransaction {
     isActive: boolean;
     userFullName:string;
     bookName:string;
+    borrowDays:number;
 }
 
 export interface ITransactionDetails extends ITransaction {
-    borrowDays:number;
     issuedByUser:string;
     returnNotes:string;
     returnedByUser:string;

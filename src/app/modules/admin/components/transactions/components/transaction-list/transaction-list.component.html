@@ -204,7 +204,7 @@
                                 <button pButton icon="pi pi-info-circle" title="Details" class="action-btn details-btn"
                                     (click)="getDetails(book.id)"></button>
                                 <button pButton *ngIf="book.status == 'Pending'" icon="pi pi-plus" title="Issue Book"
-                                    class="action-btn issue-btn" (click)="issueBook(book.id)"></button>
+                                    class="action-btn issue-btn" (click)="issueBook(book.id,book.borrowDays)"></button>
                                 <button pButton *ngIf="book.status == 'Issued' || book.status == 'Overdue'"
                                     icon="pi pi-undo" title="Return Book" class="action-btn return-btn"
                                     (click)="returnBook(book.id)"></button>
@@ -412,6 +412,13 @@
         <form [formGroup]="issueBookForm" (ngSubmit)="confirmIssueBook()">
             <div class="col-12">
                 <div class="grid formgrid p-fluid">
+                    
+                    <div class="md:col-6">
+                        <div class="mt-5 field col-12 md:col-12">
+                            <span><b>Borrow Days :</b> {{issueBookBorrowDays}}</span>
+
+                        </div>
+                    </div>
                     <div class="md:col-6">
                         <div class="field col-12 md:col-12">
                             <label for="issueDate" class="font-medium text-900">Issue Date</label>

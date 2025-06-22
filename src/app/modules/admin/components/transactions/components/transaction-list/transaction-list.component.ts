@@ -53,6 +53,7 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   selectedFilters: SelectedFilter[]
   excelColumns: SelectedFilter[] = [{ name: "Book" }, { name: "User" }, { name: "RequestDate" }, { name: "IssueDate" }, { name: "DueDate" }, { name: "ReturnDate" }, { name: "Status" }, { name: "IssuedByUser" }, { name: "ReturnedByUser" }]
 
+  issueBookBorrowDays: number = 0;
   // Computed properties for statistics
   get totalTransactions(): number {
     return this.transactions.length;
@@ -229,7 +230,8 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
     this.issueBookDialog = false;
     this.submitted = false;
   }
-  issueBook(transactionId: string) {
+  issueBook(transactionId: string,borrowDays: number) {
+    this.issueBookBorrowDays = borrowDays;
     this.submitted = false;
     this.issueBookDialog = true;
     this.issueBookForm = this.formBuilder.group({
