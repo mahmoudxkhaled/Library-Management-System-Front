@@ -43,7 +43,7 @@ export class UserProfileComponent implements OnInit {
   selectedUserImage: File | null = null;
   userProfileDialog: boolean = false;
   imageUrl: string | null;
-  constructor(private UserService: UserService, private fb: FormBuilder, private messageService: MessageService, private spinner: NgxSpinnerService,private location: Location) {
+  constructor(private UserService: UserService, private fb: FormBuilder, private messageService: MessageService, private spinner: NgxSpinnerService, private location: Location) {
 
   }
   ngOnInit(): void {
@@ -158,7 +158,9 @@ export class UserProfileComponent implements OnInit {
       UpdateUserProfile.append('DateOfBirth', new DatePipe('en-US').transform(this.DateOfBirth.value, 'yyyy-MM-dd'));
     UpdateUserProfile.append('Address', this.Address.value);
     if (this.selectedUserImage != null)
-      UpdateUserProfile.append('profileImageUrl', this.selectedUserImage, this.selectedUserImage.name);
+      UpdateUserProfile.append('profileImage', this.selectedUserImage, this.selectedUserImage.name);
+
+
 
     this.UserService.UpdateUserProfile(UpdateUserProfile).subscribe(res => {
       this.messageService.add({
@@ -196,7 +198,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   cancelProfileChanges() {
-        console.log("cancelDialog")
+    console.log("cancelDialog")
     // Reset form to original values
     this.UpdateUserProfileObj.patchValue({
       FirstName: this.userObj.data.firstName,
@@ -208,7 +210,7 @@ export class UserProfileComponent implements OnInit {
     this.imageUrl = this.userObj.data.profileImageUrl;
     this.selectedUserImage = null;
     this.submitUserProfileData = false;
-        this.location.back();
+    this.location.back();
   }
   changePasswordDialogFun() {
     this.changePasswordDialog = true;
