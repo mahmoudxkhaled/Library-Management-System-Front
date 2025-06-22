@@ -37,7 +37,7 @@
                         placeholder="Select columns for export" class="enhanced-multiselect" />
                 </div>
                 <div class="export-button">
-                    <button pButton pRipple label="Send overdue notification" icon="pi pi-bell" class="return-btn mr-2"
+                    <button *ngIf="isAdminOnly()" pButton pRipple label="Send overdue notification" icon="pi pi-bell" class="return-btn mr-2"
                         (click)="sendOverdueNotification()"></button>
                     <button pButton pRipple label="Export to Excel" icon="pi pi-file-excel" class="export-btn"
                         (click)="ExportToExcel()"></button>

@@ -418,4 +418,15 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
   getDateNow(){
     return new Date();
   }
+
+  isAdminOnly(): boolean{
+    let userData : any  = localStorage.getItem('userData');
+    if (userData) {
+        const user = JSON.parse(userData);  
+        if (user.role == "Admin") {
+          return true; 
+        }
+      }
+      return false;
+  }
 }
