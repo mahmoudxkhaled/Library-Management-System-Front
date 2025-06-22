@@ -44,4 +44,10 @@ export class TransactionService {
   returnBook(request: FormData): Observable<ApiResult> {
     return this.apiService.postRequest<ApiResult>(`/Transaction/ReturnBook`, request);
   }
+  sendReturnReminder(transactionId:string): Observable<ApiResult> {
+    return this.apiService.postRequest<ApiResult>(`/Transaction/send-issued-book-reminder/${transactionId}`, {});
+  }
+  sendOverdueNotifications(): Observable<ApiResult> {
+    return this.apiService.postRequest<ApiResult>(`/Transaction/SendOverdueNotifications`, {});
+  }
 }

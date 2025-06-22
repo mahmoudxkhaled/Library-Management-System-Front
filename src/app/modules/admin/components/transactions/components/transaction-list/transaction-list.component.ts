@@ -354,4 +354,68 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
     table.clear();
     this.filter.nativeElement.value = '';
   }
+
+  sendReturnReminder(id:string) {
+    this.loading = true;
+    this.transactionServ.sendReturnReminder(id).subscribe({
+        next: (res) => {
+          this.loading = false;
+          if (res.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: res.message
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: res.message || 'Failed to send reminder'
+            });
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Error sending reminder:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message ? error.error.message : 'Failed to send reminder'
+          });
+        }
+      });
+  }
+  sendOverdueNotification(){
+    this.loading = true;
+    this.transactionServ.sendOverdueNotifications().subscribe({
+        next: (res) => {
+          this.loading = false;
+          if (res.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: res.message
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: res.message || 'Failed to send Overdue notification'
+            });
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Error sending reminder:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message ? error.error.message : 'Failed to send Overdue notification'
+          });
+        }
+      });
+  }
+  getDateNow(){
+    return new Date();
+  }
 }
