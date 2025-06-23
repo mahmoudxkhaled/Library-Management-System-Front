@@ -400,6 +400,7 @@
                                 <i class="pi pi-users field-icon"></i>
                                 Role
                             </label>
+                       
                             <p-dropdown [options]="roles" formControlName="role" optionLabel="name" optionValue="name"
                                 placeholder="Select Role" class="enhanced-dropdown"></p-dropdown>
                             <small *ngIf="submitted && !userForm.controls['role'].valid" class="error-message">
@@ -673,3 +674,4 @@
         </div>
     </ng-template>
 </p-dialog>
+        <p-toast></p-toast>
