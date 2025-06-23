@@ -417,8 +417,12 @@ export class TransactionListComponent implements OnInit, AfterViewChecked, OnDes
         }
       });
   }
-  getDateNow(){
-    return new Date();
+  showReminderbtn(transaction:ITransaction): boolean{
+    if(transaction.status == 'Issued' && 
+      transaction.dueDate &&
+      new Date(transaction.dueDate).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0))
+      return true;
+    return false;
   }
 
   isAdminOnly(): boolean{

@@ -209,7 +209,7 @@
                                     icon="pi pi-undo" title="Return Book" class="action-btn return-btn"
                                     (click)="returnBook(book.id)"></button>
 
-                                <button pButton *ngIf="book.status == 'Issued' && book.issueDate && book.issueDate >= getDateNow()"
+                                <button pButton *ngIf="showReminderbtn(book)"
                                     icon="pi pi-bell" title="Return Reminder" class="action-btn return-btn"
                                     (click)="sendReturnReminder(book.id)"></button>
                             </div>
