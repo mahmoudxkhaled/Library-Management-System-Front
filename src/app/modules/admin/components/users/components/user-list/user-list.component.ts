@@ -211,20 +211,20 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.userDialog = true;
   }
   saveUser() {    
+    console.log("this.selectedUserImage==> ",this.selectedUserImage);
+    
     this.submitted = true;
     if (this.userForm.valid) {
       if (this.isEditing) {
        // If editing, update user
       const formData = new FormData();
             formData.append('Id', this.user.id);
-      formData.append('firstName', this.userForm.value.firstName);
-      formData.append('lastName', this.userForm.value.lastName);
+      formData.append('FirstName', this.userForm.value.firstName);
+      formData.append('LastName', this.userForm.value.lastName);
       formData.append('Email', this.userForm.value.email);
       formData.append('Role', this.userForm.value.role);
       formData.append('PhoneNumber', this.userForm.value.phoneNumber);      
-      if (this.selectedUserImage) {
-        formData.append('ProfileImageUrl', this.selectedUserImage, this.selectedUserImage.name);
-      
+      if (this.selectedUserImage) {  formData.append('ProfileImageUrl', this.selectedUserImage, this.selectedUserImage.name);}      
         this.subs.add(
           this.userServ.updateUser(formData).subscribe({
             next: () => {
@@ -244,8 +244,18 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
         );
       } else {
         // If adding new user
-        this.subs.add(
-          this.userServ.addUser(this.userForm.value).subscribe({
+      const userData = new FormData();
+       userData.append('FirstName', this.userForm.value.firstName);
+      userData.append('LastName', this.userForm.value.lastName);
+      userData.append('Email', this.userForm.value.email);
+      userData.append('Role', this.userForm.value.role);
+      userData.append('PhoneNumber', this.userForm.value.phoneNumber);      
+      if (this.selectedUserImage) {  
+        console.log("adding");
+        
+        userData.append('ProfileImageUrl', this.selectedUserImage, this.selectedUserImage.name);} 
+        this.subs.add(     
+          this.userServ.addUser(userData).subscribe({
             next: () => {
               this.messageService.add({
                 severity: 'success',
@@ -257,11 +267,26 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
               this.ref.detectChanges();
               this.initUserModelAndForm();
               this.userDialog = false;
-            },
-          })
-        );
+            },error:(err)=>{
+                          
+             const serverErrors = err?.error?.errorList; 
+          if (Array.isArray(serverErrors)) {
+            serverErrors.forEach(error => {
+              if (error.key ==="DuplicateEmail") {
+                 this.messageService.add({
+                  severity: 'error',
+                  summary: 'Duplicate Email',
+                  detail: 'This email already exists. Please choose a different one',
+                  life: 3000,
+                });
+              }})
+              }
+                
+            }
+          }))
+      
       }
-    } else {
+     } else {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -269,7 +294,8 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
         life: 3000,
       });
     }
-  }}
+
+}
 
 
   declineAddUserDialog() {
@@ -291,6 +317,7 @@ export class UserListComponent implements OnInit, AfterViewChecked, OnDestroy {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      phoneNumber:user.phoneNumber,
       role: user.role,
       isActive: user.isActive
     });
